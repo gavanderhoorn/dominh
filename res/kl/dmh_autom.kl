@@ -1,0 +1,117 @@
+
+-- Copyright (c) 2020, G.A. vd. Hoorn
+--
+-- Licensed under the Apache License, Version 2.0 (the "License");
+-- you may not use this file except in compliance with the License.
+-- You may obtain a copy of the License at
+--
+--     http://www.apache.org/licenses/LICENSE-2.0
+--
+-- Unless required by applicable law or agreed to in writing, software
+-- distributed under the License is distributed on an "AS IS" BASIS,
+-- WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+-- See the License for the specific language governing permissions and
+-- limitations under the License.
+
+
+PROGRAM dmh_autom
+--------------------------------------------------------------------------------
+--
+-- Returns whether the controller is in AUTO mode
+--
+-- author: G.A. vd. Hoorn
+--
+--------------------------------------------------------------------------------
+%ALPHABETIZE
+%COMMENT = 'DOMINH//r1'
+%NOBUSYLAMP
+%NOLOCKGROUP
+%NOPAUSE = COMMAND + TPENABLE + ERROR
+%INVISIBLE
+
+
+
+
+--------------------------------------------------------------------------------
+--
+-- remote types & constants
+--
+--------------------------------------------------------------------------------
+
+
+
+
+--------------------------------------------------------------------------------
+--
+-- local types & constants
+--
+--------------------------------------------------------------------------------
+CONST
+	RESP_FILE    = 'TD:\RESPONSE.HTM'
+	RESP_OMODE   = 'RW'
+
+
+
+
+--------------------------------------------------------------------------------
+--
+-- local variables
+--
+--------------------------------------------------------------------------------
+VAR
+	fd_          : FILE
+	stat_        : INTEGER
+
+
+
+
+--------------------------------------------------------------------------------
+--
+-- remote routine prototypes
+--
+--------------------------------------------------------------------------------
+
+
+
+
+--------------------------------------------------------------------------------
+--
+-- local routine(s) (prototypes)
+--
+--------------------------------------------------------------------------------
+
+
+
+
+--------------------------------------------------------------------------------
+--
+-- Body
+--
+--------------------------------------------------------------------------------
+BEGIN
+	OPEN FILE fd_(RESP_OMODE, RESP_FILE)
+	stat_ = IO_STATUS(fd_)
+	IF (stat_ <> 0) THEN
+		-- TODO: post some error/warning using POST_ERR
+		GOTO lbl_exit0
+	ENDIF
+
+	-- write out response document
+	WRITE fd_('{ "in_auto_mode" : ')
+
+	-- BOOLEANs stringify to uppercase TRUE and FALSE, so we can't just
+	-- use WRITE to stringify it for us.
+	IF IN_AUTO_MODE THEN
+		WRITE fd_('true')
+	ELSE
+		WRITE fd_('false')
+	ENDIF
+
+	WRITE fd_(', "success" : true ')
+
+	-- end of dict (and of file)
+	WRITE fd_('}', CR)
+
+lbl_exit0::
+	CLOSE FILE fd_
+END dmh_autom

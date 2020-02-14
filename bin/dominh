@@ -1,0 +1,68 @@
+#!/usr/bin/env python3
+
+# Copyright (c) 2020, G.A. vd. Hoorn
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+# author: G.A. vd. Hoorn
+
+
+"""
+usage: dominh [--no-upload] [--version] [--help] <command> [<args>...]
+
+options:
+  -h --help       Show this screen.
+  -n --no-upload  Don't upload the helpers (for instance because they have
+                  already been uploaded by a previous invocation).
+  --version       Print version and exit.
+
+Available commands:
+
+   reset          Attempt to reset the controller
+   read           Read from supported IO ports
+   write          Write to supported IO ports
+   get            Retrieve the value of a scalar system variable
+
+See 'dominh help <command>' for more information on a specific command.
+
+"""
+
+from docopt import docopt
+
+
+if __name__ == '__main__':
+    args = docopt(__doc__, version='dominh 0.1.1', options_first=True)
+    argv = [args['<command>']] + args['<args>']
+
+    #print(args)
+
+    skip_upload=args['--no-upload']
+
+    if args['<command>'] == 'reset':
+        from dominh.tool import dominh_reset
+        dominh_reset.main(argv=argv)
+
+    elif args['<command>'] == 'read':
+        from dominh.tool import dominh_read
+        dominh_read.main(argv=argv, skip_upload=skip_upload)
+
+    elif args['<command>'] == 'write':
+        from dominh.tool import dominh_write
+        dominh_write.main(argv=argv, skip_upload=skip_upload)
+
+    elif args['<command>'] == 'get':
+        from dominh.tool import dominh_get
+        dominh_get.main(argv=argv, skip_upload=skip_upload)
+
+    else:
+        exit("%r is not a dominh command. See 'dominh help'." % args['<command>'])
