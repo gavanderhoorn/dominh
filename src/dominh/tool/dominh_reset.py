@@ -49,7 +49,8 @@ def main(argv):
         c.reset()
 
         if (args['--verify']):
-          sys.exit(1 if c.is_faulted() else 0)
+            sys.exit(1 if c.is_faulted() else 0)
         sys.exit(0)
     except exceptions.ConnectionError as e:
-        sys.stderr.write("Error trying to connect to the controller: {}\n".format(e))
+        sys.stderr.write(
+            "Error trying to connect to the controller: {}\n".format(e))

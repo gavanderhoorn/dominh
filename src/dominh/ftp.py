@@ -19,7 +19,6 @@
 import ftplib
 
 from io import BytesIO
-from os import path
 
 
 class FtpClient():

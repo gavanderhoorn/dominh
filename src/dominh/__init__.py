@@ -16,3 +16,5 @@
 # author: G.A. vd. Hoorn
 
 from . client import Client, DominhException
+
+__all__ = ['Client', 'DominhException', ]

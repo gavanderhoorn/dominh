@@ -53,9 +53,10 @@ def main(argv, skip_upload=False):
         valp = 1 if val == 'ON' else 0
         if status:
             sys.exit(valp)
-        print (valp)
+        print(valp)
 
     except (exceptions.ConnectionError, OSError) as e:
-        sys.stderr.write("Error trying to connect to the controller: {}\n".format(e))
+        sys.stderr.write(
+            "Error trying to connect to the controller: {}\n".format(e))
     except DominhException as e:
         sys.stderr.write("Error during read: {}\n".format(e))

@@ -22,16 +22,16 @@ import requests
 from . ftp import FtpClient
 
 
-IO_ON=1
-IO_OFF=0
+IO_ON = 1
+IO_OFF = 0
 
-JSON_SUCCESS='success'
-JSON_REASON='reason'
+JSON_SUCCESS = 'success'
+JSON_REASON = 'reason'
 
-HELPER_DEVICE='td:'
-HELPER_DIR=''
+HELPER_DEVICE = 'td:'
+HELPER_DIR = ''
 
-HLPR_SCALAR_VAR='scalar_var'
+HLPR_SCALAR_VAR = 'scalar_var'
 
 
 class DominhException(Exception):
@@ -39,7 +39,8 @@ class DominhException(Exception):
 
 
 class Client(object):
-    def __init__(self, host, helper_dev=HELPER_DEVICE, helper_dir=HELPER_DIR, skip_helper_upload=False, request_timeout=5):
+    def __init__(self, host, helper_dev=HELPER_DEVICE, helper_dir=HELPER_DIR,
+                 skip_helper_upload=False, request_timeout=5):
         """Initialise an instance of the Dominh Client class.
 
         # TODO: support authentication
@@ -77,7 +78,6 @@ class Client(object):
         if self.base_path.endswith('/'):
             self.base_path = self.base_path[:-1]
 
-
     def __upload_helpers(self, host, remote_path, reupload=False):
         """Upload the (set of) helper(s) files to the controller.
 
@@ -105,28 +105,30 @@ class Client(object):
         # this is much faster than downloading and parsing the output of
         # KCL 'SHOW VAR', but should be limited to non-array variables (or
         # individual array elements)
-        content = rb'{ "<!-- #ECHO var="_reqvar" -->": "<!-- #ECHO var="{_reqvar}" -->" }'
-        ftpc.upload_as_file('/{}/{}.stm'.format(remote_path, HLPR_SCALAR_VAR), content)
-
+        content = rb'{ "<!-- #ECHO var="_reqvar" -->": "<!-- #ECHO var="{_reqvar}" -->" }'  # noqa
+        ftpc.upload_as_file('/{}/{}.stm'.format(remote_path, HLPR_SCALAR_VAR),
+                            content)
 
     def __get_stm(self, page, params={}):
-        """Retrieve a '.stm' file from the controller (rendered by the web server).
+        """Retrieve a '.stm' file from the controller (rendered by the web
+        server).
 
         :param page: Location of the stm to retrieve
         :type page: str
-        :param params: a dict containing key:value pairs to pass as a query string
+        :param params: a dict containing key:value pairs to pass as a query
+        string
         :type params: dict(str:str)
         :returns: JSON response as returned by the controller in its response
         :rtype: dict
         """
 
-        url = 'http://{host}/{base}/{page}'.format(host=self.host, base=self.base_path, page=page)
+        url = 'http://{host}/{base}/{page}'.format(
+            host=self.host, base=self.base_path, page=page)
         r = requests.get(url, params=params, timeout=self.request_timeout)
         if r.status_code != requests.codes.ok:
             raise DominhException("Controller web server returned an "
-                "error: {0}".format(r.status_code))
+                                  "error: {0}".format(r.status_code))
         return r.json()
-
 
     def __read_helper(self, helper, params={}):
         """Retrieve JSON from helper on controller.
@@ -135,7 +137,8 @@ class Client(object):
 
         :param helper: Name of the helper page (excluding extension)
         :type helper: str
-        :param params: a dict containing key:value pairs to pass as a query string
+        :param params: a dict containing key:value pairs to pass as a query
+        string
         :type params: dict(str:str)
         :returns: JSON response as returned by the controller in its response
         :rtype: dict
@@ -146,7 +149,6 @@ class Client(object):
         if '.stm' in helper.lower():
             raise ValueError("Helper name includes extension")
         return self.__get_stm(page=helper + '.stm', params=params)
-
 
     def __exec_kcl(self, cmd, wait_for_response=False):
         """Execute the specified KCL command line on the controller.
@@ -160,33 +162,37 @@ class Client(object):
         returned by the server, and whether that output should be captured and
         parsed before being returned to the caller (default: False)
         :type wait_for_response: bool
-        :returns: Verbatim copy of the text enclosed in XMP tags, as returned by
-        the controller
+        :returns: Verbatim copy of the text enclosed in XMP tags, as returned
+        by the controller
         :rtype: str
         """
 
         base = 'KCL' if wait_for_response else 'KCLDO'
-        url = 'http://{host}/{base}/{cmd}'.format(host=self.host, base=base, cmd=cmd)
+        url = 'http://{host}/{base}/{cmd}'.format(
+            host=self.host, base=base, cmd=cmd)
         r = requests.get(url, timeout=self.request_timeout)
 
         # caller requested we check return value
         if wait_for_response:
             if r.status_code != requests.codes.ok:
-                raise DominhException("Unexpected result code. "
-                    "Expected: {}, got: {}".format(requests.codes.ok, r.status_code))
+                raise DominhException(
+                    "Unexpected result code. Expected: {}, got: {}".format(
+                        requests.codes.ok, r.status_code))
             # retrieve KCL command response from doc
-            # TODO: could compile these and store them as we might use them more often
+            # TODO: could compile these and store them as we might use them
+            # more often
             kcl_output = re.search(r'<XMP>(.*)</XMP>', r.text, re.DOTALL)
             if kcl_output:
                 return kcl_output.group(1)
-            raise DominhException("Could not find KCL output in returned document")
+            raise DominhException(
+                "Could not find KCL output in returned document")
 
         # if we don't wait, we don't return anything, but we do check the
         # controller returned the appropriate HTTP result code
         if r.status_code != requests.codes.no_content:
-            raise DominhException("Unexpected result code. "
-                "Expected: {}, got: {}".format(requests.codes.no_content, r.status_code))
-
+            raise DominhException(
+                "Unexpected result code. Expected: {}, got: {}".format(
+                    requests.codes.no_content, r.status_code))
 
     def __exec_karel_prg(self, prg_name, params={}):
         """Execute a Karel program on the controller (via the web server).
@@ -205,33 +211,38 @@ class Client(object):
         :rtype: str
         """
 
-        url = 'http://{host}/KAREL/{prog}'.format(host=self.host, prog=prg_name)
+        url = 'http://{host}/KAREL/{prog}'.format(
+            host=self.host, prog=prg_name)
         r = requests.get(url, params=params, timeout=self.request_timeout)
         if r.status_code != requests.codes.ok:
-            raise DominhException("Unexpected result code. "
-                "Expected: {}, got: {}".format(requests.codes.ok, r.status_code))
+            raise DominhException(
+                "Unexpected result code. Expected: {}, got: {}".format(
+                    requests.codes.ok, r.status_code))
         if 'Unable to run' in r.text:
-            raise DominhException("Error: Karel program '{}' cannot"
-                " be started on controller.".format(prg_name))
+            raise DominhException(
+                "Error: Karel program '{}' cannot"
+                " be started on controller".format(prg_name))
         return r.json()
 
-
     def __disable_web_server_headers(self):
-        """Prevent Fanuc web server from including headers and footers with each response."""
+        """Prevent Fanuc web server from including headers and footers with
+        each response.
+        """
 
         self.set_scalar_var('$HTTP_CTRL.$ENAB_TEMPL', 0)
 
-
     def __enable_web_server_headers(self):
-        """Allow Fanuc web server to include headers and footers with each response."""
+        """Allow Fanuc web server to include headers and footers with each
+        response.
+        """
 
         self.set_scalar_var('$HTTP_CTRL.$ENAB_TEMPL', 1)
-
 
     def initialise(self):
         """Perform initialisation work needed to use the library.
 
-        In particular: upload the helper scripts and programs to the controller.
+        In particular: upload the helper scripts and programs to the
+        controller.
 
         TODO: support authentication somehow.
         """
@@ -241,7 +252,6 @@ class Client(object):
             # if we get here, we assume the following to be True
             # TODO: verify
             self.helpers_uploaded = True
-
 
     def set_scalar_var(self, varname, val):
         """Update the value of variable 'varname' to 'val'.
@@ -258,8 +268,7 @@ class Client(object):
         :type val: any (must have str() support)
         """
 
-        ret = self.__exec_kcl(cmd='set var {}={}'.format(varname, val))
-
+        self.__exec_kcl(cmd='set var {}={}'.format(varname, val))
 
     def get_scalar_var(self, varname):
         """Retrieve the value of the variable named 'varname'.
@@ -275,9 +284,9 @@ class Client(object):
         :rtype: str (to be parsed by caller)
         """
 
-        ret = self.__read_helper(helper=HLPR_SCALAR_VAR, params={'_reqvar':varname})
+        ret = self.__read_helper(helper=HLPR_SCALAR_VAR,
+                                 params={'_reqvar': varname})
         return ret[varname.upper()]
-
 
     def io_write(self, port_type, idx, val, check=False):
         """Set port 'idx' of type 'port_type' to value 'val'.
@@ -315,30 +324,31 @@ class Client(object):
         :rtype: None or bool (see above)
         """
 
-        ret = self.__exec_kcl(cmd='set port {}[{}]={}'.format(port_type, idx, val),
-            wait_for_response=check)
+        ret = self.__exec_kcl(cmd='set port {}[{}]={}'.format(
+            port_type, idx, val), wait_for_response=check)
         if not check:
             return
 
         # get some simple errors out of the way
         ret = ret.strip()
         if 'Port name expected' in ret:
-            raise DominhException("Illegal port type identifier: '{}'"
-                .format(port_type))
+            raise DominhException(
+                "Illegal port type identifier: '{}'".format(port_type))
         if 'Illegal port number' in ret:
-            raise DominhException("Illegal port number for port {}: {}"
-                .format(port_type, idx))
+            raise DominhException(
+                "Illegal port number for port {}: {}".format(port_type, idx))
         if 'Value out of range' in ret:
-            raise DominhException("Value out of range for port type {}: {}"
-                .format(port_type, val))
+            raise DominhException(
+                "Value out of range for port type {}: {}".format(
+                    port_type, val))
         if 'ERROR' in ret:
-            raise DominhException("Unrecognised error trying to set port:\n"
+            raise DominhException(
+                "Unrecognised error trying to set port:\n"
                 "\n________________\n\n{}\n________________".format(ret))
 
         # check for successful write
         is_ok = re.match(r'Value was: (0|1).*Value is:  (0|1)', ret, re.DOTALL)
         return is_ok and is_ok.group(2) == str(val)
-
 
     def io_write_dout(self, idx, val):
         """Write 'val' to 'DOUT[idx]'.
@@ -351,7 +361,6 @@ class Client(object):
 
         self.io_write('DOUT', idx, val)
 
-
     def io_write_rout(self, idx, val):
         """Write 'val' to 'ROUT[idx]'.
 
@@ -362,7 +371,6 @@ class Client(object):
         """
 
         self.io_write('ROUT', idx, val)
-
 
     def io_read(self, port_type, idx):
         """Read port 'idx' of type 'port_type'.
@@ -418,18 +426,18 @@ class Client(object):
 
         port_type = port_type.upper()
         port_id = '{}[{}]'.format(port_type, idx)
-        ret = self.__read_helper(helper=HLPR_SCALAR_VAR, params={'_reqvar':port_id})
+        ret = self.__read_helper(
+            helper=HLPR_SCALAR_VAR, params={'_reqvar': port_id})
 
         # check for some common problems
         if 'unknown port type name' in ret[port_id].lower():
-            raise DominhException("Illegal port type identifier: '{}'"
-                .format(port_type))
+            raise DominhException(
+                "Illegal port type identifier: '{}'".format(port_type))
         if 'illegal port number' in ret[port_id].lower():
-            raise DominhException("Illegal port number for port {}: {}"
-                .format(port_type, idx))
+            raise DominhException(
+                "Illegal port number for port {}: {}".format(port_type, idx))
 
         return ret[port_id]
-
 
     def io_read_sopout(self, idx):
         """Read from 'SOPOUT[idx]'.
@@ -442,7 +450,6 @@ class Client(object):
 
         return IO_ON if self.io_read('SOPOUT', idx) == 'ON' else IO_OFF
 
-
     def io_read_uopout(self, idx):
         """Read from 'UOPOUT[idx]'.
 
@@ -453,7 +460,6 @@ class Client(object):
         """
 
         return IO_ON if self.io_read('UOPOUT', idx) == 'ON' else IO_OFF
-
 
     def io_read_rout(self, idx):
         """Read from 'RDO[idx]'.
@@ -466,12 +472,10 @@ class Client(object):
 
         return IO_ON if self.io_read('RDO', idx) == 'ON' else IO_OFF
 
-
     def reset(self):
         """Attempt to RESET the controller."""
 
         self.__exec_kcl(cmd='reset')
-
 
     def select_tpe(self, program):
         """Attempt to make 'program' the SELECTed program on the TP.
@@ -488,10 +492,10 @@ class Client(object):
         """
 
         raise DominhException('Not implemented')
-        ret = self.__exec_karel_prg(prg_name='dmh_selprg', params={'prog_name':program})
+        ret = self.__exec_karel_prg(
+            prg_name='dmh_selprg', params={'prog_name': program})
         if not ret[JSON_SUCCESS]:
             raise DominhException("Select_TPE error: " + ret[JSON_REASON])
-
 
     def get_general_override(self):
         """Retrieve the currently configured General Override.
@@ -503,7 +507,6 @@ class Client(object):
         varname = '$MCR.$GENOVERRIDE'
         return int(self.get_scalar_var(varname))
 
-
     def set_general_override(self, val):
         """Set the General Override to 'val'.
 
@@ -512,8 +515,7 @@ class Client(object):
         """
 
         varname = '$MCR.$GENOVERRIDE'
-        ret = self.set_scalar_var(varname, val)
-
+        self.set_scalar_var(varname, val)
 
     def get_numreg(self, idx):
         """Retrieve the value stored in the numerical register at 'idx'.
@@ -528,17 +530,17 @@ class Client(object):
         ret = self.get_scalar_var(varname)
         return float(ret) if '.' in ret else int(ret)
 
-
     def list_programs(self, types=[]):
         """Retrieve the list of all programs stored on the controller.
 
         NOTE: this is a rather naive implementation which should not be used in
         tight loops or when high performance is required.
 
-        :param types: A list of program types to include in the returned result.
+        :param types: A list of program types to include in the returned
+        result.
         Legal values are those used by the controller when displaying lists of
-        programs in the pages served by the Fanuc web server (fi: PC, MACRO, TP,
-        VR, etc)
+        programs in the pages served by the Fanuc web server (fi: PC, MACRO,
+        TP, VR, etc)
         :type types: list[str]
         :returns: List of tuples containing names and type of programs on the
         controller in the order they are returned
@@ -556,11 +558,14 @@ class Client(object):
         matches = re.findall(r'(\S+)\s+(\S+)\s+Task', ret.strip(), re.DOTALL)
 
         types = [t.lower() for t in types]
-        return [m for m in matches if (types and m[1].lower() in types) or not types]
-
+        return [
+            m for m in matches
+            if (types and m[1].lower() in types) or not types
+        ]
 
     def in_auto_mode(self):
-        """Determine whether the controller is in AUTO or one of the MANUAL modes.
+        """Determine whether the controller is in AUTO or one of the MANUAL
+        modes.
 
         Wraps the Karel IN_AUTO_MODE routine.
 
@@ -572,7 +577,6 @@ class Client(object):
         if not ret[JSON_SUCCESS]:
             raise DominhException("Select_TPE error: " + ret[JSON_REASON])
         return ret['in_auto_mode']
-
 
     def tp_enabled(self):
         """Determine whether the Teach Pendant is currently enabled.
@@ -588,7 +592,6 @@ class Client(object):
         state = self.io_read_sopout(idx=SOPO_TPENBL)
         return state == IO_ON
 
-
     def is_faulted(self):
         """Determine whether the controller is currently faulted.
 
@@ -603,7 +606,6 @@ class Client(object):
         state = self.io_read_sopout(idx=SOPO_FAULT)
         return state == IO_ON
 
-
     def is_e_stopped(self):
         """Determine whether the controller is currently e-stopped.
 
@@ -617,7 +619,6 @@ class Client(object):
         SOPI_ESTOP = 0
         state = self.io_read_sopout(idx=SOPI_ESTOP)
         return state == IO_ON
-
 
     def is_program_running(self):
         """Determine whether the controller is executing a program.
@@ -636,7 +637,6 @@ class Client(object):
         UOPO_PROGRUN = 3
         state = self.io_read_uopout(idx=UOPO_PROGRUN)
         return state == IO_ON
-
 
     def is_program_paused(self):
         """Determine whether there is a paused program on the controller.

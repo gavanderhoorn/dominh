@@ -44,9 +44,9 @@ if __name__ == '__main__':
     args = docopt(__doc__, version='dominh 0.1.1', options_first=True)
     argv = [args['<command>']] + args['<args>']
 
-    #print(args)
+    # print(args)
 
-    skip_upload=args['--no-upload']
+    skip_upload = args['--no-upload']
 
     if args['<command>'] == 'reset':
         from dominh.tool import dominh_reset
@@ -65,4 +65,5 @@ if __name__ == '__main__':
         dominh_get.main(argv=argv, skip_upload=skip_upload)
 
     else:
-        exit("%r is not a dominh command. See 'dominh help'." % args['<command>'])
+        exit("%r is not a dominh command. See 'dominh help'." %
+             args['<command>'])

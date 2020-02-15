@@ -22,13 +22,14 @@ setup(
     name='dominh',
     version='0.1.1',
     packages=['dominh', 'dominh.tool'],
-    package_dir={'':'src'},
+    package_dir={'': 'src'},
     scripts=['bin/dominh'],
     author='G.A. vd. Hoorn',
     author_email='g.a.vanderhoorn@tudelft.nl',
     maintainer='G.A. vd. Hoorn',
     maintainer_email='g.a.vanderhoorn@tudelft.nl',
-    description=("A poor man's implementation of an RPC interface to Fanuc R-30iA and R-30iB(+) controllers"),
+    description=("A poor man's implementation of an RPC interface to Fanuc "
+                 "R-30iA and R-30iB(+) controllers"),
     license='Apache-2.0',
     install_requires=['docopt', 'requests']
 )

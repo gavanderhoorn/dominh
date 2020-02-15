@@ -41,9 +41,10 @@ def main(argv, skip_upload=False):
     try:
         c = Client(args['<host>'], skip_helper_upload=skip_upload)
         c.initialise()
-        print (c.get_scalar_var(varname))
+        print(c.get_scalar_var(varname))
 
     except (exceptions.ConnectionError, OSError) as e:
-        sys.stderr.write("Error trying to connect to the controller: {}\n".format(e))
+        sys.stderr.write(
+            "Error trying to connect to the controller: {}\n".format(e))
     except DominhException as e:
         sys.stderr.write("Error during read: {}\n".format(e))

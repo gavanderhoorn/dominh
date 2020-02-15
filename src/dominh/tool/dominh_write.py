@@ -42,7 +42,7 @@ def main(argv, skip_upload=False):
     index = int(args['<index>'])
     val = int(args['<val>'])
 
-    check=args['--check']
+    check = args['--check']
 
     try:
         c = Client(args['<host>'], skip_helper_upload=skip_upload)
@@ -50,6 +50,7 @@ def main(argv, skip_upload=False):
         val = c.io_write(port_type, index, val, check=check)
 
     except (exceptions.ConnectionError, OSError) as e:
-        sys.stderr.write("Error trying to connect to the controller: {}\n".format(e))
+        sys.stderr.write(
+            "Error trying to connect to the controller: {}\n".format(e))
     except DominhException as e:
         sys.stderr.write("Error during write: {}\n".format(e))
