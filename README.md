@@ -1,5 +1,9 @@
 # Dominh
 
+[![license - apache 2.0](https://img.shields.io/:license-Apache%202.0-yellowgreen.svg)](https://opensource.org/licenses/Apache-2.0)
+![CI](https://github.com/gavanderhoorn/dominh/workflows/Python%20package/badge.svg?branch=master)
+[![Github Issues](https://img.shields.io/github/issues/gavanderhoorn/dominh.svg)](http://github.com/gavanderhoorn/dominh/issues)
+
 ## Overview
 
 This is a poor man's version of a subset of the RPC functionality provided by the (Windows-only) Fanuc PCDK implemented in Python.
