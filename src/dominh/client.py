@@ -654,3 +654,37 @@ class Client(object):
         UOPO_PAUSED = 4
         state = self.io_read_uopout(idx=UOPO_PAUSED)
         return state == IO_ON
+
+    def list_errors(self):
+        """Return list of all errors.
+
+        The list returned contains each error as an element in the list. Each
+        element is a tuple with the following layout:
+
+          (seq nr, date, err msg, err detail, level, state mask)
+
+        The 'err detail' and 'level' elements are not always present and thus
+        may be empty.
+
+        :returns: A list of all errors and their details
+        :rtype: list(tuple(int, str, str, str, str, str))
+        """
+
+        ftpc = FtpClient(self.host, timeout=self.request_timeout)
+        ftpc.connect()
+        errs = ftpc.get_file_as_str('/md:/errall.ls')
+
+        res = []
+        for line in errs.decode('ascii').splitlines():
+            if ('Robot Name' in line) or (line == ''):
+                continue
+            fields = list(map(str.strip, line.split('"')))
+            level_state = fields[4].split()
+            if len(level_state) > 1:
+                err_level, err_state, = level_state
+            else:
+                err_level, err_state, = '', level_state[0]
+            res.append((int(fields[0]), fields[1], fields[2], fields[3],
+                        err_level, err_state))
+
+        return res
