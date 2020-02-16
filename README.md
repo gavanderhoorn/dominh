@@ -2,7 +2,7 @@
 
 [![license - apache 2.0](https://img.shields.io/:license-Apache%202.0-yellowgreen.svg)](https://opensource.org/licenses/Apache-2.0)
 [![CI](https://github.com/gavanderhoorn/dominh/workflows/CI/badge.svg?branch=master)](https://github.com/gavanderhoorn/dominh/actions?query=workflow%3ACI)
-[![Github Issues](https://img.shields.io/github/issues/gavanderhoorn/dominh.svg)](http://github.com/gavanderhoorn/dominh/issues)
+[![Github Issues](https://img.shields.io/github/issues/gavanderhoorn/dominh.svg)](https://github.com/gavanderhoorn/dominh/issues)
 
 ## Overview
 
