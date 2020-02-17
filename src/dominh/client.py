@@ -799,3 +799,47 @@ class Client(object):
             raise DominhException(
                 "Unexpected result code. Expected: {}, got: {}".format(
                     requests.codes.ok, r.status_code))
+
+    def cmt_numreg(self, idx, comment):
+        """Update the comment on numerical register at 'idx'.
+
+        :param idx: Numeric ID of register
+        :type idx: int
+        :param comment: Comment to set
+        :type comment: str
+        """
+
+        self.__comset('NUMREG', idx, comment=comment)
+
+    def cmt_posreg(self, idx, comment):
+        """Update the comment on position register at 'idx'.
+
+        :param idx: Numeric ID of register
+        :type idx: int
+        :param comment: Comment to set
+        :type comment: str
+        """
+
+        self.__comset('POSREG', idx, comment=comment)
+
+    def cmt_din(self, idx, comment):
+        """Update the comment on 'DIN[idx]'.
+
+        :param idx: Numeric ID of port
+        :type idx: int
+        :param comment: Comment to set
+        :type comment: str
+        """
+
+        self.__comset('DIN', idx, comment=comment)
+
+    def cmt_dout(self, idx, comment):
+        """Update the comment on 'DOUT[idx]'.
+
+        :param idx: Numeric ID of port
+        :type idx: int
+        :param comment: Comment to set
+        :type comment: str
+        """
+
+        self.__comset('DOUT', idx, comment=comment)
