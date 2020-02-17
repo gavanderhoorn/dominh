@@ -620,6 +620,20 @@ class Client(object):
         state = self.io_read_sopout(idx=SOPI_ESTOP)
         return state == IO_ON
 
+    def in_remote_mode(self):
+        """Determine whether the controller is in remote mode.
+
+        Checks SOP output index 0 (from kliosop.kl).
+
+        :returns: True if a program is running.
+        :rtype: bool
+        """
+
+        # from kliosop
+        SOPO_REMOTE = 0
+        state = self.io_read_sopout(idx=SOPO_REMOTE)
+        return state == IO_ON
+
     def is_program_running(self):
         """Determine whether the controller is executing a program.
 
