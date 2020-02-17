@@ -18,9 +18,11 @@
 
 
 """
-usage: dominh write [options] <host> <port_type> <index> <val>
+Write to a controller IO port.
 
-options:
+Usage: dominh [--no-upload] write [options] <host> <port_type> <index> <val>
+
+Options:
   -h --help     Show this screen.
   --check       Verify the write was successful. Exit status
                 reflects success of operation.

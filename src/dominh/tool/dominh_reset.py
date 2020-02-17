@@ -18,9 +18,11 @@
 
 
 """
-usage: dominh reset [options] <host>
+Attempt clear active faults on the controller (ie: RESET).
 
-options:
+Usage: dominh reset [options] <host>
+
+Options:
   -h --help     Show this screen.
   --verify      Verify controller was successfully reset. Exit status
                 reflects success of operation.

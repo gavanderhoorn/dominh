@@ -18,9 +18,11 @@
 
 
 """
-usage: dominh read [options] <host> <port_type> <index>
+Read from a controller IO port.
 
-options:
+Usage: dominh [--no-upload] read [options] <host> <port_type> <index>
+
+Options:
   -h --help     Show this screen.
   --status      Change program exit status according to IO value:
                  OFF : exit status 0

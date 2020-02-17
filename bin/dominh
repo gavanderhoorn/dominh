@@ -18,9 +18,11 @@
 
 
 """
-usage: dominh [--no-upload] [--version] [--help] <command> [<args>...]
+CLI tools for interacting with a Fanuc Robotics controller.
 
-options:
+Usage: dominh [--no-upload] [--version] [--help] <command> [<args>...]
+
+Options:
   -h --help       Show this screen.
   -n --no-upload  Don't upload the helpers (for instance because they have
                   already been uploaded by a previous invocation).
@@ -34,6 +36,7 @@ Available commands:
    get            Retrieve the value of a scalar system variable
 
 See 'dominh <command> --help' for more information on a specific command.
+
 """
 
 from docopt import docopt

@@ -18,9 +18,11 @@
 
 
 """
-usage: dominh get [options] <host> <variable>
+Retrieve value of a (system) variable.
 
-options:
+Usage: dominh [--no-upload] get [options] <host> <variable>
+
+Options:
   -h --help     Show this screen.
 
 """
