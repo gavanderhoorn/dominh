@@ -843,3 +843,17 @@ class Client(object):
         varname = '$NUMREG[{}]'.format(idx)
         ret = self.get_scalar_var(varname)
         return float(ret) if '.' in ret else int(ret)
+
+    def set_numreg(self, idx, val):
+        """Update the value stored in 'R[idx]' to 'val'.
+
+        Note: 'val' must be either int or float.
+
+        :param idx: The index of the register to update
+        :type idx: int
+        :param val: The value to write to the register
+        :type val: int or float
+        """
+
+        assert type(val) in [float, int]
+        self.__comset('NUMREG', idx, val=val)
