@@ -517,19 +517,6 @@ class Client(object):
         varname = '$MCR.$GENOVERRIDE'
         self.set_scalar_var(varname, val)
 
-    def get_numreg(self, idx):
-        """Retrieve the value stored in the numerical register at 'idx'.
-
-        :param idx: The index of the register to retrieve.
-        :type idx: int
-        :returns: Either the integer or the floating point number stored at
-        index 'idx' in the numerical registers on the controller
-        :rtype: int or float (see above)
-        """
-        varname = '$NUMREG[{}]'.format(idx)
-        ret = self.get_scalar_var(varname)
-        return float(ret) if '.' in ret else int(ret)
-
     def list_programs(self, types=[]):
         """Retrieve the list of all programs stored on the controller.
 
@@ -843,3 +830,16 @@ class Client(object):
         """
 
         self.__comset('DOUT', idx, comment=comment)
+
+    def get_numreg(self, idx):
+        """Retrieve the value stored in the numerical register at 'idx'.
+
+        :param idx: The index of the register to retrieve.
+        :type idx: int
+        :returns: Either the integer or the floating point number stored at
+        index 'idx' in the numerical registers on the controller
+        :rtype: int or float (see above)
+        """
+        varname = '$NUMREG[{}]'.format(idx)
+        ret = self.get_scalar_var(varname)
+        return float(ret) if '.' in ret else int(ret)
