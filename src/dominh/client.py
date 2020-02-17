@@ -65,7 +65,6 @@ class Client(object):
         (default: 5 sec)
         :type request_timeout: float
         """
-
         self.host = host
         self.helpers_uploaded = False
         self.skip_helper_upload = skip_helper_upload
@@ -95,7 +94,6 @@ class Client(object):
         has been done before by this object (default: False)
         :type reupload: bool
         """
-
         if self.helpers_uploaded and not reupload:
             return
         ftpc = FtpClient(host, timeout=self.request_timeout)
@@ -121,7 +119,6 @@ class Client(object):
         :returns: JSON response as returned by the controller in its response
         :rtype: dict
         """
-
         url = 'http://{host}/{base}/{page}'.format(
             host=self.host, base=self.base_path, page=page)
         r = requests.get(url, params=params, timeout=self.request_timeout)
@@ -143,7 +140,6 @@ class Client(object):
         :returns: JSON response as returned by the controller in its response
         :rtype: dict
         """
-
         if not self.helpers_uploaded and not self.skip_helper_upload:
             raise DominhException("Helpers not uploaded")
         if '.stm' in helper.lower():
@@ -166,7 +162,6 @@ class Client(object):
         by the controller
         :rtype: str
         """
-
         base = 'KCL' if wait_for_response else 'KCLDO'
         url = 'http://{host}/{base}/{cmd}'.format(
             host=self.host, base=base, cmd=cmd)
@@ -210,7 +205,6 @@ class Client(object):
         :returns: JSON response sent by the Karel program
         :rtype: str
         """
-
         url = 'http://{host}/KAREL/{prog}'.format(
             host=self.host, prog=prg_name)
         r = requests.get(url, params=params, timeout=self.request_timeout)
@@ -228,14 +222,12 @@ class Client(object):
         """Prevent Fanuc web server from including headers and footers with
         each response.
         """
-
         self.set_scalar_var('$HTTP_CTRL.$ENAB_TEMPL', 0)
 
     def __enable_web_server_headers(self):
         """Allow Fanuc web server to include headers and footers with each
         response.
         """
-
         self.set_scalar_var('$HTTP_CTRL.$ENAB_TEMPL', 1)
 
     def initialise(self):
@@ -246,7 +238,6 @@ class Client(object):
 
         TODO: support authentication somehow.
         """
-
         if not self.skip_helper_upload:
             self.__upload_helpers(self.host, remote_path=self.base_path)
             # if we get here, we assume the following to be True
@@ -267,7 +258,6 @@ class Client(object):
         :param val: Value to write to 'varname'
         :type val: any (must have str() support)
         """
-
         self.__exec_kcl(cmd='set var {}={}'.format(varname, val))
 
     def get_scalar_var(self, varname):
@@ -283,7 +273,6 @@ class Client(object):
         :returns: JSON value for key 'varname'
         :rtype: str (to be parsed by caller)
         """
-
         ret = self.__read_helper(helper=HLPR_SCALAR_VAR,
                                  params={'_reqvar': varname})
         return ret[varname.upper()]
@@ -323,7 +312,6 @@ class Client(object):
         operation in the form of a bool
         :rtype: None or bool (see above)
         """
-
         ret = self.__exec_kcl(cmd='set port {}[{}]={}'.format(
             port_type, idx, val), wait_for_response=check)
         if not check:
@@ -358,7 +346,6 @@ class Client(object):
         :param val: Value to write
         :type val: int
         """
-
         self.io_write('DOUT', idx, val)
 
     def io_write_rout(self, idx, val):
@@ -369,7 +356,6 @@ class Client(object):
         :param val: Value to write
         :type val: int
         """
-
         self.io_write('ROUT', idx, val)
 
     def io_read(self, port_type, idx):
@@ -423,7 +409,6 @@ class Client(object):
         represents values for the port type)
         :rtype: str
         """
-
         port_type = port_type.upper()
         port_id = '{}[{}]'.format(port_type, idx)
         ret = self.__read_helper(
@@ -447,7 +432,6 @@ class Client(object):
         :returns: Current state of 'SOPOUT[idx]'
         :rtype: int
         """
-
         return IO_ON if self.io_read('SOPOUT', idx) == 'ON' else IO_OFF
 
     def io_read_uopout(self, idx):
@@ -458,7 +442,6 @@ class Client(object):
         :returns: Current state of 'UOPOUT[idx]'
         :rtype: int
         """
-
         return IO_ON if self.io_read('UOPOUT', idx) == 'ON' else IO_OFF
 
     def io_read_rout(self, idx):
@@ -469,7 +452,6 @@ class Client(object):
         :returns: Current state of 'RDO[idx]'
         :rtype: int
         """
-
         return IO_ON if self.io_read('RDO', idx) == 'ON' else IO_OFF
 
     def reset(self):
@@ -490,7 +472,6 @@ class Client(object):
         :param program: Name of the program to select.
         :type program: str
         """
-
         raise DominhException('Not implemented')
         ret = self.__exec_karel_prg(
             prg_name='dmh_selprg', params={'prog_name': program})
@@ -503,7 +484,6 @@ class Client(object):
         :returns: Value of $MCR.$GENOVERRIDE
         :rtype: int
         """
-
         varname = '$MCR.$GENOVERRIDE'
         return int(self.get_scalar_var(varname))
 
@@ -513,7 +493,6 @@ class Client(object):
         :param val: New value for $MCR.$GENOVERRIDE
         :type val: int
         """
-
         varname = '$MCR.$GENOVERRIDE'
         self.set_scalar_var(varname, val)
 
@@ -559,7 +538,6 @@ class Client(object):
         :returns: True if the controller is in AUTO mode
         :rtype: bool
         """
-
         ret = self.__exec_karel_prg(prg_name='dmh_autom')
         if not ret[JSON_SUCCESS]:
             raise DominhException("Select_TPE error: " + ret[JSON_REASON])
@@ -573,7 +551,6 @@ class Client(object):
         :returns: True if the TP is 'ON'
         :rtype: bool
         """
-
         # from kliosop
         SOPO_TPENBL = 7
         state = self.io_read_sopout(idx=SOPO_TPENBL)
@@ -587,7 +564,6 @@ class Client(object):
         :returns: True if there is an active fault on the controller
         :rtype: bool
         """
-
         # from kliosop
         SOPO_FAULT = 3
         state = self.io_read_sopout(idx=SOPO_FAULT)
@@ -601,7 +577,6 @@ class Client(object):
         :returns: True if the e-stop is active
         :rtype: bool
         """
-
         # from kliosop
         SOPI_ESTOP = 0
         state = self.io_read_sopout(idx=SOPI_ESTOP)
@@ -615,7 +590,6 @@ class Client(object):
         :returns: True if a program is running.
         :rtype: bool
         """
-
         # from kliosop
         SOPO_REMOTE = 0
         state = self.io_read_sopout(idx=SOPO_REMOTE)
@@ -633,7 +607,6 @@ class Client(object):
         :returns: True if a program is running.
         :rtype: bool
         """
-
         # from kliouop
         UOPO_PROGRUN = 3
         state = self.io_read_uopout(idx=UOPO_PROGRUN)
@@ -650,7 +623,6 @@ class Client(object):
         :returns: True if a program is paused.
         :rtype: bool
         """
-
         # from kliouop
         UOPO_PAUSED = 4
         state = self.io_read_uopout(idx=UOPO_PAUSED)
@@ -670,7 +642,6 @@ class Client(object):
         :returns: A list of all errors and their details
         :rtype: list(tuple(int, str, str, str, str, str))
         """
-
         ftpc = FtpClient(self.host, timeout=self.request_timeout)
         ftpc.connect()
         errs = ftpc.get_file_as_str('/md:/errall.ls')
@@ -795,7 +766,6 @@ class Client(object):
         :param comment: Comment to set
         :type comment: str
         """
-
         self.__comset('NUMREG', idx, comment=comment)
 
     def cmt_posreg(self, idx, comment):
@@ -806,7 +776,6 @@ class Client(object):
         :param comment: Comment to set
         :type comment: str
         """
-
         self.__comset('POSREG', idx, comment=comment)
 
     def cmt_din(self, idx, comment):
@@ -817,7 +786,6 @@ class Client(object):
         :param comment: Comment to set
         :type comment: str
         """
-
         self.__comset('DIN', idx, comment=comment)
 
     def cmt_dout(self, idx, comment):
@@ -828,7 +796,6 @@ class Client(object):
         :param comment: Comment to set
         :type comment: str
         """
-
         self.__comset('DOUT', idx, comment=comment)
 
     def get_numreg(self, idx):
@@ -854,6 +821,5 @@ class Client(object):
         :param val: The value to write to the register
         :type val: int or float
         """
-
         assert type(val) in [float, int]
         self.__comset('NUMREG', idx, val=val)
