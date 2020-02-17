@@ -702,3 +702,100 @@ class Client(object):
                         err_level, err_state))
 
         return res
+
+    def __get_cmt_fc(self, cmt):
+        return {
+            'NUMREG': 1,
+            'POSREG': 3,
+            'UALARM': 4,
+            'RDI': 6,
+            'RDO': 7,
+            'DIN': 8,
+            'DOUT': 9,
+            'GIN': 10,
+            'GOUT': 11,
+            'AIN': 12,
+            'AOUT': 13,
+            'STRREG': 14,
+            'FLG': 19,
+        }.get(cmt.upper())
+
+    def __get_val_fc(self, valt):
+        return {
+            'NUMREG': 2,
+            'UALARM': 5,  # actually sets 'severity'
+            'STRREG': 15,
+        }.get(valt.upper())
+
+    def __comset(self, fc, idx, val=None, comment=''):
+        """Low-level wrapper around the 'karel/ComSet' program.
+
+        This method uses the COMSET Karel program on the controller, which is
+        normally used by the 'Comment Tool' (accessible via the controller's
+        web server).
+
+        Valid values for 'fc':
+
+        When updating a comment:
+
+         - AIN
+         - AOUT
+         - DIN
+         - DOUT
+         - FLG
+         - GIN
+         - GOUT
+         - NUMREG
+         - POSREG
+         - RDI
+         - RDO
+         - STRREG
+         - UALARM
+
+        When updating a value:
+
+         - NUMREG
+         - STRREG
+         - UALARM
+
+        Note: if both 'val' and 'comment' are set, only the comment will be
+        updated on the controller.
+
+        :param fc: Type name of commentable
+        :type fc: str
+        :param idx: Numeric ID of register/alarm/IO element
+        :type idx: int
+        :param val: Value to write to register
+        :type val: int/float/str
+        :param comment: Comment to set on commentable
+        :type comment: str
+        """
+        if not val and not comment:
+            raise ValueError("Need either val or comment")
+
+        if val:
+            sfc = self.__get_val_fc(fc)
+            real_flag = 1 if type(val) == float else -1
+            params = {
+                'sValue': val,
+                'sIndx': idx,
+                'sRealFlag': real_flag,
+                'sFc': sfc
+            }
+
+        if comment:
+            sfc = self.__get_cmt_fc(fc)
+            params = {
+                'sComment': comment,
+                'sIndx': idx,
+                'sFc': sfc
+            }
+
+        path = 'karel/ComSet'
+        url = 'http://{host}/{path}'.format(host=self.host, path=path)
+        r = requests.get(url, params=params, timeout=self.request_timeout)
+
+        if r.status_code != requests.codes.ok:
+            raise DominhException(
+                "Unexpected result code. Expected: {}, got: {}".format(
+                    requests.codes.ok, r.status_code))
