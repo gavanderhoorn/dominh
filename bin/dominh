@@ -33,7 +33,7 @@ Available commands:
    write          Write to supported IO ports
    get            Retrieve the value of a scalar system variable
 
-See 'dominh help <command>' for more information on a specific command.
+See 'dominh <command> --help' for more information on a specific command.
 """
 
 from docopt import docopt
