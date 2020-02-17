@@ -27,6 +27,7 @@ The author recommends using PCDK and/or any of the supported fieldbuses in those
 1. [Installation](#installation)
 1. [Example usage](#example-usage)
 1. [Limitations / Known issues](#limitations-known-issues)
+1. [Related projects](#related-projects)
 1. [Bugs, feature requests, etc](#bugs-feature-requests-etc)
 1. [Disclaimer](#disclaimer)
 
@@ -143,6 +144,11 @@ The following limitations and known issues exist:
   This is a limitation of the web server used by Fanuc.
 * HTTP status return codes do not reflect the result of operations in all cases.
   This is again a limitation of the web server used by Fanuc.
+
+
+## Related projects
+
+For a similar library, but written in Go, see [onerobotics/go-fanuc](https://github.com/onerobotics/go-fanuc).
 
 
 ## Bugs, feature requests, etc
