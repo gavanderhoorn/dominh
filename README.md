@@ -36,8 +36,7 @@ The author recommends using PCDK and/or any of the supported fieldbuses in those
 This needs the base *Web Server* (`HTTP`) and the *Web Svr Enhancements* (`R626`) options.
 As some parts are written in Karel, option `R632` could be a requirement.
 
-Other requirements include a functioning networking setup (make sure you can ping the controller and the controller's website shows up when opening
-`http://robot_ip`), and correctly configured *HTTP Authentication* settings.
+Other requirements include a functioning networking setup (make sure you can ping the controller and the controller's website shows up when opening `http://robot_ip`), and correctly configured *HTTP Authentication* settings.
 Either unlock the *KAREL* and *KCL* resources completely, set global credentials or add entries allowing specific access to the `dmh_autom` and `dmh_selprg` Karel programs that are part of this tool.
 Refer to section 6.5 *HTTP AUTHENTICATION* of the *FANUC Robot series - Ethernet Function - Operator's Manual* (document `B-82974EN` for the R-30iA) for more information.
 
