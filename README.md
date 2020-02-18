@@ -27,6 +27,7 @@ The author recommends using PCDK and/or any of the supported fieldbuses in those
 1. [Installation](#installation)
 1. [Example usage](#example-usage)
 1. [Limitations / Known issues](#limitations-known-issues)
+1. [Performance](#performance)
 1. [Related projects](#related-projects)
 1. [Bugs, feature requests, etc](#bugs-feature-requests-etc)
 1. [Disclaimer](#disclaimer)
@@ -144,6 +145,14 @@ The following limitations and known issues exist:
   This is a limitation of the web server used by Fanuc.
 * HTTP status return codes do not reflect the result of operations in all cases.
   This is again a limitation of the web server used by Fanuc.
+
+
+## Performance
+
+As an indication of the performance: reading `DOUT[1]` from an idle R-30iB+ takes about 300 to 400 ms.
+Retrieving the value of the `$FNO` system variable from the same controller takes also about 300 to 400 ms.
+
+In both cases the helpers were already present on the controller.
 
 
 ## Related projects
