@@ -19,6 +19,8 @@
 import re
 import requests
 
+from collections import namedtuple
+
 from . ftp import FtpClient
 
 
@@ -36,6 +38,18 @@ HLPR_SCALAR_VAR = 'scalar_var'
 
 class DominhException(Exception):
     pass
+
+
+plst_grp_t = namedtuple('plst_grp_t', [
+    'comment',
+    'payload',
+    'payload_x',
+    'payload_y',
+    'payload_z',
+    'payload_ix',
+    'payload_iy',
+    'payload_iz',
+])
 
 
 class Client(object):
@@ -823,3 +837,49 @@ class Client(object):
         """
         assert type(val) in [float, int]
         self.__comset('NUMREG', idx, val=val)
+
+    def __format_sysvar(self, path):
+        assert type(path) == list
+        if not path:
+            raise ValueError("Need at least one variable name")
+        return ('$' + '.$'.join(path)).upper()
+
+    def get_payload(self, grp, idx):
+        """Retrieve payload nr 'idx' for group 'grp'.
+
+        :param grp: The motion group to retrieve the payload for
+        :type grp: int
+        :param idx: The number of the payload schedule to retrieve
+        :type idx: int
+        :returns: A named tuple matching the structure of a PLST_GRP_T. The
+        'ICONDISP' field is not included.
+        :rtype: plst_grp_t
+        """
+        if (grp < 1 or grp > 5):
+            raise ValueError(
+                "Group ID must be between 1 and 5 (got: {})".format(grp))
+        if (idx < 1 or idx > 10):
+            raise ValueError(
+                "Payload ID must be between 1 and 10 (got: {})".format(idx))
+
+        # TODO: retrieve struct in one read and parse result instead
+        base_vname = 'plst_grp{}[{}]'.format(grp, idx)
+        cmt = self.get_scalar_var(
+                self.__format_sysvar([base_vname, 'comment']))
+        return plst_grp_t(
+            comment=None if cmt == 'Uninitialized' else cmt,
+            payload=float(self.get_scalar_var(
+                self.__format_sysvar([base_vname, 'payload']))),
+            payload_x=float(self.get_scalar_var(
+                self.__format_sysvar([base_vname, 'payload_x']))),
+            payload_y=float(self.get_scalar_var(
+                self.__format_sysvar([base_vname, 'payload_y']))),
+            payload_z=float(self.get_scalar_var(
+                self.__format_sysvar([base_vname, 'payload_z']))),
+            payload_ix=float(self.get_scalar_var(
+                self.__format_sysvar([base_vname, 'payload_ix']))),
+            payload_iy=float(self.get_scalar_var(
+                self.__format_sysvar([base_vname, 'payload_iy']))),
+            payload_iz=float(self.get_scalar_var(
+                self.__format_sysvar([base_vname, 'payload_iz']))),
+        )
