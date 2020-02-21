@@ -883,3 +883,36 @@ class Client(object):
             payload_iz=float(self.get_scalar_var(
                 self.__format_sysvar([base_vname, 'payload_iz']))),
         )
+
+    def get_controller_series(self):
+        """Returns the controller series identifier (ie: R-30iA, 30iB, etc).
+
+        Note: this method uses the FTP server on the controller.
+
+        :returns: The series identifier of the controller
+        :rtype: str
+        """
+        ftpc = FtpClient(self.host, timeout=self.request_timeout)
+        ftpc.connect()
+        parts = ftpc.get_welcome_msg().split()
+        return parts[1]
+
+    def get_application(self):
+        """Returns the application identifier installed on the controller.
+
+        The application is the '*Tool', such as HandlingTool, SpotTool, etc.
+
+        :returns: The application installed on the controller.
+        :rtype: str
+        """
+        APPL_ID_IDX = 1
+        return self.get_scalar_var('$application[{}]'.format(APPL_ID_IDX))
+
+    def get_system_software_version(self):
+        """Returns the version (major.minor and patch) of the system software.
+
+        :returns: The version of the system software on the controller
+        :rtype: str
+        """
+        APPL_VER_IDX = 2
+        return self.get_scalar_var('$application[{}]'.format(APPL_VER_IDX))
