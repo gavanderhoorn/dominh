@@ -25,6 +25,10 @@ class FtpClient():
     def __init__(self, host, timeout=5):
         self.host = host
         self.ftpc = ftplib.FTP(host, timeout=timeout)
+        self.__welcome_msg = self.ftpc.getwelcome()
+
+    def get_welcome_msg(self):
+        return self.__welcome_msg
 
     def connect(self, user='anonymous', pw='anonymous'):
         self.ftpc.login(user, pw)
