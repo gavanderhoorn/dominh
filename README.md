@@ -138,7 +138,6 @@ The following limitations and known issues exist:
   This is largely caused by the use of the Fanuc web server as an intermediary and the resulting need to download and parse returned HTML.
   The library makes use of `.stm` files and zero-output KCL commands where possible, but cannot avoid parsing some pages.
 * Not all methods are symmetric (ie: not all getters have setters).
-  An example of this is the `get_numreg(..)` method: there is no `set_numreg(..)` right now.
   This may change in the future.
 * "Robot Out" (ie: `RDO`) is not writable. The port name as specified in the Fanuc manual on KCL does not seem to work.
 * Dominh CLI tools wrap only a subset of the library's functionality.
