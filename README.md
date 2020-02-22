@@ -30,6 +30,7 @@ The author recommends using PCDK and/or any of the supported fieldbuses in those
 1. [Performance](#performance)
 1. [Related projects](#related-projects)
 1. [Bugs, feature requests, etc](#bugs-feature-requests-etc)
+1. [FAQ](#faq)
 1. [Disclaimer](#disclaimer)
 
 
@@ -163,6 +164,47 @@ For a similar library, but written in Go, see [onerobotics/go-fanuc](https://git
 ## Bugs, feature requests, etc
 
 Please use the [GitHub issue tracker](https://github.com/gavanderhoorn/dominh/issues).
+
+
+## FAQ
+
+### Doesn't this emulate the PCDK?
+
+Yes, it does.
+
+### Why create it then?
+
+The PCDK is primarily targeted at Windows and .NET and C++.
+I needed something that worked on a non-Windows OS and with languages other than .NET and C++.
+Python was a natural choice for me.
+
+### Why did you not use Go/Rust/Java/Kotlin/Swift/anything but Python?
+
+Time and application requirements: target framework supported Python, so writing Dominh in Python made sense.
+
+### This is far from production-ready code.
+
+Yes, I agree.
+See also the *NOTE* in the *Overview* section.
+
+### Performance is really bad.
+
+Compared to the PCDK: certainly, but if you need a more performant solution, ask Fanuc for a PCDK license or use a fieldbus.
+If you have ideas on how to improve performance, post an issue [on the tracker](https://github.com/gavanderhoorn/dominh/issues).
+
+### Can I submit feature/enhancement requests?
+
+Of course!
+I can't guarantee I'll have time to work on them though.
+
+### Would you take pull requests which add new features?
+
+Most certainly.
+As long as new features (or enhancements of existing functionality) pass CI and are reasonably implemented, they will be merged.
+
+### How should Dominh be pronounced?
+
+Domin-a (the `h` is silent).
 
 
 ## Disclaimer
