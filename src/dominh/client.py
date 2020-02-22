@@ -40,7 +40,7 @@ class DominhException(Exception):
     pass
 
 
-plst_grp_t = namedtuple('plst_grp_t', [
+Plst_Grp_t = namedtuple('Plst_Grp_t', [
     'comment',
     'payload',
     'payload_x',
@@ -866,7 +866,7 @@ class Client(object):
         base_vname = 'plst_grp{}[{}]'.format(grp, idx)
         cmt = self.get_scalar_var(
                 self.__format_sysvar([base_vname, 'comment']))
-        return plst_grp_t(
+        return Plst_Grp_t(
             comment=None if cmt == 'Uninitialized' else cmt,
             payload=float(self.get_scalar_var(
                 self.__format_sysvar([base_vname, 'payload']))),
