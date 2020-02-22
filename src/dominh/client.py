@@ -887,15 +887,19 @@ class Client(object):
     def get_controller_series(self):
         """Returns the controller series identifier (ie: R-30iA, 30iB, etc).
 
-        Note: this method uses the FTP server on the controller.
+        Note: this method maps known major versions to controller series. It
+        does not use any value retrieved from the controller directly.
 
         :returns: The series identifier of the controller
         :rtype: str
         """
-        ftpc = FtpClient(self.host, timeout=self.request_timeout)
-        ftpc.connect()
-        parts = ftpc.get_welcome_msg().split()
-        return parts[1]
+        software_version = self.get_system_software_version()
+        major = int(re.match(r'V(\d)\.', software_version).group(1))
+        return {
+            7: 'R-30iA',
+            8: 'R-30iB',
+            9: 'R-30iB+',
+        }.get(major, 'Unknown ("{}")'.format(software_version))
 
     def get_application(self):
         """Returns the application identifier installed on the controller.
