@@ -62,6 +62,8 @@ Only Ubuntu Xenial and Bionic have been extensively tested however.
 
 ## Installation
 
+### Helpers
+
 Translate all `.kl` files in `res/kl` either with Roboguide or with the supplied `Makefile`.
 The latter will require a compatible version of GNU Make for Windows to be available on the `%PATH%`.
 Now copy the resultant `.pc` files to the controller.
@@ -69,6 +71,13 @@ Now copy the resultant `.pc` files to the controller.
 Finally, make sure to check the web server security settings (see [Requirements](#requirements)).
 
 No further setup is required.
+
+### Package
+
+It's recommended to use a virtual Python 3 environment and install the package in it.
+The author has primarily used Python 3.8, but other versions are expected to work (some minor syntax problems could occur on earlier versions).
+
+Future versions may be released to PyPi.
 
 
 ## Example usage
