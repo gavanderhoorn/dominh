@@ -143,7 +143,7 @@ class Client(object):
         if r.status_code != requests.codes.ok:
             raise DominhException("Controller web server returned an "
                                   "error: {0}".format(r.status_code))
-        return r.json()
+        return r
 
     def __read_helper(self, helper, params={}):
         """Retrieve JSON from helper on controller.
@@ -162,7 +162,7 @@ class Client(object):
             raise DominhException("Helpers not uploaded")
         if '.stm' in helper.lower():
             raise ValueError("Helper name includes extension")
-        return self.__get_stm(page=helper + '.stm', params=params)
+        return self.__get_stm(page=helper + '.stm', params=params).json()
 
     def __exec_kcl(self, cmd, wait_for_response=False):
         """Execute the specified KCL command line on the controller.
