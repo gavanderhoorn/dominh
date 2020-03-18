@@ -26,6 +26,7 @@ The author recommends using PCDK and/or any of the supported fieldbuses in those
 1. [Compatibility](#compatibility)
 1. [Installation](#installation)
 1. [Example usage](#example-usage)
+1. [Supported functionality](#supported-functionality)
 1. [Limitations / Known issues](#limitations-known-issues)
 1. [Performance](#performance)
 1. [Related projects](#related-projects)
@@ -136,6 +137,37 @@ dominh write $ROBOT_IP DOUT 1 0
 # check whether controller is faulted (SO[3] = Fault LED)
 dominh read $ROBOT_IP SOPOUT 3
 ```
+
+
+## Supported functionality
+
+Dominh can currently be used to:
+
+ * fault reset the controller
+ * determine whether the controller is:
+   * faulted
+   * e-stopped
+   * executing a program
+   * paused
+   * in AUTO or MANUAL mode
+   * in REMOTE mode
+ * determine whether the TP is enabled
+ * determine the controller series (ie: R-30iA, R-30iB, R-30iB+)
+ * retrieve the application software (ie: HandlingTool, etc)
+ * retrieve the version of the application software
+ * read/write (system) variables (scalar variables are mostly supported)
+ * read/write IO elements (digital, analogue, group, UOP, SOP, TP, flags, markers, etc)
+ * read/write numerical registers
+ * read/write the general override
+ * retrieve jog, tool and user frames
+ * retrieve currently active jog, tool or user frame
+ * retrieve payload schedules
+ * retrieve the list of errors (including history)
+ * retrieve a list of programs (filtered by program type)
+ * update the comments of numeric and position registers and digital IO in and out elements
+
+The above list only includes the functionality offered by the `Client` class' public interface.
+Much more is possible (especially in the area of system variable wrapping/retrieving), but would require adding more convenience methods.
 
 
 ## Limitations / Known issues
