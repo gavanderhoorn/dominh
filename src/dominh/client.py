@@ -52,6 +52,25 @@ Plst_Grp_t = namedtuple('Plst_Grp_t', [
     'payload_iz',
 ])
 
+Config_t = namedtuple('Config_t', [
+    'flip',
+    'up',
+    'top',
+    'turn_no1',
+    'turn_no2',
+    'turn_no3',
+])
+
+Position_t = namedtuple('Position_t', [
+    'config',
+    'x',
+    'y',
+    'z',
+    'w',
+    'p',
+    'r',
+])
+
 
 class Client(object):
     def __init__(self, host, helper_dev=HELPER_DEVICE, helper_dir=HELPER_DIR,
@@ -924,3 +943,163 @@ class Client(object):
         """
         APPL_VER_IDX = 2
         return self.get_scalar_var('$application[{}]'.format(APPL_VER_IDX))
+
+    def __match_position(self, text):
+        """Try to extract elements of a FANUC POSITION from 'text'.
+
+        :param text: Textual representation of a POSITION variable.
+        :type text: str
+        :returns: A tuple with all the matched fields.
+        :rtype: tuple(str, str, ..)
+        """
+        # use Jay's regex (thanks!)
+        matches = re.findall(
+            r"(?m)"
+            r"("
+            r"  Group: (\d)   Config: (F|N) (U|D) (T|B), (\d), (\d), (\d)\r?\n"
+            r"  X:\s*(-?\d*.\d+|[*]+)   Y:\s+(-?\d*.\d+|[*]+)   Z:\s+(-?\d*.\d+|[*]+)\r?\n"  # noqa
+            r"  W:\s*(-?\d*.\d+|[*]+)   P:\s*(-?\d*.\d+|[*]+)   R:\s*(-?\d*.\d+|[*]+)"  # noqa
+            r"|"
+            r"  Group: (\d)\r?\n"
+            r"  (J1) =\s*(-?\d*.\d+|[*]+) deg   J2 =\s*(-?\d*.\d+|[*]+) deg   J3 =\s*(-?\d*.\d+|[*]+) deg \r?\n"  # noqa
+            r"  J4 =\s*(-?\d*.\d+|[*]+) deg   J5 =\s*(-?\d*.\d+|[*]+) deg   J6 =\s*(-?\d*.\d+|[*]+) deg"  # noqa
+            r")",
+            text)
+        return matches[0] if matches else None
+
+    def __get_var_raw(self, varname):
+        """Retrieve raw text dump of variable with name 'varname'.
+
+        :param varname: Name of the variable to retrieve.
+        :type varname: str
+        :returns: Raw textual rendering of the (system) variable 'varname'.
+        :rtype: str
+        """
+        # use get_stm(..) directly here as what we get returned is not actually
+        # json, and read_helper(..) will try to parse it as such and then fail
+        ret = self.__get_stm(
+            page=HLPR_RAW_VAR + '.stm', params={'_reqvar': varname})
+        return ret.text
+
+    def __get_frame_var(self, varname):
+        """Retrieve the POSITION variable 'varname'.
+
+        :param varname: Name of the variable to retrieve.
+        :type varname: str
+        :returns: Position_t instance populated with values retrieved from the
+        'varname' variable.
+        :rtype: Position_t
+        """
+        # NOTE: assuming here that get_var_raw(..) returns something we can
+        # actually parse
+        ret = self.__get_var_raw(varname)
+        # remove the first line as it's empty
+        match = self.__match_position(ret.replace('\r\n', '', 1))
+
+        # some nasty fiddling
+        # TODO: this won't work for non-6-axis systems
+        f = match[2] == 'F'  # N
+        u = match[3] == 'U'  # D
+        t = match[4] == 'T'  # B
+        turn_nos = list(map(int, match[5:8]))
+        xyzwpr = list(map(float, match[8:14]))
+        return Position_t(Config_t(f, u, t, *turn_nos), *xyzwpr)
+
+    def __get_frame_comment(self, frame_type, group, idx):
+        """Return the comment for the jog/tool/user frame 'idx'.
+
+        :param frame_type: Type of frame the comment is associated with (
+        jog:2, tool:1, user:3).
+        :type frame_type: int
+        :param group: Numeric ID of the motion group the frame is associated
+        with.
+        :type group: int
+        :param idx: Numeric ID of the frame.
+        :type idx: int
+        :returns: The comment of the frame in group 'group', with ID 'idx'
+        :rtype: str
+        """
+        varname = '[TPFDEF]SETUP_DATA[{},{},{}].$COMMENT'.format(
+            group, frame_type, idx)
+        return self.get_scalar_var(varname)
+
+    def get_jogframe(self, idx, group=1, include_comment=False):
+        """Return the jog frame at index 'idx'.
+
+        :param idx: Numeric ID of the jog frame.
+        :type idx: int
+        :param group: Numeric ID of the motion group the jog frame is
+        associated with.
+        :type group: int
+        :returns: A tuple containing the user frame and associated comment (if
+        requested)
+        :rtype: tuple(Position_t, str)
+        """
+        if group < 1 or group > 8:
+            raise ValueError("Requested group id invalid (must be "
+                             "between 1 and 8, got: {})".format(group))
+        if idx < 1 or idx > 5:
+            raise ValueError("Requested jog frame idx invalid (must be "
+                             "between 1 and 5, got: {})".format(idx))
+        varname = '[TPFDEF]JOGFRAMES[{},{}]'.format(group, idx)
+        frame = self.__get_frame_var(varname)
+        if include_comment:
+            JOGFRAME = 2
+            cmt = self.__get_frame_comment(
+                frame_type=JOGFRAME, group=group, idx=idx)
+            return (frame, cmt)
+        return (frame,)
+
+    def get_toolframe(self, idx, group=1, include_comment=False):
+        """Return the tool frame at index 'idx'.
+
+        :param idx: Numeric ID of the tool frame.
+        :type idx: int
+        :param group: Numeric ID of the motion group the tool frame is
+        associated with.
+        :type group: int
+        :returns: A tuple containing the tool frame and associated comment (if
+        requested)
+        :rtype: tuple(Position_t,) or tuple(Position_t, str)
+        """
+        if group < 1 or group > 8:
+            raise ValueError("Requested group id invalid (must be "
+                             "between 1 and 8, got: {})".format(group))
+        if idx < 1 or idx > 10:
+            raise ValueError("Requested tool frame idx invalid (must be "
+                             "between 1 and 10, got: {})".format(idx))
+        varname = '[*SYSTEM*]$MNUTOOL[{},{}]'.format(group, idx)
+        frame = self.__get_frame_var(varname)
+        if include_comment:
+            TOOLFRAME = 1
+            cmt = self.__get_frame_comment(
+                frame_type=TOOLFRAME, group=group, idx=idx)
+            return (frame, cmt)
+        return (frame,)
+
+    def get_userframe(self, idx, group=1, include_comment=False):
+        """Return the user frame at index 'idx'.
+
+        :param idx: Numeric ID of the user frame.
+        :type idx: int
+        :param group: Numeric ID of the motion group the user frame is
+        associated with.
+        :type group: int
+        :returns: A tuple containing the user frame and associated comment (if
+        requested)
+        :rtype: tuple(Position_t, str)
+        """
+        if group < 1 or group > 8:
+            raise ValueError("Requested group id invalid (must be "
+                             "between 1 and 8, got: {})".format(group))
+        if idx < 1 or idx > 10:
+            raise ValueError("Requested user frame idx invalid (must be "
+                             "between 1 and 10, got: {})".format(idx))
+        varname = '[*SYSTEM*]$MNUFRAME[{},{}]'.format(group, idx)
+        frame = self.__get_frame_var(varname)
+        if include_comment:
+            USERFRAME = 3
+            cmt = self.__get_frame_comment(
+                frame_type=USERFRAME, group=group, idx=idx)
+            return (frame, cmt)
+        return (frame,)
