@@ -33,6 +33,7 @@ JSON_REASON = 'reason'
 HELPER_DEVICE = 'td:'
 HELPER_DIR = ''
 
+HLPR_RAW_VAR = 'raw_var'
 HLPR_SCALAR_VAR = 'scalar_var'
 
 
@@ -119,6 +120,9 @@ class Client(object):
         # individual array elements)
         content = rb'{ "<!-- #ECHO var="_reqvar" -->": "<!-- #ECHO var="{_reqvar}" -->" }'  # noqa
         ftpc.upload_as_file('/{}/{}.stm'.format(remote_path, HLPR_SCALAR_VAR),
+                            content)
+        content = rb'<!-- #ECHO var="{_reqvar}" -->'
+        ftpc.upload_as_file('/{}/{}.stm'.format(remote_path, HLPR_RAW_VAR),
                             content)
 
     def __get_stm(self, page, params={}):
