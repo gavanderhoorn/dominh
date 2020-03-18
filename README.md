@@ -200,6 +200,13 @@ See also the *NOTE* in the *Overview* section.
 Compared to the PCDK: certainly, but if you need a more performant solution, ask Fanuc for a PCDK license or use a fieldbus.
 If you have ideas on how to improve performance, post an issue [on the tracker](https://github.com/gavanderhoorn/dominh/issues).
 
+### Why not use Karel more?
+
+While it would certainly possible to delegate much more of the functionality to Karel programs on the controller, it would also increase the 'footprint' of dominh.
+As much of the functionality is not intended to be used in performance critical parts of applications, I decided it would be interesting to see how much could be done with existing interfaces and functionality already provided by Fanuc.
+Dominh uses the KCL and built-in web server as much as possible.
+Only where absolutely necessary (or where very much more efficient) is Karel used.
+
 ### Can I submit feature/enhancement requests?
 
 Of course!
