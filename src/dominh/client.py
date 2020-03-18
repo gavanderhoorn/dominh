@@ -1103,3 +1103,24 @@ class Client(object):
                 frame_type=USERFRAME, group=group, idx=idx)
             return (frame, cmt)
         return (frame,)
+
+    def get_active_jogframe(self, group=1):
+        if group < 1 or group > 8:
+            raise ValueError("Requested group id invalid (must be "
+                             "between 1 and 8, got: {})".format(group))
+        return self.get_scalar_var(
+            varname='[TPFDEF]JOGFRAMNUM[{}]'.format(group))
+
+    def get_active_toolframe(self, group=1):
+        if group < 1 or group > 8:
+            raise ValueError("Requested group id invalid (must be "
+                             "between 1 and 8, got: {})".format(group))
+        return self.get_scalar_var(
+            varname='[*SYSTEM*]$MNUTOOLNUM[{}]'.format(group))
+
+    def get_active_userframe(self, group=1):
+        if group < 1 or group > 8:
+            raise ValueError("Requested group id invalid (must be "
+                             "between 1 and 8, got: {})".format(group))
+        return self.get_scalar_var(
+            varname='[*SYSTEM*]$MNUFRAMENUM[{}]'.format(group))
