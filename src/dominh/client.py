@@ -71,6 +71,15 @@ Position_t = namedtuple('Position_t', [
     'r',
 ])
 
+JointPos_t = namedtuple('JointPos_t', [
+    'j1',
+    'j2',
+    'j3',
+    'j4',
+    'j5',
+    'j6',
+])
+
 
 class Client(object):
     def __init__(self, host, helper_dev=HELPER_DEVICE, helper_dir=HELPER_DIR,
@@ -1128,3 +1137,61 @@ class Client(object):
                              "between 1 and 8, got: {})".format(group))
         return self.get_scalar_var(
             varname='[*SYSTEM*]$MNUFRAMENUM[{}]'.format(group))
+
+    def get_posreg(self, idx, group=1):
+        """Return the position register at index 'idx' for group 'group'.
+
+        :param idx: Numeric ID of the position register.
+        :type idx: int
+        :param group: Numeric ID of the motion group the position register is
+        associated with.
+        :type group: int
+        :returns: A tuple containing the pose and associated comment
+        :rtype: tuple(Position_t, str) or tuple(JointPos_t, str)
+        """
+        varname = '$POSREG[{},{}]'.format(group, idx)
+        # use get_stm(..) directly here as what we get returned is not actually
+        # json, and read_helper(..) will try to parse it as such and then fail
+        ret = self.__get_stm(
+            page=HLPR_RAW_VAR + '.stm', params={'_reqvar': varname})
+
+        # use Jay's regex (thanks!)
+        # TODO: merge with get_frame_var(..)
+        match = re.findall(
+            r"(?m)"
+            r"\'([^']*)' "
+            r"("
+            r"Uninitialized"
+            r"|"
+            r"\r?\n"
+            r"  Group: (\d)   Config: (F|N) (U|D) (T|B), (\d), (\d), (\d)\r?\n"
+            r"  X:\s*(-?\d*.\d+|[*]+)   Y:\s+(-?\d*.\d+|[*]+)   Z:\s+(-?\d*.\d+|[*]+)\r?\n"  # noqa
+            r"  W:\s*(-?\d*.\d+|[*]+)   P:\s*(-?\d*.\d+|[*]+)   R:\s*(-?\d*.\d+|[*]+)"  # noqa
+            r"|"
+            r"  Group: (\d)\r?\n"
+            r"  (J1) =\s*(-?\d*.\d+|[*]+) deg   J2 =\s*(-?\d*.\d+|[*]+) deg   J3 =\s*(-?\d*.\d+|[*]+) deg \r?\n"  # noqa
+            r"  J4 =\s*(-?\d*.\d+|[*]+) deg   J5 =\s*(-?\d*.\d+|[*]+) deg   J6 =\s*(-?\d*.\d+|[*]+) deg)",  # noqa
+            ret.text)
+
+        if not match:
+            raise DominhException(
+                "Could not match value returned for '{}'".format(varname))
+
+        posreg = match[0]
+        if 'Uninitialized' in posreg:
+            return (None, '')
+
+        cmt = posreg[0]
+        if posreg[16] == 'J1':
+            # TODO: this doesn't work for non-6-axis systems
+            jpos = list(map(float, posreg[17:24]))
+            return (JointPos_t(*jpos), cmt)
+        else:
+            # some nasty fiddling
+            # TODO: this won't work for non-6-axis systems
+            f = posreg[3] == 'F'  # N
+            u = posreg[4] == 'U'  # D
+            t = posreg[5] == 'T'  # B
+            turn_nos = list(map(int, posreg[6:9]))
+            xyzwpr = list(map(float, posreg[9:15]))
+            return (Position_t(Config_t(f, u, t, *turn_nos), *xyzwpr), cmt)
