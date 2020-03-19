@@ -996,6 +996,10 @@ class Client(object):
         # remove the first line as it's empty
         match = self.__match_position(ret.replace('\r\n', '', 1))
 
+        if not match:
+            raise DominhException(
+                "Could not match value returned for '{}'".format(varname))
+
         # some nasty fiddling
         # TODO: this won't work for non-6-axis systems
         f = match[2] == 'F'  # N
