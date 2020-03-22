@@ -1195,3 +1195,10 @@ class Client(object):
             turn_nos = list(map(int, posreg[6:9]))
             xyzwpr = list(map(float, posreg[9:15]))
             return (Position_t(Config_t(f, u, t, *turn_nos), *xyzwpr), cmt)
+
+    def was_jogged(self, group=1):
+        varname = '$MOR_GRP[{}].$JOGGED'.format(group)
+        ret = self.get_scalar_var(varname=varname)
+        if 'bad variable' in ret.lower():
+            raise DominhException("Could not read sysvar: '{}'".format(ret))
+        return ret.lower() == 'true'
