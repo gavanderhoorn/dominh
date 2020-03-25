@@ -19,6 +19,8 @@ They allow incidental external access to a controller without needing to use any
 Do not use this on production systems or in contexts where any kind of determinism is required.
 The author recommends using PCDK and/or any of the supported fieldbuses in those cases.
 
+**NOTE 2**: on R-30iB+ controllers, option `R912` can do some of the things this library supports.
+
 
 ## TOC
 
