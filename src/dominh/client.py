@@ -1202,3 +1202,24 @@ class Client(object):
         if 'bad variable' in ret.lower():
             raise DominhException("Could not read sysvar: '{}'".format(ret))
         return ret.lower() == 'true'
+
+    def get_active_prog(self):
+        varname = '$SHELL_WRK.$ACTIVEPROG'
+        ret = self.get_scalar_var(varname=varname)
+        if 'bad variable' in ret.lower():
+            raise DominhException("Could not read sysvar: '{}'".format(ret))
+        return ret
+
+    def get_curr_routine(self):
+        varname = '$SHELL_WRK.$ROUT_NAME'
+        ret = self.get_scalar_var(varname=varname)
+        if 'bad variable' in ret.lower():
+            raise DominhException("Could not read sysvar: '{}'".format(ret))
+        return ret
+
+    def get_curr_line(self):
+        varname = '$SHELL_WRK.$CURR_LINE'
+        ret = self.get_scalar_var(varname=varname)
+        if 'bad variable' in ret.lower():
+            raise DominhException("Could not read sysvar: '{}'".format(ret))
+        return int(ret)
