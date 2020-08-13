@@ -7,7 +7,7 @@
 ## Overview
 
 This is a poor man's version of a subset of the RPC functionality provided by the (Windows-only) Fanuc PCDK implemented in Python.
-This uses the *Web Svr Enhancements* option (`R626`) and the interfaces it provides to the controller.
+This uses the *Web Svr Enhancements* option (`R626`) and the interfaces it provides to the controller (see note in [Requirements](#requirements)).
 Only a subset of the functionality is currently available and performance will not be comparable with the PCDK.
 
 Additionally a simple set of CLI tools is included, which allows some of the library's functionality to be used from the command line and/or in shell scripts.
@@ -39,8 +39,8 @@ The author recommends using PCDK and/or any of the supported fieldbuses in those
 
 ## Requirements
 
-This needs the base *Web Server* (`HTTP`) and the *Web Svr Enhancements* (`R626`) options.
-As some parts are written in Karel, option `R632` could be a requirement.
+This needs the base *Web Server* (`HTTP`) and the *Web Svr Enhancements* (`R626`) options (note: contrary to what the manual states, this is not a separate option: all functionality is already built-in, at least for R-30iA and newer controllers).
+As some parts are written in Karel, option `R632` could be a requirement, but this is unlikely.
 
 Other requirements include a functioning networking setup (make sure you can ping the controller and the controller's website shows up when opening `http://robot_ip`), and correctly configured *HTTP Authentication* and FTP server settings.
 Either unlock the *KAREL* and *KCL* resources completely, set global credentials or add entries allowing specific access to the `dmh_autom` and `dmh_selprg` Karel programs that are part of this tool.
