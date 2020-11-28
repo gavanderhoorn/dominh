@@ -114,7 +114,7 @@ dout1_state = c.read_dout(1)
 ## CLI
 
 ```bash
-ROBOT_IP=<ip.of.robot.ctrlr>
+export ROBOT_IP=<ip.of.robot.ctrlr>
 
 # reset a controller (fire-and-forget)
 dominh reset $ROBOT_IP
