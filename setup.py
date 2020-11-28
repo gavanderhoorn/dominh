@@ -31,5 +31,6 @@ setup(
     description=("A poor man's implementation of an RPC interface to Fanuc "
                  "R-30iA and R-30iB(+) controllers"),
     license='Apache-2.0',
-    install_requires=['docopt', 'requests']
+    python_requires='>=3.6',
+    install_requires=['docopt', 'requests'],
 )
