@@ -1137,6 +1137,9 @@ class Client(object):
         :returns: A tuple containing the pose and associated comment
         :rtype: tuple(Position_t, str) or tuple(JointPos_t, str)
         """
+        if group < 1 or group > 8:
+            raise ValueError("Requested group id invalid (must be "
+                             f"between 1 and 8, got: {group})")
         varname = f'$POSREG[{group},{idx}]'
         # use get_stm(..) directly here as what we get returned is not actually
         # json, and read_helper(..) will try to parse it as such and then fail
@@ -1185,6 +1188,9 @@ class Client(object):
             return (Position_t(Config_t(f, u, t, *turn_nos), *xyzwpr), cmt)
 
     def was_jogged(self, group=1):
+        if group < 1 or group > 8:
+            raise ValueError("Requested group id invalid (must be "
+                             f"between 1 and 8, got: {group})")
         varname = f'$MOR_GRP[{group}].$JOGGED'
         ret = self.get_scalar_var(varname=varname)
         if 'bad variable' in ret.lower():
