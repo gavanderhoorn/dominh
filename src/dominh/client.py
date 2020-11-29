@@ -496,7 +496,6 @@ class Client(object):
 
     def reset(self):
         """Attempt to RESET the controller."""
-
         self.__exec_kcl(cmd='reset')
 
     def select_tpe(self, program):
