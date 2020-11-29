@@ -69,5 +69,4 @@ if __name__ == '__main__':
         dominh_get.main(argv=argv, skip_upload=skip_upload)
 
     else:
-        sys.stderr.write("'{}' is not a dominh command.\n{}".format(
-            args['<command>'], __doc__))
+        sys.stderr.write(f"'{args['<command>']}' is not a dominh command.\n{__doc__}")

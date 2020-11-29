@@ -46,7 +46,6 @@ def main(argv, skip_upload=False):
         print(c.get_scalar_var(varname))
 
     except (exceptions.ConnectionError, OSError) as e:
-        sys.stderr.write(
-            "Error trying to connect to the controller: {}\n".format(e))
+        sys.stderr.write(f"Error trying to connect to the controller: {e}\n")
     except DominhException as e:
-        sys.stderr.write("Error during read: {}\n".format(e))
+        sys.stderr.write(f"Error during read: {e}\n")

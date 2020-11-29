@@ -35,13 +35,13 @@ class FtpClient():
 
     def get_file_as_str(self, remote_name):
         buf = BytesIO()
-        self.ftpc.retrbinary('RETR {}'.format(remote_name), buf.write)
+        self.ftpc.retrbinary(f'RETR {remote_name}', buf.write)
         return buf.getvalue()
 
     def upload_as_file(self, remote_name, contents):
         buf = BytesIO(contents)
         buf.seek(0)
-        self.ftpc.storbinary('STOR {}'.format(remote_name), buf)
+        self.ftpc.storbinary(f'STOR {remote_name}', buf)
 
     def remove_file(self, remote_name):
         self.ftpc.delete(remote_name)

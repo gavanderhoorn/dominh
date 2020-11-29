@@ -114,7 +114,7 @@ class Client(object):
         self.request_timeout = request_timeout
 
         # TODO: do this some other way
-        self.base_path = '{}/{}'.format(helper_dev, helper_dir)
+        self.base_path = f'{helper_dev}/{helper_dir}'
         while ('//' in self.base_path):
             self.base_path = self.base_path.replace('//', '/')
         if self.base_path.endswith('/'):
@@ -147,11 +147,9 @@ class Client(object):
         # KCL 'SHOW VAR', but should be limited to non-array variables (or
         # individual array elements)
         content = rb'{ "<!-- #ECHO var="_reqvar" -->": "<!-- #ECHO var="{_reqvar}" -->" }'  # noqa
-        ftpc.upload_as_file('/{}/{}.stm'.format(remote_path, HLPR_SCALAR_VAR),
-                            content)
+        ftpc.upload_as_file(f'/{remote_path}/{HLPR_SCALAR_VAR}.stm', content)
         content = rb'<!-- #ECHO var="{_reqvar}" -->'
-        ftpc.upload_as_file('/{}/{}.stm'.format(remote_path, HLPR_RAW_VAR),
-                            content)
+        ftpc.upload_as_file(f'/{remote_path}/{HLPR_RAW_VAR}.stm', content)
 
     def __get_stm(self, page, params={}):
         """Retrieve a '.stm' file from the controller (rendered by the web
@@ -165,12 +163,11 @@ class Client(object):
         :returns: JSON response as returned by the controller in its response
         :rtype: dict
         """
-        url = 'http://{host}/{base}/{page}'.format(
-            host=self.host, base=self.base_path, page=page)
+        url = f'http://{self.host}/{self.base_path}/{page}'
         r = requests.get(url, params=params, timeout=self.request_timeout)
         if r.status_code != requests.codes.ok:
             raise DominhException("Controller web server returned an "
-                                  "error: {0}".format(r.status_code))
+                                  f"error: {r.status_code}")
         return r
 
     def __read_helper(self, helper, params={}):
@@ -190,7 +187,7 @@ class Client(object):
             raise DominhException("Helpers not uploaded")
         if '.stm' in helper.lower():
             raise ValueError("Helper name includes extension")
-        return self.__get_stm(page=helper + '.stm', params=params).json()
+        return self.__get_stm(page=f'{helper}.stm', params=params).json()
 
     def __exec_kcl(self, cmd, wait_for_response=False):
         """Execute the specified KCL command line on the controller.
@@ -209,16 +206,15 @@ class Client(object):
         :rtype: str
         """
         base = 'KCL' if wait_for_response else 'KCLDO'
-        url = 'http://{host}/{base}/{cmd}'.format(
-            host=self.host, base=base, cmd=cmd)
+        url = f'http://{self.host}/{base}/{cmd}'
         r = requests.get(url, timeout=self.request_timeout)
 
         # caller requested we check return value
         if wait_for_response:
             if r.status_code != requests.codes.ok:
                 raise DominhException(
-                    "Unexpected result code. Expected: {}, got: {}".format(
-                        requests.codes.ok, r.status_code))
+                    f"Unexpected result code. Expected: {requests.codes.ok}, "
+                    f"got: {r.status_code}")
             # retrieve KCL command response from doc
             # TODO: could compile these and store them as we might use them
             # more often
@@ -232,8 +228,8 @@ class Client(object):
         # controller returned the appropriate HTTP result code
         if r.status_code != requests.codes.no_content:
             raise DominhException(
-                "Unexpected result code. Expected: {}, got: {}".format(
-                    requests.codes.no_content, r.status_code))
+                "Unexpected result code. Expected: "
+                f"{requests.codes.no_content}, got: {r.status_code}")
 
     def __exec_karel_prg(self, prg_name, params={}):
         """Execute a Karel program on the controller (via the web server).
@@ -251,17 +247,16 @@ class Client(object):
         :returns: JSON response sent by the Karel program
         :rtype: str
         """
-        url = 'http://{host}/KAREL/{prog}'.format(
-            host=self.host, prog=prg_name)
+        url = f'http://{self.host}/KAREL/{prg_name}'
         r = requests.get(url, params=params, timeout=self.request_timeout)
         if r.status_code != requests.codes.ok:
             raise DominhException(
-                "Unexpected result code. Expected: {}, got: {}".format(
-                    requests.codes.ok, r.status_code))
+                f"Unexpected result code. Expected: {requests.codes.ok}, "
+                f"got: {r.status_code}")
         if 'Unable to run' in r.text:
             raise DominhException(
-                "Error: Karel program '{}' cannot"
-                " be started on controller".format(prg_name))
+                f"Error: Karel program '{prg_name}' cannot be started on "
+                "controller")
         return r.json()
 
     def __disable_web_server_headers(self):
@@ -304,7 +299,7 @@ class Client(object):
         :param val: Value to write to 'varname'
         :type val: any (must have str() support)
         """
-        self.__exec_kcl(cmd='set var {}={}'.format(varname, val))
+        self.__exec_kcl(cmd=f'set var {varname}={val}')
 
     def get_scalar_var(self, varname):
         """Retrieve the value of the variable named 'varname'.
@@ -358,8 +353,8 @@ class Client(object):
         operation in the form of a bool
         :rtype: None or bool (see above)
         """
-        ret = self.__exec_kcl(cmd='set port {}[{}]={}'.format(
-            port_type, idx, val), wait_for_response=check)
+        ret = self.__exec_kcl(
+            cmd=f'set port {port_type}[{idx}]={val}', wait_for_response=check)
         if not check:
             return
 
@@ -367,18 +362,17 @@ class Client(object):
         ret = ret.strip()
         if 'Port name expected' in ret:
             raise DominhException(
-                "Illegal port type identifier: '{}'".format(port_type))
+                f"Illegal port type identifier: '{port_type}'")
         if 'Illegal port number' in ret:
             raise DominhException(
-                "Illegal port number for port {}: {}".format(port_type, idx))
+                f"Illegal port number for port {port_type}: {idx}")
         if 'Value out of range' in ret:
             raise DominhException(
-                "Value out of range for port type {}: {}".format(
-                    port_type, val))
+                f"Value out of range for port type {port_type}: {val}")
         if 'ERROR' in ret:
             raise DominhException(
                 "Unrecognised error trying to set port:\n"
-                "\n________________\n\n{}\n________________".format(ret))
+                f"\n________________\n\n{ret}\n________________")
 
         # check for successful write
         is_ok = re.match(r'Value was: (0|1).*Value is:  (0|1)', ret, re.DOTALL)
@@ -456,17 +450,17 @@ class Client(object):
         :rtype: str
         """
         port_type = port_type.upper()
-        port_id = '{}[{}]'.format(port_type, idx)
+        port_id = f'{port_type}[{idx}]'
         ret = self.__read_helper(
             helper=HLPR_SCALAR_VAR, params={'_reqvar': port_id})
 
         # check for some common problems
         if 'unknown port type name' in ret[port_id].lower():
             raise DominhException(
-                "Illegal port type identifier: '{}'".format(port_type))
+                f"Illegal port type identifier: '{port_type}'")
         if 'illegal port number' in ret[port_id].lower():
             raise DominhException(
-                "Illegal port number for port {}: {}".format(port_type, idx))
+                f"Illegal port number for port {port_type}: {idx}")
 
         return ret[port_id]
 
@@ -796,13 +790,13 @@ class Client(object):
             }
 
         path = 'karel/ComSet'
-        url = 'http://{host}/{path}'.format(host=self.host, path=path)
+        url = f'http://{self.host}/{path}'
         r = requests.get(url, params=params, timeout=self.request_timeout)
 
         if r.status_code != requests.codes.ok:
             raise DominhException(
-                "Unexpected result code. Expected: {}, got: {}".format(
-                    requests.codes.ok, r.status_code))
+                f"Unexpected result code. Expected: {requests.codes.ok}, "
+                f"got: {r.status_code}")
 
     def cmt_numreg(self, idx, comment):
         """Update the comment on numerical register at 'idx'.
@@ -853,7 +847,7 @@ class Client(object):
         index 'idx' in the numerical registers on the controller
         :rtype: int or float (see above)
         """
-        varname = '$NUMREG[{}]'.format(idx)
+        varname = f'$NUMREG[{idx}]'
         ret = self.get_scalar_var(varname)
         return float(ret) if '.' in ret else int(ret)
 
@@ -888,14 +882,13 @@ class Client(object):
         :rtype: plst_grp_t
         """
         if (grp < 1 or grp > 5):
-            raise ValueError(
-                "Group ID must be between 1 and 5 (got: {})".format(grp))
+            raise ValueError(f"Group ID must be between 1 and 5 (got: {grp})")
         if (idx < 1 or idx > 10):
             raise ValueError(
-                "Payload ID must be between 1 and 10 (got: {})".format(idx))
+                f"Payload ID must be between 1 and 10 (got: {idx})")
 
         # TODO: retrieve struct in one read and parse result instead
-        base_vname = 'plst_grp{}[{}]'.format(grp, idx)
+        base_vname = f'plst_grp{grp}[{idx}]'
         cmt = self.get_scalar_var(
                 self.__format_sysvar([base_vname, 'comment']))
         return Plst_Grp_t(
@@ -931,7 +924,7 @@ class Client(object):
             7: 'R-30iA',
             8: 'R-30iB',
             9: 'R-30iB+',
-        }.get(major, 'Unknown ("{}")'.format(software_version))
+        }.get(major, f'Unknown ("{software_version}")')
 
     def get_application(self):
         """Returns the application identifier installed on the controller.
@@ -942,7 +935,7 @@ class Client(object):
         :rtype: str
         """
         APPL_ID_IDX = 1
-        return self.get_scalar_var('$application[{}]'.format(APPL_ID_IDX))
+        return self.get_scalar_var(f'$application[{APPL_ID_IDX}]')
 
     def get_system_software_version(self):
         """Returns the version (major.minor and patch) of the system software.
@@ -951,7 +944,7 @@ class Client(object):
         :rtype: str
         """
         APPL_VER_IDX = 2
-        return self.get_scalar_var('$application[{}]'.format(APPL_VER_IDX))
+        return self.get_scalar_var(f'$application[{APPL_VER_IDX}]')
 
     def __match_position(self, text):
         """Try to extract elements of a FANUC POSITION from 'text'.
@@ -1007,7 +1000,7 @@ class Client(object):
 
         if not match:
             raise DominhException(
-                "Could not match value returned for '{}'".format(varname))
+                f"Could not match value returned for '{varname}'")
 
         # some nasty fiddling
         # TODO: this won't work for non-6-axis systems
@@ -1032,8 +1025,7 @@ class Client(object):
         :returns: The comment of the frame in group 'group', with ID 'idx'
         :rtype: str
         """
-        varname = '[TPFDEF]SETUP_DATA[{},{},{}].$COMMENT'.format(
-            group, frame_type, idx)
+        varname = f'[TPFDEF]SETUP_DATA[{group},{frame_type},{idx}].$COMMENT'
         return self.get_scalar_var(varname)
 
     def get_jogframe(self, idx, group=1, include_comment=False):
@@ -1050,11 +1042,11 @@ class Client(object):
         """
         if group < 1 or group > 8:
             raise ValueError("Requested group id invalid (must be "
-                             "between 1 and 8, got: {})".format(group))
+                             f"between 1 and 8, got: {group})")
         if idx < 1 or idx > 5:
             raise ValueError("Requested jog frame idx invalid (must be "
-                             "between 1 and 5, got: {})".format(idx))
-        varname = '[TPFDEF]JOGFRAMES[{},{}]'.format(group, idx)
+                             f"between 1 and 5, got: {idx})")
+        varname = f'[TPFDEF]JOGFRAMES[{group},{idx}]'
         frame = self.__get_frame_var(varname)
         if include_comment:
             JOGFRAME = 2
@@ -1077,11 +1069,11 @@ class Client(object):
         """
         if group < 1 or group > 8:
             raise ValueError("Requested group id invalid (must be "
-                             "between 1 and 8, got: {})".format(group))
+                             f"between 1 and 8, got: {group})")
         if idx < 1 or idx > 10:
             raise ValueError("Requested tool frame idx invalid (must be "
-                             "between 1 and 10, got: {})".format(idx))
-        varname = '[*SYSTEM*]$MNUTOOL[{},{}]'.format(group, idx)
+                             f"between 1 and 10, got: {idx})")
+        varname = f'[*SYSTEM*]$MNUTOOL[{group},{idx}]'
         frame = self.__get_frame_var(varname)
         if include_comment:
             TOOLFRAME = 1
@@ -1104,11 +1096,11 @@ class Client(object):
         """
         if group < 1 or group > 8:
             raise ValueError("Requested group id invalid (must be "
-                             "between 1 and 8, got: {})".format(group))
+                             f"between 1 and 8, got: {group})")
         if idx < 1 or idx > 10:
             raise ValueError("Requested user frame idx invalid (must be "
-                             "between 1 and 10, got: {})".format(idx))
-        varname = '[*SYSTEM*]$MNUFRAME[{},{}]'.format(group, idx)
+                             f"between 1 and 10, got: {idx})")
+        varname = f'[*SYSTEM*]$MNUFRAME[{group},{idx}]'
         frame = self.__get_frame_var(varname)
         if include_comment:
             USERFRAME = 3
@@ -1120,23 +1112,20 @@ class Client(object):
     def get_active_jogframe(self, group=1):
         if group < 1 or group > 8:
             raise ValueError("Requested group id invalid (must be "
-                             "between 1 and 8, got: {})".format(group))
-        return self.get_scalar_var(
-            varname='[TPFDEF]JOGFRAMNUM[{}]'.format(group))
+                             f"between 1 and 8, got: {group})")
+        return self.get_scalar_var(varname=f'[TPFDEF]JOGFRAMNUM[{group}]')
 
     def get_active_toolframe(self, group=1):
         if group < 1 or group > 8:
             raise ValueError("Requested group id invalid (must be "
-                             "between 1 and 8, got: {})".format(group))
-        return self.get_scalar_var(
-            varname='[*SYSTEM*]$MNUTOOLNUM[{}]'.format(group))
+                             f"between 1 and 8, got: {group})")
+        return self.get_scalar_var(varname=f'[*SYSTEM*]$MNUTOOLNUM[{group}]')
 
     def get_active_userframe(self, group=1):
         if group < 1 or group > 8:
             raise ValueError("Requested group id invalid (must be "
-                             "between 1 and 8, got: {})".format(group))
-        return self.get_scalar_var(
-            varname='[*SYSTEM*]$MNUFRAMENUM[{}]'.format(group))
+                             f"between 1 and 8, got: {group})")
+        return self.get_scalar_var(varname=f'[*SYSTEM*]$MNUFRAMENUM[{group}]')
 
     def get_posreg(self, idx, group=1):
         """Return the position register at index 'idx' for group 'group'.
@@ -1149,7 +1138,7 @@ class Client(object):
         :returns: A tuple containing the pose and associated comment
         :rtype: tuple(Position_t, str) or tuple(JointPos_t, str)
         """
-        varname = '$POSREG[{},{}]'.format(group, idx)
+        varname = f'$POSREG[{group},{idx}]'
         # use get_stm(..) directly here as what we get returned is not actually
         # json, and read_helper(..) will try to parse it as such and then fail
         ret = self.__get_stm(
@@ -1175,7 +1164,7 @@ class Client(object):
 
         if not match:
             raise DominhException(
-                "Could not match value returned for '{}'".format(varname))
+                f"Could not match value returned for '{varname}'")
 
         posreg = match[0]
         if 'Uninitialized' in posreg:
@@ -1197,29 +1186,29 @@ class Client(object):
             return (Position_t(Config_t(f, u, t, *turn_nos), *xyzwpr), cmt)
 
     def was_jogged(self, group=1):
-        varname = '$MOR_GRP[{}].$JOGGED'.format(group)
+        varname = f'$MOR_GRP[{group}].$JOGGED'
         ret = self.get_scalar_var(varname=varname)
         if 'bad variable' in ret.lower():
-            raise DominhException("Could not read sysvar: '{}'".format(ret))
+            raise DominhException(f"Could not read sysvar: '{ret}'")
         return ret.lower() == 'true'
 
     def get_active_prog(self):
         varname = '$SHELL_WRK.$ACTIVEPROG'
         ret = self.get_scalar_var(varname=varname)
         if 'bad variable' in ret.lower():
-            raise DominhException("Could not read sysvar: '{}'".format(ret))
+            raise DominhException(f"Could not read sysvar: '{ret}'")
         return ret
 
     def get_curr_routine(self):
         varname = '$SHELL_WRK.$ROUT_NAME'
         ret = self.get_scalar_var(varname=varname)
         if 'bad variable' in ret.lower():
-            raise DominhException("Could not read sysvar: '{}'".format(ret))
+            raise DominhException(f"Could not read sysvar: '{ret}'")
         return ret
 
     def get_curr_line(self):
         varname = '$SHELL_WRK.$CURR_LINE'
         ret = self.get_scalar_var(varname=varname)
         if 'bad variable' in ret.lower():
-            raise DominhException("Could not read sysvar: '{}'".format(ret))
+            raise DominhException(f"Could not read sysvar: '{ret}'")
         return int(ret)
