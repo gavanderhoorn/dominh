@@ -1048,12 +1048,12 @@ class Client(object):
                              f"between 1 and 5, got: {idx})")
         varname = f'[TPFDEF]JOGFRAMES[{group},{idx}]'
         frame = self.__get_frame_var(varname)
+        cmt = None
         if include_comment:
             JOGFRAME = 2
             cmt = self.__get_frame_comment(
                 frame_type=JOGFRAME, group=group, idx=idx)
-            return (frame, cmt)
-        return (frame,)
+        return (frame, cmt)
 
     def get_toolframe(self, idx, group=1, include_comment=False):
         """Return the tool frame at index 'idx'.
@@ -1075,12 +1075,12 @@ class Client(object):
                              f"between 1 and 10, got: {idx})")
         varname = f'[*SYSTEM*]$MNUTOOL[{group},{idx}]'
         frame = self.__get_frame_var(varname)
+        cmt = None
         if include_comment:
             TOOLFRAME = 1
             cmt = self.__get_frame_comment(
                 frame_type=TOOLFRAME, group=group, idx=idx)
-            return (frame, cmt)
-        return (frame,)
+        return (frame, cmt)
 
     def get_userframe(self, idx, group=1, include_comment=False):
         """Return the user frame at index 'idx'.
@@ -1102,12 +1102,12 @@ class Client(object):
                              f"between 1 and 10, got: {idx})")
         varname = f'[*SYSTEM*]$MNUFRAME[{group},{idx}]'
         frame = self.__get_frame_var(varname)
+        cmt = None
         if include_comment:
             USERFRAME = 3
             cmt = self.__get_frame_comment(
                 frame_type=USERFRAME, group=group, idx=idx)
-            return (frame, cmt)
-        return (frame,)
+        return (frame, cmt)
 
     def get_active_jogframe(self, group=1):
         if group < 1 or group > 8:
