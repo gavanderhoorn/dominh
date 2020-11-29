@@ -869,13 +869,13 @@ class Client(object):
             raise ValueError("Need at least one variable name")
         return ('$' + '.$'.join(path)).upper()
 
-    def get_payload(self, grp, idx):
+    def get_payload(self, idx, grp=1):
         """Retrieve payload nr 'idx' for group 'grp'.
 
-        :param grp: The motion group to retrieve the payload for
-        :type grp: int
         :param idx: The number of the payload schedule to retrieve
         :type idx: int
+        :param grp: The motion group to retrieve the payload for
+        :type grp: int
         :returns: A named tuple matching the structure of a PLST_GRP_T. The
         'ICONDISP' field is not included.
         :rtype: plst_grp_t
