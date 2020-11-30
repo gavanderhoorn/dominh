@@ -247,14 +247,23 @@ class Client(object):
         r = requests.get(
             url, auth=self.kcl_creds, timeout=self.request_timeout)
 
+        # always check for authentication issues, even if caller doesn't
+        # necessarily want the response checked.
+        if r.status_code == requests.codes.unauthorized:
+            raise AuthenticationException("Authentication failed (KCL)")
+        if r.status_code == requests.codes.forbidden:
+            raise LockedResourceException("Access is forbidden/locked (KCL)")
+
+        # if we don't wait, we don't return anything, but we do check the
+        # controller returned the appropriate HTTP result code
+        if not wait_for_response:
+            if r.status_code != requests.codes.no_content:
+                raise DominhException(
+                    "Unexpected result code. Expected: "
+                    f"{requests.codes.no_content}, got: {r.status_code}")
+
         # caller requested we check return value
-        if wait_for_response:
-            # provide caller with appropriate exceptions
-            if r.status_code == requests.codes.unauthorized:
-                raise AuthenticationException("Authentication failed (KCL)")
-            if r.status_code == requests.codes.forbidden:
-                raise LockedResourceException(
-                    "Access is forbidden/locked (KCL)")
+        else:
             if r.status_code != requests.codes.ok:
                 raise DominhException(
                     f"Unexpected result code. Expected: {requests.codes.ok}, "
@@ -267,19 +276,6 @@ class Client(object):
                 return kcl_output.group(1)
             raise DominhException(
                 "Could not find KCL output in returned document")
-
-        # if we don't wait, we don't return anything, but we do check the
-        # controller returned the appropriate HTTP result code
-        if r.status_code != requests.codes.no_content:
-            # provide caller with appropriate exceptions
-            if r.status_code == requests.codes.unauthorized:
-                raise AuthenticationException("Authentication failed (KCL)")
-            if r.status_code == requests.codes.forbidden:
-                raise LockedResourceException(
-                    "Access is forbidden/locked (KCL)")
-            raise DominhException(
-                "Unexpected result code. Expected: "
-                f"{requests.codes.no_content}, got: {r.status_code}")
 
     def __exec_karel_prg(self, prg_name, params={}):
         """Execute a Karel program on the controller (via the web server).
