@@ -76,7 +76,8 @@ No further setup is required.
 ### Package
 
 It's recommended to use a virtual Python 3 environment and install the package in it.
-The author has primarily used Python 3.8, but other versions are expected to work (some minor syntax problems could occur on earlier versions).
+Due to the heavy use of f-strings, at least Python 3.6 is required.
+The author has primarily used Python 3.8, but other versions are expected to work.
 
 Future versions may be released to PyPi.
 
