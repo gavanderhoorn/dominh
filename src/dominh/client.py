@@ -858,6 +858,8 @@ class Client(object):
                 'sFc': sfc
             }
 
+        # we don't use __exec_karel_prg(..) here, as it expects the invoked
+        # program to return JSON.
         path = 'karel/ComSet'
         url = f'http://{self.host}/{path}'
         r = requests.get(
