@@ -156,10 +156,14 @@ Dominh can currently be used to:
  * determine the controller series (ie: R-30iA, R-30iB, R-30iB+)
  * retrieve the application software (ie: HandlingTool, etc)
  * retrieve the version of the application software
+ * retrieve the controller's time and date
  * read/write (system) variables (scalar variables are mostly supported)
  * read/write IO elements (digital, analogue, group, UOP, SOP, TP, flags, markers, etc)
  * read/write numerical registers
+ * read string registers
  * read/write the general override
+ * retrieve the number of defined groups
+ * retrieve the ID and model of configured robots
  * retrieve jog, tool and user frames
  * retrieve currently active jog, tool or user frame
  * retrieve payload schedules
@@ -183,6 +187,7 @@ The following limitations and known issues exist:
   This may change in the future.
 * "Robot Out" (ie: `RDO`) is not writable. The port name as specified in the Fanuc manual on KCL does not seem to work.
 * Dominh CLI tools wrap only a subset of the library's functionality.
+* CLI tools currently do not support authentication
 * Even though some helpers return JSON, HTTP headers returned by the web server do not reflect this.
   This is a limitation of the web server used by Fanuc.
 * HTTP status return codes do not reflect the result of operations in all cases.
