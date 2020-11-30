@@ -541,6 +541,8 @@ class Client(object):
         NOTE: this is a rather naive implementation which should not be used in
         tight loops or when high performance is required.
 
+        NOTE: this method is expensive and slow, as it parses a web page.
+
         :param types: A list of program types to include in the returned
         result.
         Legal values are those used by the controller when displaying lists of
@@ -573,6 +575,9 @@ class Client(object):
         modes.
 
         Wraps the Karel IN_AUTO_MODE routine.
+
+        NOTE: this method is moderately expensive, as it executes a Karel
+        program on the controller.
 
         :returns: True if the controller is in AUTO mode
         :rtype: bool
@@ -677,6 +682,9 @@ class Client(object):
 
         The 'err detail' and 'level' elements are not always present and thus
         may be empty.
+
+        NOTE: this method is expensive and slow, as it retrieves a file from
+        the controller over FTP and parses it.
 
         :returns: A list of all errors and their details
         :rtype: list(tuple(int, str, str, str, str, str))
@@ -871,6 +879,9 @@ class Client(object):
 
     def get_payload(self, idx, grp=1):
         """Retrieve payload nr 'idx' for group 'grp'.
+
+        NOTE: this method is expensive and slow, as it retrieves the individual
+        fields of the payload variable separately, instead of a single struct.
 
         :param idx: The number of the payload schedule to retrieve
         :type idx: int
@@ -1128,6 +1139,8 @@ class Client(object):
 
     def get_posreg(self, idx, group=1):
         """Return the position register at index 'idx' for group 'group'.
+
+        NOTE: this method is expensive and slow, as it parses a web page.
 
         :param idx: Numeric ID of the position register.
         :type idx: int
