@@ -1269,3 +1269,10 @@ class Client(object):
         if 'bad variable' in ret.lower():
             raise DominhException(f"Could not read sysvar: '{ret}'")
         return ret
+
+    def get_num_groups(self):
+        varname = '$SCR.$NUM_GROUP'
+        ret = self.get_scalar_var(varname=varname)
+        if 'bad variable' in ret.lower():
+            raise DominhException(f"Could not read sysvar: '{ret}'")
+        return int(ret)
