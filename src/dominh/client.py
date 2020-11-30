@@ -16,6 +16,7 @@
 # author: G.A. vd. Hoorn
 
 
+import datetime
 import re
 import requests
 
@@ -1276,3 +1277,18 @@ class Client(object):
         if 'bad variable' in ret.lower():
             raise DominhException(f"Could not read sysvar: '{ret}'")
         return int(ret)
+
+    def get_clock(self):
+        """ Return the current date and time on the controller.
+
+        NOTE: this method is rather slow, as it parses a web page.
+
+        NOTE 2: the controller reports time with a resolution of 1 minute.
+
+        :returns: Controller date and time.
+        :rtype: datetime.datetime
+        """
+        ret = self.__exec_kcl(cmd='show clock', wait_for_response=True)
+        # date & time is on the second line of the output
+        stamp = ret.strip().split('\n')[1]
+        return datetime.datetime.strptime(stamp, '%d-%b-%y %H:%M')
