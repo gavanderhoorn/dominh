@@ -43,11 +43,9 @@ This needs the base *Web Server* (`HTTP`) and the *Web Svr Enhancements* (`R626`
 As some parts are written in Karel, option `R632` could be a requirement, but this is unlikely.
 
 Other requirements include a functioning networking setup (make sure you can ping the controller and the controller's website shows up when opening `http://robot_ip`), and correctly configured *HTTP Authentication* and FTP server settings.
-Either unlock the *KAREL* and *KCL* resources completely, set global credentials or add entries allowing specific access to the `dmh_autom` and `dmh_selprg` Karel programs that are part of this tool.
-Configuration for the built-in FTP server should be OK by default (no username or password required).
+Either unlock the *KAREL* and *KCL* resources completely or configure sets of credentials for both resources.
+Configuration for the built-in FTP server should be OK by default, but may be changed to also require a username and password.
 Refer to section 6.5 *HTTP AUTHENTICATION* of the *FANUC Robot series - Ethernet Function - Operator's Manual* (document `B-82974EN` for the R-30iA) for more information.
-
-NOTE: support for authentication for HTTP resources and FTP has not yet been added to this library.
 
 
 ## Compatibility
@@ -87,12 +85,12 @@ Future versions may be released to PyPi.
 
 ### Library
 
-The following shows a short example of how this library could be used to connect to a controller, reset it, then set the override to 100% and finally read the `DOUT[1]` IO element.
+The following shows a short example of how this library could be used to connect to a controller with credentials for access to the `KAREL` resource, reset the controller, then set the override to 100% and finally read the `DOUT[1]` IO element.
 
 ```python
 from dominh import Client
 
-c = Client('ip.of.robot.ctrlr')
+c = Client('ip.of.robot.ctrlr', karel_creds=('user', 'pass'))
 c.initialise()
 
 c.reset()
