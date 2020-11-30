@@ -42,6 +42,14 @@ class DominhException(Exception):
     pass
 
 
+class LockedResourceException(DominhException):
+    pass
+
+
+class AuthenticationException(DominhException):
+    pass
+
+
 Plst_Grp_t = namedtuple('Plst_Grp_t', [
     'comment',
     'payload',
@@ -241,6 +249,12 @@ class Client(object):
 
         # caller requested we check return value
         if wait_for_response:
+            # provide caller with appropriate exceptions
+            if r.status_code == requests.codes.unauthorized:
+                raise AuthenticationException("Authentication failed (KCL)")
+            if r.status_code == requests.codes.forbidden:
+                raise LockedResourceException(
+                    "Access is forbidden/locked (KCL)")
             if r.status_code != requests.codes.ok:
                 raise DominhException(
                     f"Unexpected result code. Expected: {requests.codes.ok}, "
@@ -257,6 +271,12 @@ class Client(object):
         # if we don't wait, we don't return anything, but we do check the
         # controller returned the appropriate HTTP result code
         if r.status_code != requests.codes.no_content:
+            # provide caller with appropriate exceptions
+            if r.status_code == requests.codes.unauthorized:
+                raise AuthenticationException("Authentication failed (KCL)")
+            if r.status_code == requests.codes.forbidden:
+                raise LockedResourceException(
+                    "Access is forbidden/locked (KCL)")
             raise DominhException(
                 "Unexpected result code. Expected: "
                 f"{requests.codes.no_content}, got: {r.status_code}")
@@ -280,6 +300,12 @@ class Client(object):
         url = f'http://{self.host}/KAREL/{prg_name}'
         r = requests.get(url, auth=self.karel_creds, params=params,
                          timeout=self.request_timeout)
+        # provide caller with appropriate exceptions
+        if r.status_code == requests.codes.unauthorized:
+            raise AuthenticationException("Authentication failed (Karel)")
+        if r.status_code == requests.codes.forbidden:
+            raise LockedResourceException(
+                "Access is forbidden/locked (Karel)")
         if r.status_code != requests.codes.ok:
             raise DominhException(
                 f"Unexpected result code. Expected: {requests.codes.ok}, "
@@ -839,6 +865,12 @@ class Client(object):
             timeout=self.request_timeout)
 
         if r.status_code != requests.codes.ok:
+            # provide caller with appropriate exceptions
+            if r.status_code == requests.codes.unauthorized:
+                raise AuthenticationException("Authentication failed (Karel)")
+            if r.status_code == requests.codes.forbidden:
+                raise LockedResourceException(
+                    "Access is forbidden/locked (Karel)")
             raise DominhException(
                 f"Unexpected result code. Expected: {requests.codes.ok}, "
                 f"got: {r.status_code}")
