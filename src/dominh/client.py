@@ -314,8 +314,8 @@ class Client(object):
         :returns: JSON value for key 'varname'
         :rtype: str (to be parsed by caller)
         """
-        ret = self.__read_helper(helper=HLPR_SCALAR_VAR,
-                                 params={'_reqvar': varname})
+        ret = self.__read_helper(
+            helper=HLPR_SCALAR_VAR, params={'_reqvar': varname})
         return ret[varname.upper()]
 
     def io_write(self, port_type, idx, val, check=False):
