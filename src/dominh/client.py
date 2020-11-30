@@ -845,6 +845,31 @@ class Client(object):
         """
         self.__comset('DOUT', idx, comment=comment)
 
+    def get_strreg(self, idx):
+        """Retrieve the value stored in the string register at 'idx'.
+
+        :param idx: The index of the register to retrieve.
+        :type idx: int
+        :returns: The string stored at index 'idx' in the string registers on
+        the controller
+        :rtype: str
+        """
+        # TODO: rather nasty hard-coded variable name
+        # TODO: check for errors (fi idx too high)
+        varname = f'[*STRREG*]$STRREG[{idx}]'
+        ret = self.get_scalar_var(varname)
+        return ret
+
+    def get_num_strreg(self):
+        """Retrieve total number of string registers available on the
+        controller.
+
+        :returns: value of [*STRREG*]$MAXSREGNUM.
+        :rtype: int
+        """
+        ret = self.get_scalar_var('[*STRREG*]$MAXSREGNUM')
+        return int(ret)
+
     def get_numreg(self, idx):
         """Retrieve the value stored in the numerical register at 'idx'.
 
