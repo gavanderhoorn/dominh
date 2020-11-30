@@ -1255,3 +1255,17 @@ class Client(object):
         if 'bad variable' in ret.lower():
             raise DominhException(f"Could not read sysvar: '{ret}'")
         return int(ret)
+
+    def get_robot_id(self, group=1):
+        varname = f'$SCR_GRP[{group}].$ROBOT_ID'
+        ret = self.get_scalar_var(varname=varname)
+        if 'bad variable' in ret.lower():
+            raise DominhException(f"Could not read sysvar: '{ret}'")
+        return ret
+
+    def get_robot_model(self, group=1):
+        varname = f'$SCR_GRP[{group}].$ROBOT_MODEL'
+        ret = self.get_scalar_var(varname=varname)
+        if 'bad variable' in ret.lower():
+            raise DominhException(f"Could not read sysvar: '{ret}'")
+        return ret
