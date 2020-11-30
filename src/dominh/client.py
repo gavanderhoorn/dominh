@@ -84,10 +84,9 @@ JointPos_t = namedtuple('JointPos_t', [
 
 class Client(object):
     def __init__(self, host, helper_dev=HELPER_DEVICE, helper_dir=HELPER_DIR,
-                 skip_helper_upload=False, request_timeout=5):
+                 skip_helper_upload=False, request_timeout=5,
+                 kcl_creds=None, karel_creds=None, ftp_creds=None):
         """Initialise an instance of the Dominh Client class.
-
-        # TODO: support authentication
 
         Note: use 'skip_helper_upload' to override the default behaviour which
         always uploads the helpers. If they have already been uploaded (for
@@ -108,11 +107,34 @@ class Client(object):
         :param request_timeout: Time after which requests should time out
         (default: 5 sec)
         :type request_timeout: float
+        :param kcl_creds: A tuple (username, password) providing the
+        credentials for access to KCL resources. If not set, the KCL resource
+        is assumed to be accessible by anonymous users and such access will
+        fail if the controller does have authentication configured for that
+        resource.
+        :type kcl_creds: tuple(str, str)
+        :param karel_creds: A tuple (username, password) providing the
+        credentials for access to Karel resources. If not set, the Karel
+        resource is assumed to be accessible by anonymous users and such access
+        will fail if the controller does have authentication configured for
+        that resource.
+        :type karel_creds: tuple(str, str)
+        :param ftp_creds: A tuple (username, password) providing the
+        credentials for access to FTP resources. If not set, the FTP resource
+        is assumed to be accessible by anonymous users and such access will
+        fail if the controller does have authentication configured for that
+        resource.
+        :type ftp_creds: tuple(str, str)
         """
         self.host = host
         self.helpers_uploaded = False
         self.skip_helper_upload = skip_helper_upload
         self.request_timeout = request_timeout
+
+        # authentication data
+        self.kcl_creds = kcl_creds
+        self.karel_creds = karel_creds
+        self.ftp_creds = ftp_creds
 
         # TODO: do this some other way
         self.base_path = f'{helper_dev}/{helper_dir}'
@@ -141,7 +163,13 @@ class Client(object):
         if self.helpers_uploaded and not reupload:
             return
         ftpc = FtpClient(host, timeout=self.request_timeout)
-        ftpc.connect()
+
+        # log in using username and pw, if provided by user
+        if self.ftp_creds:
+            user, pw = self.ftp_creds
+            ftpc.connect(user=user, pw=pw)
+        else:
+            ftpc.connect()
 
         # non array var reader helper
         # this is much faster than downloading and parsing the output of
@@ -208,7 +236,8 @@ class Client(object):
         """
         base = 'KCL' if wait_for_response else 'KCLDO'
         url = f'http://{self.host}/{base}/{cmd}'
-        r = requests.get(url, timeout=self.request_timeout)
+        r = requests.get(
+            url, auth=self.kcl_creds, timeout=self.request_timeout)
 
         # caller requested we check return value
         if wait_for_response:
@@ -249,7 +278,8 @@ class Client(object):
         :rtype: str
         """
         url = f'http://{self.host}/KAREL/{prg_name}'
-        r = requests.get(url, params=params, timeout=self.request_timeout)
+        r = requests.get(url, auth=self.karel_creds, params=params,
+                         timeout=self.request_timeout)
         if r.status_code != requests.codes.ok:
             raise DominhException(
                 f"Unexpected result code. Expected: {requests.codes.ok}, "
@@ -691,7 +721,12 @@ class Client(object):
         :rtype: list(tuple(int, str, str, str, str, str))
         """
         ftpc = FtpClient(self.host, timeout=self.request_timeout)
-        ftpc.connect()
+        # log in using username and pw, if provided by user
+        if self.ftp_creds:
+            user, pw = self.ftp_creds
+            ftpc.connect(user=user, pw=pw)
+        else:
+            ftpc.connect()
         errs = ftpc.get_file_as_str('/md:/errall.ls')
 
         res = []
@@ -799,7 +834,9 @@ class Client(object):
 
         path = 'karel/ComSet'
         url = f'http://{self.host}/{path}'
-        r = requests.get(url, params=params, timeout=self.request_timeout)
+        r = requests.get(
+            url, auth=self.karel_creds, params=params,
+            timeout=self.request_timeout)
 
         if r.status_code != requests.codes.ok:
             raise DominhException(
