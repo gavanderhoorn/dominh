@@ -52,7 +52,7 @@ Refer to section 6.5 *HTTP AUTHENTICATION* of the *FANUC Robot series - Ethernet
 
 ### Controllers
 
-Compatibility has only been tested with R-30iA and R-30iB+ controllers running V7.70 and V9.10 of the system software, but others are expected to be compatible as well, as long as they have the required options (or equivalents).
+Compatibility has only been tested with R-30iA and R-30iB+ controllers running V7.70, V9.10 and V9.30 of the system software, but others are expected to be compatible as well, as long as they have the required options (or equivalents).
 
 ### Operating Systems
 
