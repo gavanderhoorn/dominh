@@ -293,6 +293,8 @@ class Client(object):
         :returns: JSON response sent by the Karel program
         :rtype: str
         """
+        if '.pc' in prg_name.lower():
+            raise ValueError(f"Program name includes extension ('{prg_name}')")
         url = f'http://{self.host}/KAREL/{prg_name}'
         r = requests.get(url, auth=self.karel_creds, params=params,
                          timeout=self.request_timeout)
