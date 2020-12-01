@@ -277,7 +277,7 @@ class Client(object):
             raise DominhException(
                 "Could not find KCL output in returned document")
 
-    def __exec_karel_prg(self, prg_name, params={}):
+    def __exec_karel_prg(self, prg_name, params={}, return_raw=False):
         """Execute a Karel program on the controller (via the web server).
 
         NOTE: 'prg_name' should not include the '.pc' extension.
@@ -310,7 +310,7 @@ class Client(object):
             raise DominhException(
                 f"Error: Karel program '{prg_name}' cannot be started on "
                 "controller")
-        return r.json()
+        return r.json() if not return_raw else r.text
 
     def __disable_web_server_headers(self):
         """Prevent Fanuc web server from including headers and footers with
