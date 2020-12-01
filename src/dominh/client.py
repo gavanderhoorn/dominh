@@ -302,8 +302,7 @@ class Client(object):
         if r.status_code == requests.codes.unauthorized:
             raise AuthenticationException("Authentication failed (Karel)")
         if r.status_code == requests.codes.forbidden:
-            raise LockedResourceException(
-                "Access is forbidden/locked (Karel)")
+            raise LockedResourceException("Access is forbidden/locked (Karel)")
         if r.status_code != requests.codes.ok:
             raise DominhException(
                 f"Unexpected result code. Expected: {requests.codes.ok}, "
