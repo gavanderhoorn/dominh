@@ -854,24 +854,10 @@ class Client(object):
                 'sFc': sfc
             }
 
-        # we don't use __exec_karel_prg(..) here, as it expects the invoked
-        # program to return JSON.
-        path = 'karel/ComSet'
-        url = f'http://{self.host}/{path}'
-        r = requests.get(
-            url, auth=self.karel_creds, params=params,
-            timeout=self.request_timeout)
-
-        if r.status_code != requests.codes.ok:
-            # provide caller with appropriate exceptions
-            if r.status_code == requests.codes.unauthorized:
-                raise AuthenticationException("Authentication failed (Karel)")
-            if r.status_code == requests.codes.forbidden:
-                raise LockedResourceException(
-                    "Access is forbidden/locked (Karel)")
-            raise DominhException(
-                f"Unexpected result code. Expected: {requests.codes.ok}, "
-                f"got: {r.status_code}")
+        # make sure to request 'return_raw', as 'ComSet' does not return JSON
+        # TODO: check return value
+        self.__exec_karel_prg(
+            prg_name='ComSet', params=params, return_raw=True)
 
     def cmt_numreg(self, idx, comment):
         """Update the comment on numerical register at 'idx'.
