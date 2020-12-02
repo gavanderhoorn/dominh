@@ -45,7 +45,7 @@ import sys
 
 if __name__ == '__main__':
     args = docopt(__doc__, help=True, options_first=True,
-        version='dominh 0.1.1')
+        version='dominh 0.2.1')
     argv = [args['<command>']] + args['<args>']
 
     # print(args)
