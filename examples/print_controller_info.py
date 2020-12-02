@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 
+# flake8: noqa
+
 # Copyright (c) 2020, G.A. vd. Hoorn
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
