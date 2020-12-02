@@ -93,7 +93,7 @@ JointPos_t = namedtuple('JointPos_t', [
 class Client(object):
     def __init__(self, host, helper_dev=HELPER_DEVICE, helper_dir=HELPER_DIR,
                  skip_helper_upload=False, request_timeout=5,
-                 kcl_creds=None, karel_creds=None, ftp_creds=None):
+                 kcl_auth=None, karel_auth=None, ftp_auth=None):
         """Initialise an instance of the Dominh Client class.
 
         Note: use 'skip_helper_upload' to override the default behaviour which
@@ -115,24 +115,24 @@ class Client(object):
         :param request_timeout: Time after which requests should time out
         (default: 5 sec)
         :type request_timeout: float
-        :param kcl_creds: A tuple (username, password) providing the
+        :param kcl_auth: A tuple (username, password) providing the
         credentials for access to KCL resources. If not set, the KCL resource
         is assumed to be accessible by anonymous users and such access will
         fail if the controller does have authentication configured for that
         resource.
-        :type kcl_creds: tuple(str, str)
-        :param karel_creds: A tuple (username, password) providing the
+        :type kcl_auth: tuple(str, str)
+        :param karel_auth: A tuple (username, password) providing the
         credentials for access to Karel resources. If not set, the Karel
         resource is assumed to be accessible by anonymous users and such access
         will fail if the controller does have authentication configured for
         that resource.
-        :type karel_creds: tuple(str, str)
-        :param ftp_creds: A tuple (username, password) providing the
+        :type karel_auth: tuple(str, str)
+        :param ftp_auth: A tuple (username, password) providing the
         credentials for access to FTP resources. If not set, the FTP resource
         is assumed to be accessible by anonymous users and such access will
         fail if the controller does have authentication configured for that
         resource.
-        :type ftp_creds: tuple(str, str)
+        :type ftp_auth: tuple(str, str)
         """
         self.host = host
         self.helpers_uploaded = False
@@ -140,9 +140,9 @@ class Client(object):
         self.request_timeout = request_timeout
 
         # authentication data
-        self.kcl_creds = kcl_creds
-        self.karel_creds = karel_creds
-        self.ftp_creds = ftp_creds
+        self.kcl_auth = kcl_auth
+        self.karel_auth = karel_auth
+        self.ftp_auth = ftp_auth
 
         # TODO: do this some other way
         self.base_path = f'{helper_dev}/{helper_dir}'
@@ -173,8 +173,8 @@ class Client(object):
         ftpc = FtpClient(host, timeout=self.request_timeout)
 
         # log in using username and pw, if provided by user
-        if self.ftp_creds:
-            user, pw = self.ftp_creds
+        if self.ftp_auth:
+            user, pw = self.ftp_auth
             ftpc.connect(user=user, pw=pw)
         else:
             ftpc.connect()
@@ -245,7 +245,7 @@ class Client(object):
         base = 'KCL' if wait_for_response else 'KCLDO'
         url = f'http://{self.host}/{base}/{cmd}'
         r = requests.get(
-            url, auth=self.kcl_creds, timeout=self.request_timeout)
+            url, auth=self.kcl_auth, timeout=self.request_timeout)
 
         # always check for authentication issues, even if caller doesn't
         # necessarily want the response checked.
@@ -296,7 +296,7 @@ class Client(object):
         if '.pc' in prg_name.lower():
             raise ValueError(f"Program name includes extension ('{prg_name}')")
         url = f'http://{self.host}/KAREL/{prg_name}'
-        r = requests.get(url, auth=self.karel_creds, params=params,
+        r = requests.get(url, auth=self.karel_auth, params=params,
                          timeout=self.request_timeout)
         # provide caller with appropriate exceptions
         if r.status_code == requests.codes.unauthorized:
@@ -745,8 +745,8 @@ class Client(object):
         """
         ftpc = FtpClient(self.host, timeout=self.request_timeout)
         # log in using username and pw, if provided by user
-        if self.ftp_creds:
-            user, pw = self.ftp_creds
+        if self.ftp_auth:
+            user, pw = self.ftp_auth
             ftpc.connect(user=user, pw=pw)
         else:
             ftpc.connect()
