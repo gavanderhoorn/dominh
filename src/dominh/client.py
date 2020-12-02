@@ -134,22 +134,22 @@ class Client(object):
         resource.
         :type ftp_auth: tuple(str, str)
         """
-        self.host = host
-        self.helpers_uploaded = False
-        self.skip_helper_upload = skip_helper_upload
-        self.request_timeout = request_timeout
+        self._host = host
+        self._helpers_uploaded = False
+        self._skip_helper_upload = skip_helper_upload
+        self._request_timeout = request_timeout
 
         # authentication data
-        self.kcl_auth = kcl_auth
-        self.karel_auth = karel_auth
-        self.ftp_auth = ftp_auth
+        self._kcl_auth = kcl_auth
+        self._karel_auth = karel_auth
+        self._ftp_auth = ftp_auth
 
         # TODO: do this some other way
-        self.base_path = f'{helper_dev}/{helper_dir}'
-        while ('//' in self.base_path):
-            self.base_path = self.base_path.replace('//', '/')
-        if self.base_path.endswith('/'):
-            self.base_path = self.base_path[:-1]
+        self._base_path = f'{helper_dev}/{helper_dir}'
+        while ('//' in self._base_path):
+            self._base_path = self._base_path.replace('//', '/')
+        if self._base_path.endswith('/'):
+            self._base_path = self._base_path[:-1]
 
     def _upload_helpers(self, host, remote_path, reupload=False):
         """Upload the (set of) helper(s) files to the controller.
@@ -168,13 +168,13 @@ class Client(object):
         has been done before by this object (default: False)
         :type reupload: bool
         """
-        if self.helpers_uploaded and not reupload:
+        if self._helpers_uploaded and not reupload:
             return
-        ftpc = FtpClient(host, timeout=self.request_timeout)
+        ftpc = FtpClient(host, timeout=self._request_timeout)
 
         # log in using username and pw, if provided by user
-        if self.ftp_auth:
-            user, pw = self.ftp_auth
+        if self._ftp_auth:
+            user, pw = self._ftp_auth
             ftpc.connect(user=user, pw=pw)
         else:
             ftpc.connect()
@@ -200,8 +200,8 @@ class Client(object):
         :returns: JSON response as returned by the controller in its response
         :rtype: dict
         """
-        url = f'http://{self.host}/{self.base_path}/{page}'
-        r = requests.get(url, params=params, timeout=self.request_timeout)
+        url = f'http://{self._host}/{self._base_path}/{page}'
+        r = requests.get(url, params=params, timeout=self._request_timeout)
         if r.status_code != requests.codes.ok:
             raise DominhException("Controller web server returned an "
                                   f"error: {r.status_code}")
@@ -220,7 +220,7 @@ class Client(object):
         :returns: JSON response as returned by the controller in its response
         :rtype: dict
         """
-        if not self.helpers_uploaded and not self.skip_helper_upload:
+        if not self._helpers_uploaded and not self._skip_helper_upload:
             raise DominhException("Helpers not uploaded")
         if '.stm' in helper.lower():
             raise ValueError("Helper name includes extension")
@@ -243,9 +243,9 @@ class Client(object):
         :rtype: str
         """
         base = 'KCL' if wait_for_response else 'KCLDO'
-        url = f'http://{self.host}/{base}/{cmd}'
+        url = f'http://{self._host}/{base}/{cmd}'
         r = requests.get(
-            url, auth=self.kcl_auth, timeout=self.request_timeout)
+            url, auth=self._kcl_auth, timeout=self._request_timeout)
 
         # always check for authentication issues, even if caller doesn't
         # necessarily want the response checked.
@@ -295,9 +295,9 @@ class Client(object):
         """
         if '.pc' in prg_name.lower():
             raise ValueError(f"Program name includes extension ('{prg_name}')")
-        url = f'http://{self.host}/KAREL/{prg_name}'
-        r = requests.get(url, auth=self.karel_auth, params=params,
-                         timeout=self.request_timeout)
+        url = f'http://{self._host}/KAREL/{prg_name}'
+        r = requests.get(url, auth=self._karel_auth, params=params,
+                         timeout=self._request_timeout)
         # provide caller with appropriate exceptions
         if r.status_code == requests.codes.unauthorized:
             raise AuthenticationException("Authentication failed (Karel)")
@@ -333,11 +333,11 @@ class Client(object):
 
         TODO: support authentication somehow.
         """
-        if not self.skip_helper_upload:
-            self._upload_helpers(self.host, remote_path=self.base_path)
+        if not self._skip_helper_upload:
+            self._upload_helpers(self._host, remote_path=self._base_path)
             # if we get here, we assume the following to be True
             # TODO: verify
-            self.helpers_uploaded = True
+            self._helpers_uploaded = True
 
     def set_scalar_var(self, varname, val):
         """Update the value of variable 'varname' to 'val'.
@@ -743,10 +743,10 @@ class Client(object):
         :returns: A list of all errors and their details
         :rtype: list(tuple(int, str, str, str, str, str))
         """
-        ftpc = FtpClient(self.host, timeout=self.request_timeout)
+        ftpc = FtpClient(self._host, timeout=self._request_timeout)
         # log in using username and pw, if provided by user
-        if self.ftp_auth:
-            user, pw = self.ftp_auth
+        if self._ftp_auth:
+            user, pw = self._ftp_auth
             ftpc.connect(user=user, pw=pw)
         else:
             ftpc.connect()
