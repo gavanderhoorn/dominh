@@ -151,7 +151,7 @@ class Client(object):
         if self.base_path.endswith('/'):
             self.base_path = self.base_path[:-1]
 
-    def __upload_helpers(self, host, remote_path, reupload=False):
+    def _upload_helpers(self, host, remote_path, reupload=False):
         """Upload the (set of) helper(s) files to the controller.
 
         These helpers are used by the various other functionality provided by
@@ -188,7 +188,7 @@ class Client(object):
         content = rb'<!-- #ECHO var="{_reqvar}" -->'
         ftpc.upload_as_file(f'/{remote_path}/{HLPR_RAW_VAR}.stm', content)
 
-    def __get_stm(self, page, params={}):
+    def _get_stm(self, page, params={}):
         """Retrieve a '.stm' file from the controller (rendered by the web
         server).
 
@@ -207,7 +207,7 @@ class Client(object):
                                   f"error: {r.status_code}")
         return r
 
-    def __read_helper(self, helper, params={}):
+    def _read_helper(self, helper, params={}):
         """Retrieve JSON from helper on controller.
 
         NOTE: 'helper' should not include the extension
@@ -224,9 +224,9 @@ class Client(object):
             raise DominhException("Helpers not uploaded")
         if '.stm' in helper.lower():
             raise ValueError("Helper name includes extension")
-        return self.__get_stm(page=f'{helper}.stm', params=params).json()
+        return self._get_stm(page=f'{helper}.stm', params=params).json()
 
-    def __exec_kcl(self, cmd, wait_for_response=False):
+    def _exec_kcl(self, cmd, wait_for_response=False):
         """Execute the specified KCL command line on the controller.
 
         NOTE: any expected parameters must be supplied as part of 'cmd'.
@@ -277,7 +277,7 @@ class Client(object):
             raise DominhException(
                 "Could not find KCL output in returned document")
 
-    def __exec_karel_prg(self, prg_name, params={}, return_raw=False):
+    def _exec_karel_prg(self, prg_name, params={}, return_raw=False):
         """Execute a Karel program on the controller (via the web server).
 
         NOTE: 'prg_name' should not include the '.pc' extension.
@@ -313,13 +313,13 @@ class Client(object):
                 "controller")
         return r.json() if not return_raw else r.text
 
-    def __disable_web_server_headers(self):
+    def _disable_web_server_headers(self):
         """Prevent Fanuc web server from including headers and footers with
         each response.
         """
         self.set_scalar_var('$HTTP_CTRL.$ENAB_TEMPL', 0)
 
-    def __enable_web_server_headers(self):
+    def _enable_web_server_headers(self):
         """Allow Fanuc web server to include headers and footers with each
         response.
         """
@@ -334,7 +334,7 @@ class Client(object):
         TODO: support authentication somehow.
         """
         if not self.skip_helper_upload:
-            self.__upload_helpers(self.host, remote_path=self.base_path)
+            self._upload_helpers(self.host, remote_path=self.base_path)
             # if we get here, we assume the following to be True
             # TODO: verify
             self.helpers_uploaded = True
@@ -353,7 +353,7 @@ class Client(object):
         :param val: Value to write to 'varname'
         :type val: any (must have str() support)
         """
-        self.__exec_kcl(cmd=f'set var {varname}={val}')
+        self._exec_kcl(cmd=f'set var {varname}={val}')
 
     def get_scalar_var(self, varname):
         """Retrieve the value of the variable named 'varname'.
@@ -368,7 +368,7 @@ class Client(object):
         :returns: JSON value for key 'varname'
         :rtype: str (to be parsed by caller)
         """
-        ret = self.__read_helper(
+        ret = self._read_helper(
             helper=HLPR_SCALAR_VAR, params={'_reqvar': varname})
         return ret[varname.upper()]
 
@@ -407,7 +407,7 @@ class Client(object):
         operation in the form of a bool
         :rtype: None or bool (see above)
         """
-        ret = self.__exec_kcl(
+        ret = self._exec_kcl(
             cmd=f'set port {port_type}[{idx}]={val}', wait_for_response=check)
         if not check:
             return
@@ -505,7 +505,7 @@ class Client(object):
         """
         port_type = port_type.upper()
         port_id = f'{port_type}[{idx}]'
-        ret = self.__read_helper(
+        ret = self._read_helper(
             helper=HLPR_SCALAR_VAR, params={'_reqvar': port_id})
 
         # check for some common problems
@@ -550,7 +550,7 @@ class Client(object):
 
     def reset(self):
         """Attempt to RESET the controller."""
-        self.__exec_kcl(cmd='reset')
+        self._exec_kcl(cmd='reset')
 
     def select_tpe(self, program):
         """Attempt to make 'program' the SELECTed program on the TP.
@@ -566,7 +566,7 @@ class Client(object):
         :type program: str
         """
         raise DominhException('Not implemented')
-        ret = self.__exec_karel_prg(
+        ret = self._exec_karel_prg(
             prg_name='dmh_selprg', params={'prog_name': program})
         if not ret[JSON_SUCCESS]:
             raise DominhException("Select_TPE error: " + ret[JSON_REASON])
@@ -609,10 +609,10 @@ class Client(object):
         """
         # TODO: check whether headers are currently enabled and restore state
         # after having used 'show progs'
-        self.__disable_web_server_headers()
+        self._disable_web_server_headers()
         # TODO: see whether FTP-ing 'prgstate.dg' would be faster
-        ret = self.__exec_kcl(cmd='show progs', wait_for_response=True)
-        self.__enable_web_server_headers()
+        ret = self._exec_kcl(cmd='show progs', wait_for_response=True)
+        self._enable_web_server_headers()
 
         # parse returned list
         # TODO: we only return '(name, type)' tuples for now
@@ -636,7 +636,7 @@ class Client(object):
         :returns: True if the controller is in AUTO mode
         :rtype: bool
         """
-        ret = self.__exec_karel_prg(prg_name='dmh_autom')
+        ret = self._exec_karel_prg(prg_name='dmh_autom')
         if not ret[JSON_SUCCESS]:
             raise DominhException("Select_TPE error: " + ret[JSON_REASON])
         return ret['in_auto_mode']
@@ -767,7 +767,7 @@ class Client(object):
 
         return res
 
-    def __get_cmt_fc(self, cmt):
+    def _get_cmt_fc(self, cmt):
         return {
             'NUMREG': 1,
             'POSREG': 3,
@@ -784,14 +784,14 @@ class Client(object):
             'FLG': 19,
         }.get(cmt.upper())
 
-    def __get_val_fc(self, valt):
+    def _get_val_fc(self, valt):
         return {
             'NUMREG': 2,
             'UALARM': 5,  # actually sets 'severity'
             'STRREG': 15,
         }.get(valt.upper())
 
-    def __comset(self, fc, idx, val=None, comment=''):
+    def _comset(self, fc, idx, val=None, comment=''):
         """Low-level wrapper around the 'karel/ComSet' program.
 
         This method uses the COMSET Karel program on the controller, which is
@@ -838,7 +838,7 @@ class Client(object):
             raise ValueError("Need either val or comment")
 
         if val:
-            sfc = self.__get_val_fc(fc)
+            sfc = self._get_val_fc(fc)
             real_flag = 1 if type(val) == float else -1
             params = {
                 'sValue': val,
@@ -848,7 +848,7 @@ class Client(object):
             }
 
         if comment:
-            sfc = self.__get_cmt_fc(fc)
+            sfc = self._get_cmt_fc(fc)
             params = {
                 'sComment': comment,
                 'sIndx': idx,
@@ -857,7 +857,7 @@ class Client(object):
 
         # make sure to request 'return_raw', as 'ComSet' does not return JSON
         # TODO: check return value
-        self.__exec_karel_prg(
+        self._exec_karel_prg(
             prg_name='ComSet', params=params, return_raw=True)
 
     def cmt_numreg(self, idx, comment):
@@ -868,7 +868,7 @@ class Client(object):
         :param comment: Comment to set
         :type comment: str
         """
-        self.__comset('NUMREG', idx, comment=comment)
+        self._comset('NUMREG', idx, comment=comment)
 
     def cmt_posreg(self, idx, comment):
         """Update the comment on position register at 'idx'.
@@ -878,7 +878,7 @@ class Client(object):
         :param comment: Comment to set
         :type comment: str
         """
-        self.__comset('POSREG', idx, comment=comment)
+        self._comset('POSREG', idx, comment=comment)
 
     def cmt_din(self, idx, comment):
         """Update the comment on 'DIN[idx]'.
@@ -888,7 +888,7 @@ class Client(object):
         :param comment: Comment to set
         :type comment: str
         """
-        self.__comset('DIN', idx, comment=comment)
+        self._comset('DIN', idx, comment=comment)
 
     def cmt_dout(self, idx, comment):
         """Update the comment on 'DOUT[idx]'.
@@ -898,7 +898,7 @@ class Client(object):
         :param comment: Comment to set
         :type comment: str
         """
-        self.__comset('DOUT', idx, comment=comment)
+        self._comset('DOUT', idx, comment=comment)
 
     def get_strreg(self, idx):
         """Retrieve the value stored in the string register at 'idx'.
@@ -949,9 +949,9 @@ class Client(object):
         :type val: int or float
         """
         assert type(val) in [float, int]
-        self.__comset('NUMREG', idx, val=val)
+        self._comset('NUMREG', idx, val=val)
 
-    def __format_sysvar(self, path):
+    def _format_sysvar(self, path):
         assert type(path) == list
         if not path:
             raise ValueError("Need at least one variable name")
@@ -980,23 +980,23 @@ class Client(object):
         # TODO: retrieve struct in one read and parse result instead
         base_vname = f'plst_grp{grp}[{idx}]'
         cmt = self.get_scalar_var(
-                self.__format_sysvar([base_vname, 'comment']))
+                self._format_sysvar([base_vname, 'comment']))
         return Plst_Grp_t(
             comment=None if cmt == 'Uninitialized' else cmt,
             payload=float(self.get_scalar_var(
-                self.__format_sysvar([base_vname, 'payload']))),
+                self._format_sysvar([base_vname, 'payload']))),
             payload_x=float(self.get_scalar_var(
-                self.__format_sysvar([base_vname, 'payload_x']))),
+                self._format_sysvar([base_vname, 'payload_x']))),
             payload_y=float(self.get_scalar_var(
-                self.__format_sysvar([base_vname, 'payload_y']))),
+                self._format_sysvar([base_vname, 'payload_y']))),
             payload_z=float(self.get_scalar_var(
-                self.__format_sysvar([base_vname, 'payload_z']))),
+                self._format_sysvar([base_vname, 'payload_z']))),
             payload_ix=float(self.get_scalar_var(
-                self.__format_sysvar([base_vname, 'payload_ix']))),
+                self._format_sysvar([base_vname, 'payload_ix']))),
             payload_iy=float(self.get_scalar_var(
-                self.__format_sysvar([base_vname, 'payload_iy']))),
+                self._format_sysvar([base_vname, 'payload_iy']))),
             payload_iz=float(self.get_scalar_var(
-                self.__format_sysvar([base_vname, 'payload_iz']))),
+                self._format_sysvar([base_vname, 'payload_iz']))),
         )
 
     def get_controller_series(self):
@@ -1036,7 +1036,7 @@ class Client(object):
         APPL_VER_IDX = 2
         return self.get_scalar_var(f'$application[{APPL_VER_IDX}]')
 
-    def __match_position(self, text):
+    def _match_position(self, text):
         """Try to extract elements of a FANUC POSITION from 'text'.
 
         :param text: Textual representation of a POSITION variable.
@@ -1059,7 +1059,7 @@ class Client(object):
             text)
         return matches[0] if matches else None
 
-    def __get_var_raw(self, varname):
+    def _get_var_raw(self, varname):
         """Retrieve raw text dump of variable with name 'varname'.
 
         :param varname: Name of the variable to retrieve.
@@ -1069,11 +1069,11 @@ class Client(object):
         """
         # use get_stm(..) directly here as what we get returned is not actually
         # json, and read_helper(..) will try to parse it as such and then fail
-        ret = self.__get_stm(
+        ret = self._get_stm(
             page=HLPR_RAW_VAR + '.stm', params={'_reqvar': varname})
         return ret.text
 
-    def __get_frame_var(self, varname):
+    def _get_frame_var(self, varname):
         """Retrieve the POSITION variable 'varname'.
 
         :param varname: Name of the variable to retrieve.
@@ -1084,9 +1084,9 @@ class Client(object):
         """
         # NOTE: assuming here that get_var_raw(..) returns something we can
         # actually parse
-        ret = self.__get_var_raw(varname)
+        ret = self._get_var_raw(varname)
         # remove the first line as it's empty
-        match = self.__match_position(ret.replace('\r\n', '', 1))
+        match = self._match_position(ret.replace('\r\n', '', 1))
 
         if not match:
             raise DominhException(
@@ -1101,7 +1101,7 @@ class Client(object):
         xyzwpr = list(map(float, match[8:14]))
         return Position_t(Config_t(f, u, t, *turn_nos), *xyzwpr)
 
-    def __get_frame_comment(self, frame_type, group, idx):
+    def _get_frame_comment(self, frame_type, group, idx):
         """Return the comment for the jog/tool/user frame 'idx'.
 
         :param frame_type: Type of frame the comment is associated with (
@@ -1137,11 +1137,11 @@ class Client(object):
             raise ValueError("Requested jog frame idx invalid (must be "
                              f"between 1 and 5, got: {idx})")
         varname = f'[TPFDEF]JOGFRAMES[{group},{idx}]'
-        frame = self.__get_frame_var(varname)
+        frame = self._get_frame_var(varname)
         cmt = None
         if include_comment:
             JOGFRAME = 2
-            cmt = self.__get_frame_comment(
+            cmt = self._get_frame_comment(
                 frame_type=JOGFRAME, group=group, idx=idx)
         return (frame, cmt)
 
@@ -1164,11 +1164,11 @@ class Client(object):
             raise ValueError("Requested tool frame idx invalid (must be "
                              f"between 1 and 10, got: {idx})")
         varname = f'[*SYSTEM*]$MNUTOOL[{group},{idx}]'
-        frame = self.__get_frame_var(varname)
+        frame = self._get_frame_var(varname)
         cmt = None
         if include_comment:
             TOOLFRAME = 1
-            cmt = self.__get_frame_comment(
+            cmt = self._get_frame_comment(
                 frame_type=TOOLFRAME, group=group, idx=idx)
         return (frame, cmt)
 
@@ -1191,11 +1191,11 @@ class Client(object):
             raise ValueError("Requested user frame idx invalid (must be "
                              f"between 1 and 10, got: {idx})")
         varname = f'[*SYSTEM*]$MNUFRAME[{group},{idx}]'
-        frame = self.__get_frame_var(varname)
+        frame = self._get_frame_var(varname)
         cmt = None
         if include_comment:
             USERFRAME = 3
-            cmt = self.__get_frame_comment(
+            cmt = self._get_frame_comment(
                 frame_type=USERFRAME, group=group, idx=idx)
         return (frame, cmt)
 
@@ -1236,7 +1236,7 @@ class Client(object):
         varname = f'$POSREG[{group},{idx}]'
         # use get_stm(..) directly here as what we get returned is not actually
         # json, and read_helper(..) will try to parse it as such and then fail
-        ret = self.__get_stm(
+        ret = self._get_stm(
             page=HLPR_RAW_VAR + '.stm', params={'_reqvar': varname})
 
         # use Jay's regex (thanks!)
@@ -1342,7 +1342,7 @@ class Client(object):
         :returns: Controller date and time.
         :rtype: datetime.datetime
         """
-        ret = self.__exec_kcl(cmd='show clock', wait_for_response=True)
+        ret = self._exec_kcl(cmd='show clock', wait_for_response=True)
         # date & time is on the second line of the output
         stamp = ret.strip().split('\n')[1]
         return datetime.datetime.strptime(stamp, '%d-%b-%y %H:%M')
