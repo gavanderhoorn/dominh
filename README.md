@@ -84,6 +84,54 @@ Future versions may be released to PyPi.
 
 ## Example usage
 
+### Example script
+
+The `examples` directory contains an example script which uses some of the functionality of `dominh` to print various bits of information retrieved from a controller.
+
+Example output for an R-30iA with an M-10iA in Roboguide:
+
+```
+$ python examples/print_controller_info.py ip.of.robot.ctrlr
+Attempting to connect to: ip.of.robot.ctrlr
+
+Controller info:
+  Time                  : 2020-11-23 10:19:00
+  Series                : R-30iA
+  Application           : HandlingTool
+  Software version      : V7.70P/48
+  $FNO                  : 12345
+
+Robot info:
+  Number of groups      : 1
+  Group 1:
+    ID                  : M-10iA
+    Model               : M-10iA
+
+General override        : 100%
+
+Controller status:
+  TP enabled            : False
+  In AUTO               : True
+  In error              : False
+  E-stopped             : False
+  Remote mode           : False
+  Program running       : False
+  Program paused        : False
+
+First 5 numregs         : 1.234, 0, 0, 0, 0
+
+Payload 1 in group 1    : 10.0 Kg at (0.0, 0.0, 0.0) (inertia: 0.0, 0.0, 0.0)
+
+First five programs     : -BCKED8-.TP; -BCKED9-.TP; -BCKEDT-.TP; ATERRJOB.VR; GEMDATA.PC
+
+Five most recent errors:
+  23-NOV-20 10:18         R E S E T
+  23-NOV-20 09:47         R E S E T
+  23-NOV-20 09:47 WARN    SRVO-012 Power failure recovery
+  23-NOV-20 09:47 WARN    INTP-127 Power fail detected
+  23-NOV-20 09:47         R E S E T
+```
+
 ### Library
 
 The following shows a short example of how this library could be used to connect to a controller with credentials for access to the `KAREL` resource, reset the controller, then set the override to 100% and finally read the `DOUT[1]` IO element.
