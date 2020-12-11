@@ -528,6 +528,16 @@ class Client(object):
         """
         return IO_ON if self.io_read('SOPOUT', idx) == 'ON' else IO_OFF
 
+    def io_read_sopin(self, idx):
+        """Read from 'SOPIN[idx]'.
+
+        :param idx: Index to read from
+        :type idx: int
+        :returns: Current state of 'SOPIN[idx]'
+        :rtype: int
+        """
+        return IO_ON if self.io_read('SOPIN', idx) == 'ON' else IO_OFF
+
     def io_read_uopout(self, idx):
         """Read from 'UOPOUT[idx]'.
 
