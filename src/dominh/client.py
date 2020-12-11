@@ -687,7 +687,7 @@ class Client(object):
         """
         # from kliosop
         SOPI_ESTOP = 0
-        state = self.io_read_sopout(idx=SOPI_ESTOP)
+        state = self.io_read_sopin(idx=SOPI_ESTOP)
         return state == IO_ON
 
     def in_remote_mode(self):
