@@ -688,7 +688,8 @@ class Client(object):
         # from kliosop
         SOPI_ESTOP = 0
         state = self.io_read_sopin(idx=SOPI_ESTOP)
-        return state == IO_ON
+        # active low input
+        return state == IO_OFF
 
     def in_remote_mode(self):
         """Determine whether the controller is in remote mode.
