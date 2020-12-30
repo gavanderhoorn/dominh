@@ -20,7 +20,6 @@ import datetime
 import re
 import requests
 
-from collections import namedtuple
 
 from . ftp import FtpClient
 
@@ -52,44 +51,10 @@ class AuthenticationException(DominhException):
     pass
 
 
-Plst_Grp_t = namedtuple('Plst_Grp_t', [
-    'comment',
-    'payload',
-    'payload_x',
-    'payload_y',
-    'payload_z',
-    'payload_ix',
-    'payload_iy',
-    'payload_iz',
-])
-
-Config_t = namedtuple('Config_t', [
-    'flip',
-    'up',
-    'top',
-    'turn_no1',
-    'turn_no2',
-    'turn_no3',
-])
-
-Position_t = namedtuple('Position_t', [
-    'config',
-    'x',
-    'y',
-    'z',
-    'w',
-    'p',
-    'r',
-])
-
-JointPos_t = namedtuple('JointPos_t', [
-    'j1',
-    'j2',
-    'j3',
-    'j4',
-    'j5',
-    'j6',
-])
+from . types import Config_t
+from . types import JointPos_t
+from . types import Plst_Grp_t
+from . types import Position_t
 
 
 class Client(object):
