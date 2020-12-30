@@ -139,7 +139,7 @@ The following shows a short example of how this library could be used to connect
 ```python
 from dominh import Client
 
-c = Client('ip.of.robot.ctrlr', karel_creds=('user', 'pass'))
+c = Client('ip.of.robot.ctrlr', karel_auth=('user', 'pass'))
 c.initialise()
 
 c.reset()
