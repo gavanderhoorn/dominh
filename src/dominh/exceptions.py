@@ -15,7 +15,14 @@
 
 # author: G.A. vd. Hoorn
 
-from . client import Client
-from . exceptions import DominhException
 
-__all__ = ['Client', 'DominhException', ]
+class DominhException(Exception):
+    pass
+
+
+class LockedResourceException(DominhException):
+    pass
+
+
+class AuthenticationException(DominhException):
+    pass

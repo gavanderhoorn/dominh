@@ -29,23 +29,14 @@ from . constants import IO_ON
 from . constants import JSON_REASON
 from . constants import JSON_SUCCESS
 
+from . exceptions import AuthenticationException
+from . exceptions import DominhException
+from . exceptions import LockedResourceException
+
 from . ftp import FtpClient
 
 from . import kliosop
 from . import kliouop
-
-
-class DominhException(Exception):
-    pass
-
-
-class LockedResourceException(DominhException):
-    pass
-
-
-class AuthenticationException(DominhException):
-    pass
-
 
 from . types import Config_t
 from . types import JointPos_t
