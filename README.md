@@ -91,8 +91,8 @@ The `examples` directory contains an example script which uses some of the funct
 Example output for an R-30iA with an M-10iA in Roboguide:
 
 ```
-$ python examples/print_controller_info.py ip.of.robot.ctrlr
-Attempting to connect to: ip.of.robot.ctrlr
+$ python examples/print_controller_info.py localhost
+Attempting to connect to: localhost
 
 Controller info:
   Time                  : 2020-11-23 10:19:00
