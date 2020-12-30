@@ -24,6 +24,8 @@ from collections import namedtuple
 
 from . ftp import FtpClient
 
+from . import kliosop
+from . import kliouop
 
 IO_ON = 1
 IO_OFF = 0
@@ -659,9 +661,7 @@ class Client(object):
         :returns: True if the TP is 'ON'
         :rtype: bool
         """
-        # from kliosop
-        SOPO_TPENBL = 7
-        state = self.io_read_sopout(idx=SOPO_TPENBL)
+        state = self.io_read_sopout(idx=kliosop.SOPO_TPENBL)
         return state == IO_ON
 
     def is_faulted(self):
@@ -672,9 +672,7 @@ class Client(object):
         :returns: True if there is an active fault on the controller
         :rtype: bool
         """
-        # from kliosop
-        SOPO_FAULT = 3
-        state = self.io_read_sopout(idx=SOPO_FAULT)
+        state = self.io_read_sopout(idx=kliosop.SOPO_FAULT)
         return state == IO_ON
 
     def is_e_stopped(self):
@@ -685,9 +683,7 @@ class Client(object):
         :returns: True if the e-stop is active
         :rtype: bool
         """
-        # from kliosop
-        SOPI_ESTOP = 0
-        state = self.io_read_sopin(idx=SOPI_ESTOP)
+        state = self.io_read_sopin(idx=kliosop.SOPI_ESTOP)
         # active low input
         return state == IO_OFF
 
@@ -699,9 +695,7 @@ class Client(object):
         :returns: True if a program is running.
         :rtype: bool
         """
-        # from kliosop
-        SOPO_REMOTE = 0
-        state = self.io_read_sopout(idx=SOPO_REMOTE)
+        state = self.io_read_sopout(idx=kliosop.SOPO_REMOTE)
         return state == IO_ON
 
     def is_program_running(self):
@@ -716,9 +710,7 @@ class Client(object):
         :returns: True if a program is running.
         :rtype: bool
         """
-        # from kliouop
-        UOPO_PROGRUN = 3
-        state = self.io_read_uopout(idx=UOPO_PROGRUN)
+        state = self.io_read_uopout(idx=kliouop.UOPO_PROGRUN)
         return state == IO_ON
 
     def is_program_paused(self):
@@ -732,9 +724,7 @@ class Client(object):
         :returns: True if a program is paused.
         :rtype: bool
         """
-        # from kliouop
-        UOPO_PAUSED = 4
-        state = self.io_read_uopout(idx=UOPO_PAUSED)
+        state = self.io_read_uopout(idx=kliouop.UOPO_PAUSED)
         return state == IO_ON
 
     def list_errors(self):
