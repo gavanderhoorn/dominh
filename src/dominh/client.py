@@ -20,23 +20,19 @@ import datetime
 import re
 import requests
 
+from . constants import HELPER_DEVICE
+from . constants import HELPER_DIR
+from . constants import HLPR_RAW_VAR
+from . constants import HLPR_SCALAR_VAR
+from . constants import IO_OFF
+from . constants import IO_ON
+from . constants import JSON_REASON
+from . constants import JSON_SUCCESS
 
 from . ftp import FtpClient
 
 from . import kliosop
 from . import kliouop
-
-IO_ON = 1
-IO_OFF = 0
-
-JSON_SUCCESS = 'success'
-JSON_REASON = 'reason'
-
-HELPER_DEVICE = 'td:'
-HELPER_DIR = ''
-
-HLPR_RAW_VAR = 'raw_var'
-HLPR_SCALAR_VAR = 'scalar_var'
 
 
 class DominhException(Exception):
