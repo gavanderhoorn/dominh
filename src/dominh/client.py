@@ -284,8 +284,6 @@ class Client(object):
 
         In particular: upload the helper scripts and programs to the
         controller.
-
-        TODO: support authentication somehow.
         """
         if not self._skip_helper_upload:
             self._upload_helpers(self._host, remote_path=self._base_path)
