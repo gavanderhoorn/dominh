@@ -30,7 +30,7 @@ from dominh import Client
 
 
 if __name__ == '__main__':
-    args = docopt(__doc__, version='dominh 0.2.1')
+    args = docopt(__doc__, version='dominh 0.2.2')
     host = args['<host>']
     user = args['--user']
     pw = args['--pw']
