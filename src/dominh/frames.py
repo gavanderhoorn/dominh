@@ -16,7 +16,16 @@
 # author: G.A. vd. Hoorn
 
 
-def _match_position(self, text):
+import re
+
+from . exceptions import DominhException
+from . helpers import get_var_raw
+from . variables import get_scalar_var
+from . types import Config_t
+from . types import Position_t
+
+
+def _match_position(text):
     """Try to extract elements of a FANUC POSITION from 'text'.
 
     :param text: Textual representation of a POSITION variable.
@@ -40,22 +49,7 @@ def _match_position(self, text):
     return matches[0] if matches else None
 
 
-def _get_var_raw(self, varname):
-    """Retrieve raw text dump of variable with name 'varname'.
-
-    :param varname: Name of the variable to retrieve.
-    :type varname: str
-    :returns: Raw textual rendering of the (system) variable 'varname'.
-    :rtype: str
-    """
-    # use get_stm(..) directly here as what we get returned is not actually
-    # json, and read_helper(..) will try to parse it as such and then fail
-    ret = self._get_stm(
-        page=HLPR_RAW_VAR + '.stm', params={'_reqvar': varname})
-    return ret.text
-
-
-def _get_frame_var(self, varname):
+def _get_frame_var(conx, varname):
     """Retrieve the POSITION variable 'varname'.
 
     :param varname: Name of the variable to retrieve.
@@ -66,9 +60,9 @@ def _get_frame_var(self, varname):
     """
     # NOTE: assuming here that get_var_raw(..) returns something we can
     # actually parse
-    ret = self._get_var_raw(varname)
+    ret = get_var_raw(conx, varname)
     # remove the first line as it's empty
-    match = self._match_position(ret.replace('\r\n', '', 1))
+    match = _match_position(ret.replace('\r\n', '', 1))
 
     if not match:
         raise DominhException(
@@ -84,7 +78,7 @@ def _get_frame_var(self, varname):
     return Position_t(Config_t(f, u, t, *turn_nos), *xyzwpr)
 
 
-def _get_frame_comment(self, frame_type, group, idx):
+def _get_frame_comment(conx, frame_type, group, idx):
     """Return the comment for the jog/tool/user frame 'idx'.
 
     :param frame_type: Type of frame the comment is associated with (
@@ -99,10 +93,10 @@ def _get_frame_comment(self, frame_type, group, idx):
     :rtype: str
     """
     varname = f'[TPFDEF]SETUP_DATA[{group},{frame_type},{idx}].$COMMENT'
-    return self.get_scalar_var(varname)
+    return get_scalar_var(conx, name=varname)
 
 
-def get_jogframe(self, idx, group=1, include_comment=False):
+def get_jogframe(conx, idx, group=1, include_comment=False):
     """Return the jog frame at index 'idx'.
 
     :param idx: Numeric ID of the jog frame.
@@ -116,21 +110,21 @@ def get_jogframe(self, idx, group=1, include_comment=False):
     """
     if group < 1 or group > 8:
         raise ValueError("Requested group id invalid (must be "
-                            f"between 1 and 8, got: {group})")
+                         f"between 1 and 8, got: {group})")
     if idx < 1 or idx > 5:
         raise ValueError("Requested jog frame idx invalid (must be "
-                            f"between 1 and 5, got: {idx})")
+                         f"between 1 and 5, got: {idx})")
     varname = f'[TPFDEF]JOGFRAMES[{group},{idx}]'
-    frame = self._get_frame_var(varname)
+    frame = _get_frame_var(conx, varname)
     cmt = None
     if include_comment:
         JOGFRAME = 2
-        cmt = self._get_frame_comment(
-            frame_type=JOGFRAME, group=group, idx=idx)
+        cmt = _get_frame_comment(
+            conx, frame_type=JOGFRAME, group=group, idx=idx)
     return (frame, cmt)
 
 
-def get_toolframe(self, idx, group=1, include_comment=False):
+def get_toolframe(conx, idx, group=1, include_comment=False):
     """Return the tool frame at index 'idx'.
 
     :param idx: Numeric ID of the tool frame.
@@ -144,21 +138,21 @@ def get_toolframe(self, idx, group=1, include_comment=False):
     """
     if group < 1 or group > 8:
         raise ValueError("Requested group id invalid (must be "
-                            f"between 1 and 8, got: {group})")
+                         f"between 1 and 8, got: {group})")
     if idx < 1 or idx > 10:
         raise ValueError("Requested tool frame idx invalid (must be "
-                            f"between 1 and 10, got: {idx})")
+                         f"between 1 and 10, got: {idx})")
     varname = f'[*SYSTEM*]$MNUTOOL[{group},{idx}]'
-    frame = self._get_frame_var(varname)
+    frame = _get_frame_var(conx, varname)
     cmt = None
     if include_comment:
         TOOLFRAME = 1
-        cmt = self._get_frame_comment(
-            frame_type=TOOLFRAME, group=group, idx=idx)
+        cmt = _get_frame_comment(
+            conx, frame_type=TOOLFRAME, group=group, idx=idx)
     return (frame, cmt)
 
 
-def get_userframe(self, idx, group=1, include_comment=False):
+def get_userframe(conx, idx, group=1, include_comment=False):
     """Return the user frame at index 'idx'.
 
     :param idx: Numeric ID of the user frame.
@@ -172,36 +166,36 @@ def get_userframe(self, idx, group=1, include_comment=False):
     """
     if group < 1 or group > 8:
         raise ValueError("Requested group id invalid (must be "
-                            f"between 1 and 8, got: {group})")
+                         f"between 1 and 8, got: {group})")
     if idx < 1 or idx > 10:
         raise ValueError("Requested user frame idx invalid (must be "
-                            f"between 1 and 10, got: {idx})")
+                         f"between 1 and 10, got: {idx})")
     varname = f'[*SYSTEM*]$MNUFRAME[{group},{idx}]'
-    frame = self._get_frame_var(varname)
+    frame = _get_frame_var(conx, varname)
     cmt = None
     if include_comment:
         USERFRAME = 3
-        cmt = self._get_frame_comment(
-            frame_type=USERFRAME, group=group, idx=idx)
+        cmt = _get_frame_comment(
+            conx, frame_type=USERFRAME, group=group, idx=idx)
     return (frame, cmt)
 
 
-def get_active_jogframe(self, group=1):
+def get_active_jogframe(conx, group=1):
     if group < 1 or group > 8:
         raise ValueError("Requested group id invalid (must be "
-                            f"between 1 and 8, got: {group})")
-    return self.get_scalar_var(varname=f'[TPFDEF]JOGFRAMNUM[{group}]')
+                         f"between 1 and 8, got: {group})")
+    return get_scalar_var(conx, name=f'[TPFDEF]JOGFRAMNUM[{group}]')
 
 
-def get_active_toolframe(self, group=1):
+def get_active_toolframe(conx, group=1):
     if group < 1 or group > 8:
         raise ValueError("Requested group id invalid (must be "
-                            f"between 1 and 8, got: {group})")
-    return self.get_scalar_var(varname=f'[*SYSTEM*]$MNUTOOLNUM[{group}]')
+                         f"between 1 and 8, got: {group})")
+    return get_scalar_var(conx, name=f'[*SYSTEM*]$MNUTOOLNUM[{group}]')
 
 
-def get_active_userframe(self, group=1):
+def get_active_userframe(conx, group=1):
     if group < 1 or group > 8:
         raise ValueError("Requested group id invalid (must be "
-                            f"between 1 and 8, got: {group})")
-    return self.get_scalar_var(varname=f'[*SYSTEM*]$MNUFRAMENUM[{group}]')
+                         f"between 1 and 8, got: {group})")
+    return get_scalar_var(conx, name=f'[*SYSTEM*]$MNUFRAMENUM[{group}]')

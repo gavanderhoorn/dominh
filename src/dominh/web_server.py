@@ -16,8 +16,18 @@
 # author: G.A. vd. Hoorn
 
 
-def format_sysvar(path):
-    assert type(path) == list
-    if not path:
-        raise ValueError("Need at least one variable name")
-    return ('$' + '.$'.join(path)).upper()
+from . variables import set_scalar_var
+
+
+def disable_web_server_headers(conx):
+    """Prevent Fanuc web server from including headers and footers with
+    each response.
+    """
+    set_scalar_var(conx, name='$HTTP_CTRL.$ENAB_TEMPL', val=0)
+
+
+def enable_web_server_headers(conx):
+    """Allow Fanuc web server to include headers and footers with each
+    response.
+    """
+    set_scalar_var(conx, name='$HTTP_CTRL.$ENAB_TEMPL', val=1)

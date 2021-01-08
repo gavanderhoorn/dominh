@@ -16,7 +16,19 @@
 # author: G.A. vd. Hoorn
 
 
-def get_strreg(self, idx):
+import re
+
+from . comset import comset
+from . constants import HLPR_RAW_VAR
+from . exceptions import DominhException
+from . helpers import get_stm
+from . types import Config_t
+from . types import JointPos_t
+from . types import Position_t
+from . variables import get_scalar_var
+
+
+def get_strreg(conx, idx):
     """Retrieve the value stored in the string register at 'idx'.
 
     :param idx: The index of the register to retrieve.
@@ -27,23 +39,20 @@ def get_strreg(self, idx):
     """
     # TODO: rather nasty hard-coded variable name
     # TODO: check for errors (fi idx too high)
-    varname = f'[*STRREG*]$STRREG[{idx}]'
-    ret = self.get_scalar_var(varname)
-    return ret
+    return get_scalar_var(conx, name=f'[*STRREG*]$STRREG[{idx}]')
 
 
-def get_num_strreg(self):
+def get_num_strreg(conx):
     """Retrieve total number of string registers available on the
     controller.
 
     :returns: value of [*STRREG*]$MAXSREGNUM.
     :rtype: int
     """
-    ret = self.get_scalar_var('[*STRREG*]$MAXSREGNUM')
-    return int(ret)
+    return int(get_scalar_var(conx, name='[*STRREG*]$MAXSREGNUM'))
 
 
-def get_numreg(self, idx):
+def get_numreg(conx, idx):
     """Retrieve the value stored in the numerical register at 'idx'.
 
     :param idx: The index of the register to retrieve.
@@ -52,12 +61,11 @@ def get_numreg(self, idx):
     index 'idx' in the numerical registers on the controller
     :rtype: int or float (see above)
     """
-    varname = f'$NUMREG[{idx}]'
-    ret = self.get_scalar_var(varname)
+    ret = get_scalar_var(conx, name=f'$NUMREG[{idx}]')
     return float(ret) if '.' in ret else int(ret)
 
 
-def set_numreg(self, idx, val):
+def set_numreg(conx, idx, val):
     """Update the value stored in 'R[idx]' to 'val'.
 
     Note: 'val' must be either int or float.
@@ -68,10 +76,10 @@ def set_numreg(self, idx, val):
     :type val: int or float
     """
     assert type(val) in [float, int]
-    self._comset('NUMREG', idx, val=val)
+    comset(conx, 'NUMREG', idx, val=val)
 
 
-def get_posreg(self, idx, group=1):
+def get_posreg(conx, idx, group=1):
     """Return the position register at index 'idx' for group 'group'.
 
     NOTE: this method is expensive and slow, as it parses a web page.
@@ -86,12 +94,12 @@ def get_posreg(self, idx, group=1):
     """
     if group < 1 or group > 8:
         raise ValueError("Requested group id invalid (must be "
-                            f"between 1 and 8, got: {group})")
+                         f"between 1 and 8, got: {group})")
     varname = f'$POSREG[{group},{idx}]'
     # use get_stm(..) directly here as what we get returned is not actually
     # json, and read_helper(..) will try to parse it as such and then fail
-    ret = self._get_stm(
-        page=HLPR_RAW_VAR + '.stm', params={'_reqvar': varname})
+    ret = get_stm(
+        conx, page=HLPR_RAW_VAR + '.stm', params={'_reqvar': varname})
 
     # use Jay's regex (thanks!)
     # TODO: merge with get_frame_var(..)

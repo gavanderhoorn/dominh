@@ -16,7 +16,18 @@
 # author: G.A. vd. Hoorn
 
 
-def _upload_helpers(self, host, remote_path, reupload=False):
+import re
+import requests
+
+from . constants import HLPR_RAW_VAR
+from . constants import HLPR_SCALAR_VAR
+from . exceptions import AuthenticationException
+from . exceptions import DominhException
+from . exceptions import LockedResourceException
+from . ftp import FtpClient
+
+
+def upload_helpers(host, remote_path, request_timeout=5, ftp_auth=None):
     """Upload the (set of) helper(s) files to the controller.
 
     These helpers are used by the various other functionality provided by
@@ -33,13 +44,11 @@ def _upload_helpers(self, host, remote_path, reupload=False):
     has been done before by this object (default: False)
     :type reupload: bool
     """
-    if self._helpers_uploaded and not reupload:
-        return
-    ftpc = FtpClient(host, timeout=self._request_timeout)
+    ftpc = FtpClient(host, timeout=request_timeout)
 
     # log in using username and pw, if provided by user
-    if self._ftp_auth:
-        user, pw = self._ftp_auth
+    if ftp_auth:
+        user, pw = ftp_auth
         ftpc.connect(user=user, pw=pw)
     else:
         ftpc.connect()
@@ -54,7 +63,7 @@ def _upload_helpers(self, host, remote_path, reupload=False):
     ftpc.upload_as_file(f'/{remote_path}/{HLPR_RAW_VAR}.stm', content)
 
 
-def _get_stm(self, page, params={}):
+def get_stm(conx, page, params={}):
     """Retrieve a '.stm' file from the controller (rendered by the web
     server).
 
@@ -66,15 +75,15 @@ def _get_stm(self, page, params={}):
     :returns: JSON response as returned by the controller in its response
     :rtype: dict
     """
-    url = f'http://{self._host}/{self._base_path}/{page}'
-    r = requests.get(url, params=params, timeout=self._request_timeout)
+    url = f'http://{conx.host}/{conx.base_path}/{page}'
+    r = requests.get(url, params=params, timeout=conx.request_timeout)
     if r.status_code != requests.codes.ok:
-        raise DominhException("Controller web server returned an "
-                                f"error: {r.status_code}")
+        raise DominhException(
+            f"Controller web server returned an error: {r.status_code}")
     return r
 
 
-def _read_helper(self, helper, params={}):
+def read_helper(conx, helper, params={}):
     """Retrieve JSON from helper on controller.
 
     NOTE: 'helper' should not include the extension
@@ -87,14 +96,14 @@ def _read_helper(self, helper, params={}):
     :returns: JSON response as returned by the controller in its response
     :rtype: dict
     """
-    if not self._helpers_uploaded and not self._skip_helper_upload:
+    if not conx.helpers_uploaded and not conx.skipped_helpers_upload:
         raise DominhException("Helpers not uploaded")
     if '.stm' in helper.lower():
         raise ValueError("Helper name includes extension")
-    return self._get_stm(page=f'{helper}.stm', params=params).json()
+    return get_stm(conx, page=f'{helper}.stm', params=params).json()
 
 
-def _exec_kcl(self, cmd, wait_for_response=False):
+def exec_kcl(conx, cmd, wait_for_response=False):
     """Execute the specified KCL command line on the controller.
 
     NOTE: any expected parameters must be supplied as part of 'cmd'.
@@ -111,9 +120,8 @@ def _exec_kcl(self, cmd, wait_for_response=False):
     :rtype: str
     """
     base = 'KCL' if wait_for_response else 'KCLDO'
-    url = f'http://{self._host}/{base}/{cmd}'
-    r = requests.get(
-        url, auth=self._kcl_auth, timeout=self._request_timeout)
+    url = f'http://{conx.host}/{base}/{cmd}'
+    r = requests.get(url, auth=conx.kcl_auth, timeout=conx.request_timeout)
 
     # always check for authentication issues, even if caller doesn't
     # necessarily want the response checked.
@@ -142,11 +150,10 @@ def _exec_kcl(self, cmd, wait_for_response=False):
         kcl_output = re.search(r'<XMP>(.*)</XMP>', r.text, re.DOTALL)
         if kcl_output:
             return kcl_output.group(1)
-        raise DominhException(
-            "Could not find KCL output in returned document")
+        raise DominhException("Could not find KCL output in returned document")
 
 
-def _exec_karel_prg(self, prg_name, params={}, return_raw=False):
+def exec_karel_prg(conx, prg_name, params={}, return_raw=False):
     """Execute a Karel program on the controller (via the web server).
 
     NOTE: 'prg_name' should not include the '.pc' extension.
@@ -164,9 +171,9 @@ def _exec_karel_prg(self, prg_name, params={}, return_raw=False):
     """
     if '.pc' in prg_name.lower():
         raise ValueError(f"Program name includes extension ('{prg_name}')")
-    url = f'http://{self._host}/KAREL/{prg_name}'
-    r = requests.get(url, auth=self._karel_auth, params=params,
-                        timeout=self._request_timeout)
+    url = f'http://{conx.host}/KAREL/{prg_name}'
+    r = requests.get(
+        url, auth=conx.karel_auth, params=params, timeout=conx.request_timeout)
     # provide caller with appropriate exceptions
     if r.status_code == requests.codes.unauthorized:
         raise AuthenticationException("Authentication failed (Karel)")
@@ -183,15 +190,16 @@ def _exec_karel_prg(self, prg_name, params={}, return_raw=False):
     return r.json() if not return_raw else r.text
 
 
-def _disable_web_server_headers(self):
-    """Prevent Fanuc web server from including headers and footers with
-    each response.
-    """
-    self.set_scalar_var('$HTTP_CTRL.$ENAB_TEMPL', 0)
+def get_var_raw(conx, varname):
+    """Retrieve raw text dump of variable with name 'varname'.
 
-
-def _enable_web_server_headers(self):
-    """Allow Fanuc web server to include headers and footers with each
-    response.
+    :param varname: Name of the variable to retrieve.
+    :type varname: str
+    :returns: Raw textual rendering of the (system) variable 'varname'.
+    :rtype: str
     """
-    self.set_scalar_var('$HTTP_CTRL.$ENAB_TEMPL', 1)
+    # use get_stm(..) directly here as what we get returned is not actually
+    # json, and read_helper(..) will try to parse it as such and then fail
+    ret = get_stm(
+        conx, page=HLPR_RAW_VAR + '.stm', params={'_reqvar': varname})
+    return ret.text

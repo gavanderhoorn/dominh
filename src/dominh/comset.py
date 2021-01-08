@@ -16,7 +16,10 @@
 # author: G.A. vd. Hoorn
 
 
-def _get_cmt_fc(self, cmt):
+from . helpers import exec_karel_prg
+
+
+def _get_cmt_fc(cmt):
     return {
         'NUMREG': 1,
         'POSREG': 3,
@@ -34,7 +37,7 @@ def _get_cmt_fc(self, cmt):
     }.get(cmt.upper())
 
 
-def _get_val_fc(self, valt):
+def _get_val_fc(valt):
     return {
         'NUMREG': 2,
         'UALARM': 5,  # actually sets 'severity'
@@ -42,7 +45,7 @@ def _get_val_fc(self, valt):
     }.get(valt.upper())
 
 
-def _comset(self, fc, idx, val=None, comment=''):
+def comset(conx, fc, idx, val=None, comment=''):
     """Low-level wrapper around the 'karel/ComSet' program.
 
     This method uses the COMSET Karel program on the controller, which is
@@ -89,7 +92,7 @@ def _comset(self, fc, idx, val=None, comment=''):
         raise ValueError("Need either val or comment")
 
     if val:
-        sfc = self._get_val_fc(fc)
+        sfc = _get_val_fc(fc)
         real_flag = 1 if type(val) == float else -1
         params = {
             'sValue': val,
@@ -99,7 +102,7 @@ def _comset(self, fc, idx, val=None, comment=''):
         }
 
     if comment:
-        sfc = self._get_cmt_fc(fc)
+        sfc = _get_cmt_fc(fc)
         params = {
             'sComment': comment,
             'sIndx': idx,
@@ -108,5 +111,4 @@ def _comset(self, fc, idx, val=None, comment=''):
 
     # make sure to request 'return_raw', as 'ComSet' does not return JSON
     # TODO: check return value
-    self._exec_karel_prg(
-        prg_name='ComSet', params=params, return_raw=True)
+    exec_karel_prg(conx, prg_name='ComSet', params=params, return_raw=True)

@@ -16,34 +16,37 @@
 # author: G.A. vd. Hoorn
 
 
-def was_jogged(self, group=1):
+from . exceptions import DominhException
+from . variables import get_scalar_var
+from . types import Plst_Grp_t
+from . utils import format_sysvar
+
+
+def was_jogged(conx, group=1):
     if group < 1 or group > 8:
         raise ValueError("Requested group id invalid (must be "
-                            f"between 1 and 8, got: {group})")
-    varname = f'$MOR_GRP[{group}].$JOGGED'
-    ret = self.get_scalar_var(varname=varname)
+                         f"between 1 and 8, got: {group})")
+    ret = get_scalar_var(conx, name=f'$MOR_GRP[{group}].$JOGGED')
     if 'bad variable' in ret.lower():
         raise DominhException(f"Could not read sysvar: '{ret}'")
     return ret.lower() == 'true'
 
 
-def get_robot_id(self, group=1):
-    varname = f'$SCR_GRP[{group}].$ROBOT_ID'
-    ret = self.get_scalar_var(varname=varname)
+def get_robot_id(conx, group=1):
+    ret = get_scalar_var(conx, name=f'$SCR_GRP[{group}].$ROBOT_ID')
     if 'bad variable' in ret.lower():
         raise DominhException(f"Could not read sysvar: '{ret}'")
     return ret
 
 
-def get_robot_model(self, group=1):
-    varname = f'$SCR_GRP[{group}].$ROBOT_MODEL'
-    ret = self.get_scalar_var(varname=varname)
+def get_robot_model(conx, group=1):
+    ret = get_scalar_var(conx, name=f'$SCR_GRP[{group}].$ROBOT_MODEL')
     if 'bad variable' in ret.lower():
         raise DominhException(f"Could not read sysvar: '{ret}'")
     return ret
 
 
-def get_payload(self, idx, grp=1):
+def get_payload(conx, idx, grp=1):
     """Retrieve payload nr 'idx' for group 'grp'.
 
     NOTE: this method is expensive and slow, as it retrieves the individual
@@ -65,22 +68,21 @@ def get_payload(self, idx, grp=1):
 
     # TODO: retrieve struct in one read and parse result instead
     base_vname = f'plst_grp{grp}[{idx}]'
-    cmt = self.get_scalar_var(
-            self._format_sysvar([base_vname, 'comment']))
+    cmt = get_scalar_var(conx, format_sysvar([base_vname, 'comment']))
     return Plst_Grp_t(
         comment=None if cmt == 'Uninitialized' else cmt,
-        payload=float(self.get_scalar_var(
-            self._format_sysvar([base_vname, 'payload']))),
-        payload_x=float(self.get_scalar_var(
-            self._format_sysvar([base_vname, 'payload_x']))),
-        payload_y=float(self.get_scalar_var(
-            self._format_sysvar([base_vname, 'payload_y']))),
-        payload_z=float(self.get_scalar_var(
-            self._format_sysvar([base_vname, 'payload_z']))),
-        payload_ix=float(self.get_scalar_var(
-            self._format_sysvar([base_vname, 'payload_ix']))),
-        payload_iy=float(self.get_scalar_var(
-            self._format_sysvar([base_vname, 'payload_iy']))),
-        payload_iz=float(self.get_scalar_var(
-            self._format_sysvar([base_vname, 'payload_iz']))),
+        payload=float(get_scalar_var(conx,
+                      format_sysvar([base_vname, 'payload']))),
+        payload_x=float(get_scalar_var(conx,
+                        format_sysvar([base_vname, 'payload_x']))),
+        payload_y=float(get_scalar_var(conx,
+                        format_sysvar([base_vname, 'payload_y']))),
+        payload_z=float(get_scalar_var(conx,
+                        format_sysvar([base_vname, 'payload_z']))),
+        payload_ix=float(get_scalar_var(conx,
+                         format_sysvar([base_vname, 'payload_ix']))),
+        payload_iy=float(get_scalar_var(conx,
+                         format_sysvar([base_vname, 'payload_iy']))),
+        payload_iz=float(get_scalar_var(conx,
+                         format_sysvar([base_vname, 'payload_iz']))),
     )

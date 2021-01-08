@@ -16,7 +16,10 @@
 # author: G.A. vd. Hoorn
 
 
-def cmt_numreg(self, idx, comment):
+from . comset import comset
+
+
+def cmt_numreg(conx, idx, comment):
     """Update the comment on numerical register at 'idx'.
 
     :param idx: Numeric ID of register
@@ -24,10 +27,10 @@ def cmt_numreg(self, idx, comment):
     :param comment: Comment to set
     :type comment: str
     """
-    self._comset('NUMREG', idx, comment=comment)
+    comset(conx, 'NUMREG', idx, comment=comment)
 
 
-def cmt_posreg(self, idx, comment):
+def cmt_posreg(conx, idx, comment):
     """Update the comment on position register at 'idx'.
 
     :param idx: Numeric ID of register
@@ -35,10 +38,10 @@ def cmt_posreg(self, idx, comment):
     :param comment: Comment to set
     :type comment: str
     """
-    self._comset('POSREG', idx, comment=comment)
+    comset(conx, 'POSREG', idx, comment=comment)
 
 
-def cmt_din(self, idx, comment):
+def cmt_din(conx, idx, comment):
     """Update the comment on 'DIN[idx]'.
 
     :param idx: Numeric ID of port
@@ -46,10 +49,10 @@ def cmt_din(self, idx, comment):
     :param comment: Comment to set
     :type comment: str
     """
-    self._comset('DIN', idx, comment=comment)
+    comset(conx, 'DIN', idx, comment=comment)
 
 
-def cmt_dout(self, idx, comment):
+def cmt_dout(conx, idx, comment):
     """Update the comment on 'DOUT[idx]'.
 
     :param idx: Numeric ID of port
@@ -57,4 +60,4 @@ def cmt_dout(self, idx, comment):
     :param comment: Comment to set
     :type comment: str
     """
-    self._comset('DOUT', idx, comment=comment)
+    comset(conx, 'DOUT', idx, comment=comment)

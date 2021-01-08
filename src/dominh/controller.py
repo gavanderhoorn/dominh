@@ -16,12 +16,35 @@
 # author: G.A. vd. Hoorn
 
 
-def reset(self):
+import datetime
+import re
+
+from . import kliosop
+from . import kliouop
+
+from . constants import IO_OFF
+from . constants import IO_ON
+from . constants import JSON_REASON
+from . constants import JSON_SUCCESS
+from . exceptions import DominhException
+from . ftp import FtpClient
+from . helpers import exec_karel_prg
+from . helpers import exec_kcl
+from . io import io_read_sopin
+from . io import io_read_sopout
+from . io import io_read_uopout
+from . variables import get_scalar_var
+from . variables import set_scalar_var
+from . web_server import disable_web_server_headers
+from . web_server import enable_web_server_headers
+
+
+def reset(conx):
     """Attempt to RESET the controller."""
-    self._exec_kcl(cmd='reset')
+    exec_kcl(conx, cmd='reset')
 
 
-def select_tpe(self, program):
+def select_tpe(conx, program):
     """Attempt to make 'program' the SELECTed program on the TP.
 
     Wraps the Karel SELECT_TPE(..) routine.
@@ -35,33 +58,31 @@ def select_tpe(self, program):
     :type program: str
     """
     raise DominhException('Not implemented')
-    ret = self._exec_karel_prg(
-        prg_name='dmh_selprg', params={'prog_name': program})
+    ret = exec_karel_prg(
+        conx, prg_name='dmh_selprg', params={'prog_name': program})
     if not ret[JSON_SUCCESS]:
         raise DominhException("Select_TPE error: " + ret[JSON_REASON])
 
 
-def get_general_override(self):
+def get_general_override(conx):
     """Retrieve the currently configured General Override.
 
     :returns: Value of $MCR.$GENOVERRIDE
     :rtype: int
     """
-    varname = '$MCR.$GENOVERRIDE'
-    return int(self.get_scalar_var(varname))
+    return int(get_scalar_var(conx, name='$MCR.$GENOVERRIDE'))
 
 
-def set_general_override(self, val):
+def set_general_override(conx, val):
     """Set the General Override to 'val'.
 
     :param val: New value for $MCR.$GENOVERRIDE
     :type val: int
     """
-    varname = '$MCR.$GENOVERRIDE'
-    self.set_scalar_var(varname, val)
+    set_scalar_var(conx, name='$MCR.$GENOVERRIDE', val=val)
 
 
-def list_programs(self, types=[]):
+def list_programs(conx, types=[]):
     """Retrieve the list of all programs stored on the controller.
 
     NOTE: this is a rather naive implementation which should not be used in
@@ -81,10 +102,10 @@ def list_programs(self, types=[]):
     """
     # TODO: check whether headers are currently enabled and restore state
     # after having used 'show progs'
-    self._disable_web_server_headers()
+    disable_web_server_headers(conx)
     # TODO: see whether FTP-ing 'prgstate.dg' would be faster
-    ret = self._exec_kcl(cmd='show progs', wait_for_response=True)
-    self._enable_web_server_headers()
+    ret = exec_kcl(conx, cmd='show progs', wait_for_response=True)
+    enable_web_server_headers(conx)
 
     # parse returned list
     # TODO: we only return '(name, type)' tuples for now
@@ -97,7 +118,7 @@ def list_programs(self, types=[]):
     ]
 
 
-def get_controller_series(self):
+def get_controller_series(conx):
     """Returns the controller series identifier (ie: R-30iA, 30iB, etc).
 
     Note: this method maps known major versions to controller series. It
@@ -106,7 +127,7 @@ def get_controller_series(self):
     :returns: The series identifier of the controller
     :rtype: str
     """
-    software_version = self.get_system_software_version()
+    software_version = get_system_software_version(conx)
     major = int(re.match(r'V(\d)\.', software_version).group(1))
     return {
         7: 'R-30iA',
@@ -115,7 +136,7 @@ def get_controller_series(self):
     }.get(major, f'Unknown ("{software_version}")')
 
 
-def get_application(self):
+def get_application(conx):
     """Returns the application identifier installed on the controller.
 
     The application is the '*Tool', such as HandlingTool, SpotTool, etc.
@@ -124,20 +145,20 @@ def get_application(self):
     :rtype: str
     """
     APPL_ID_IDX = 1
-    return self.get_scalar_var(f'$application[{APPL_ID_IDX}]')
+    return get_scalar_var(conx, name=f'$application[{APPL_ID_IDX}]')
 
 
-def get_system_software_version(self):
+def get_system_software_version(conx):
     """Returns the version (major.minor and patch) of the system software.
 
     :returns: The version of the system software on the controller
     :rtype: str
     """
     APPL_VER_IDX = 2
-    return self.get_scalar_var(f'$application[{APPL_VER_IDX}]')
+    return get_scalar_var(conx, name=f'$application[{APPL_VER_IDX}]')
 
 
-def in_auto_mode(self):
+def in_auto_mode(conx):
     """Determine whether the controller is in AUTO or one of the MANUAL
     modes.
 
@@ -149,13 +170,13 @@ def in_auto_mode(self):
     :returns: True if the controller is in AUTO mode
     :rtype: bool
     """
-    ret = self._exec_karel_prg(prg_name='dmh_autom')
+    ret = exec_karel_prg(conx, prg_name='dmh_autom')
     if not ret[JSON_SUCCESS]:
         raise DominhException("Select_TPE error: " + ret[JSON_REASON])
     return ret['in_auto_mode']
 
 
-def tp_enabled(self):
+def tp_enabled(conx):
     """Determine whether the Teach Pendant is currently enabled.
 
     Checks SOP output index 7 (from kliosop.kl).
@@ -163,11 +184,10 @@ def tp_enabled(self):
     :returns: True if the TP is 'ON'
     :rtype: bool
     """
-    state = self.io_read_sopout(idx=kliosop.SOPO_TPENBL)
-    return state == IO_ON
+    return io_read_sopout(conx, idx=kliosop.SOPO_TPENBL) == IO_ON
 
 
-def is_faulted(self):
+def is_faulted(conx):
     """Determine whether the controller is currently faulted.
 
     Checks SOP output index 3 (from kliosop.kl).
@@ -175,11 +195,10 @@ def is_faulted(self):
     :returns: True if there is an active fault on the controller
     :rtype: bool
     """
-    state = self.io_read_sopout(idx=kliosop.SOPO_FAULT)
-    return state == IO_ON
+    return io_read_sopout(conx, idx=kliosop.SOPO_FAULT) == IO_ON
 
 
-def is_e_stopped(self):
+def is_e_stopped(conx):
     """Determine whether the controller is currently e-stopped.
 
     Checks SOP input index 0 (from kliosop.kl).
@@ -187,12 +206,11 @@ def is_e_stopped(self):
     :returns: True if the e-stop is active
     :rtype: bool
     """
-    state = self.io_read_sopin(idx=kliosop.SOPI_ESTOP)
     # active low input
-    return state == IO_OFF
+    return io_read_sopin(conx, idx=kliosop.SOPI_ESTOP) == IO_OFF
 
 
-def in_remote_mode(self):
+def in_remote_mode(conx):
     """Determine whether the controller is in remote mode.
 
     Checks SOP output index 0 (from kliosop.kl).
@@ -200,11 +218,10 @@ def in_remote_mode(self):
     :returns: True if a program is running.
     :rtype: bool
     """
-    state = self.io_read_sopout(idx=kliosop.SOPO_REMOTE)
-    return state == IO_ON
+    return io_read_sopout(conx, idx=kliosop.SOPO_REMOTE) == IO_ON
 
 
-def is_program_running(self):
+def is_program_running(conx):
     """Determine whether the controller is executing a program.
 
     NOTE: this does not check for any specific program, but will return
@@ -216,11 +233,10 @@ def is_program_running(self):
     :returns: True if a program is running.
     :rtype: bool
     """
-    state = self.io_read_uopout(idx=kliouop.UOPO_PROGRUN)
-    return state == IO_ON
+    return io_read_uopout(conx, idx=kliouop.UOPO_PROGRUN) == IO_ON
 
 
-def is_program_paused(self):
+def is_program_paused(conx):
     """Determine whether there is a paused program on the controller.
 
     NOTE: this does not check for any specific program, but will return
@@ -231,11 +247,10 @@ def is_program_paused(self):
     :returns: True if a program is paused.
     :rtype: bool
     """
-    state = self.io_read_uopout(idx=kliouop.UOPO_PAUSED)
-    return state == IO_ON
+    return io_read_uopout(conx, idx=kliouop.UOPO_PAUSED) == IO_ON
 
 
-def list_errors(self):
+def list_errors(conx):
     """Return list of all errors.
 
     The list returned contains each error as an element in the list. Each
@@ -252,10 +267,10 @@ def list_errors(self):
     :returns: A list of all errors and their details
     :rtype: list(tuple(int, str, str, str, str, str))
     """
-    ftpc = FtpClient(self._host, timeout=self._request_timeout)
+    ftpc = FtpClient(conx.host, timeout=conx.request_timeout)
     # log in using username and pw, if provided by user
-    if self._ftp_auth:
-        user, pw = self._ftp_auth
+    if conx.ftp_auth:
+        user, pw = conx.ftp_auth
         ftpc.connect(user=user, pw=pw)
     else:
         ftpc.connect()
@@ -273,43 +288,38 @@ def list_errors(self):
             err_level, err_state, = '', level_state[0]
         res.append((int(fields[0]), fields[1], fields[2], fields[3],
                     err_level, err_state))
-
     return res
 
 
-def get_active_prog(self):
-    varname = '$SHELL_WRK.$ACTIVEPROG'
-    ret = self.get_scalar_var(varname=varname)
+def get_active_prog(conx):
+    ret = get_scalar_var(conx, name='$SHELL_WRK.$ACTIVEPROG')
     if 'bad variable' in ret.lower():
         raise DominhException(f"Could not read sysvar: '{ret}'")
     return ret
 
 
-def get_curr_routine(self):
-    varname = '$SHELL_WRK.$ROUT_NAME'
-    ret = self.get_scalar_var(varname=varname)
+def get_curr_routine(conx):
+    ret = get_scalar_var(conx, name='$SHELL_WRK.$ROUT_NAME')
     if 'bad variable' in ret.lower():
         raise DominhException(f"Could not read sysvar: '{ret}'")
     return ret
 
 
-def get_curr_line(self):
-    varname = '$SHELL_WRK.$CURR_LINE'
-    ret = self.get_scalar_var(varname=varname)
+def get_curr_line(conx):
+    ret = get_scalar_var(conx, name='$SHELL_WRK.$CURR_LINE')
     if 'bad variable' in ret.lower():
         raise DominhException(f"Could not read sysvar: '{ret}'")
     return int(ret)
 
 
-def get_num_groups(self):
-    varname = '$SCR.$NUM_GROUP'
-    ret = self.get_scalar_var(varname=varname)
+def get_num_groups(conx):
+    ret = get_scalar_var(conx, name='$SCR.$NUM_GROUP')
     if 'bad variable' in ret.lower():
         raise DominhException(f"Could not read sysvar: '{ret}'")
     return int(ret)
 
 
-def get_clock(self):
+def get_clock(conx):
     """ Return the current date and time on the controller.
 
     NOTE: this method is rather slow, as it parses a web page.
@@ -319,7 +329,7 @@ def get_clock(self):
     :returns: Controller date and time.
     :rtype: datetime.datetime
     """
-    ret = self._exec_kcl(cmd='show clock', wait_for_response=True)
+    ret = exec_kcl(conx, cmd='show clock', wait_for_response=True)
     # date & time is on the second line of the output
     stamp = ret.strip().split('\n')[1]
     return datetime.datetime.strptime(stamp, '%d-%b-%y %H:%M')

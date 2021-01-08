@@ -16,7 +16,17 @@
 # author: G.A. vd. Hoorn
 
 
-def io_write(self, port_type, idx, val, check=False):
+import re
+
+from . constants import HLPR_SCALAR_VAR
+from . constants import IO_OFF
+from . constants import IO_ON
+from . exceptions import DominhException
+from . helpers import exec_kcl
+from . helpers import read_helper
+
+
+def io_write(conx, port_type, idx, val, check=False):
     """Set port 'idx' of type 'port_type' to value 'val'.
 
     Valid values for 'port_type':
@@ -51,8 +61,9 @@ def io_write(self, port_type, idx, val, check=False):
     operation in the form of a bool
     :rtype: None or bool (see above)
     """
-    ret = self._exec_kcl(
-        cmd=f'set port {port_type}[{idx}]={val}', wait_for_response=check)
+    ret = exec_kcl(
+        conx, cmd=f'set port {port_type}[{idx}]={val}',
+        wait_for_response=check)
     if not check:
         return
 
@@ -77,7 +88,7 @@ def io_write(self, port_type, idx, val, check=False):
     return is_ok and is_ok.group(2) == str(val)
 
 
-def io_write_dout(self, idx, val):
+def io_write_dout(conx, idx, val):
     """Write 'val' to 'DOUT[idx]'.
 
     :param idx: Index to write to
@@ -85,10 +96,10 @@ def io_write_dout(self, idx, val):
     :param val: Value to write
     :type val: int
     """
-    self.io_write('DOUT', idx, val)
+    io_write(conx, 'DOUT', idx, val)
 
 
-def io_write_rout(self, idx, val):
+def io_write_rout(conx, idx, val):
     """Write 'val' to 'ROUT[idx]'.
 
     :param idx: Index to write to
@@ -96,10 +107,10 @@ def io_write_rout(self, idx, val):
     :param val: Value to write
     :type val: int
     """
-    self.io_write('ROUT', idx, val)
+    io_write(conx, 'ROUT', idx, val)
 
 
-def io_read(self, port_type, idx):
+def io_read(conx, port_type, idx):
     """Read port 'idx' of type 'port_type'.
 
     Valid values for 'port_type':
@@ -152,8 +163,8 @@ def io_read(self, port_type, idx):
     """
     port_type = port_type.upper()
     port_id = f'{port_type}[{idx}]'
-    ret = self._read_helper(
-        helper=HLPR_SCALAR_VAR, params={'_reqvar': port_id})
+    ret = read_helper(
+        conx, helper=HLPR_SCALAR_VAR, params={'_reqvar': port_id})
 
     # check for some common problems
     if 'unknown port type name' in ret[port_id].lower():
@@ -166,7 +177,7 @@ def io_read(self, port_type, idx):
     return ret[port_id]
 
 
-def io_read_sopout(self, idx):
+def io_read_sopout(conx, idx):
     """Read from 'SOPOUT[idx]'.
 
     :param idx: Index to read from
@@ -174,10 +185,12 @@ def io_read_sopout(self, idx):
     :returns: Current state of 'SOPOUT[idx]'
     :rtype: int
     """
-    return IO_ON if self.io_read('SOPOUT', idx) == 'ON' else IO_OFF
+    if io_read(conx, 'SOPOUT', idx) == 'ON':
+        return IO_ON
+    return IO_OFF
 
 
-def io_read_sopin(self, idx):
+def io_read_sopin(conx, idx):
     """Read from 'SOPIN[idx]'.
 
     :param idx: Index to read from
@@ -185,10 +198,12 @@ def io_read_sopin(self, idx):
     :returns: Current state of 'SOPIN[idx]'
     :rtype: int
     """
-    return IO_ON if self.io_read('SOPIN', idx) == 'ON' else IO_OFF
+    if io_read(conx, 'SOPIN', idx) == 'ON':
+        return IO_ON
+    return IO_OFF
 
 
-def io_read_uopout(self, idx):
+def io_read_uopout(conx, idx):
     """Read from 'UOPOUT[idx]'.
 
     :param idx: Index to read from
@@ -196,10 +211,12 @@ def io_read_uopout(self, idx):
     :returns: Current state of 'UOPOUT[idx]'
     :rtype: int
     """
-    return IO_ON if self.io_read('UOPOUT', idx) == 'ON' else IO_OFF
+    if io_read(conx, 'UOPOUT', idx) == 'ON':
+        return IO_ON
+    return IO_OFF
 
 
-def io_read_rout(self, idx):
+def io_read_rout(conx, idx):
     """Read from 'RDO[idx]'.
 
     :param idx: Index to write to
@@ -207,4 +224,6 @@ def io_read_rout(self, idx):
     :returns: Current state of 'RDO[idx]'
     :rtype: int
     """
-    return IO_ON if self.io_read('RDO', idx) == 'ON' else IO_OFF
+    if io_read(conx, 'RDO', idx) == 'ON':
+        return IO_ON
+    return IO_OFF

@@ -16,8 +16,14 @@
 # author: G.A. vd. Hoorn
 
 
-def set_scalar_var(self, varname, val):
-    """Update the value of variable 'varname' to 'val'.
+from . constants import HLPR_SCALAR_VAR
+from . exceptions import DominhException
+from . helpers import exec_kcl
+from . helpers import read_helper
+
+
+def set_scalar_var(conx, name, val):
+    """Update the value of variable 'name' to 'val'.
 
     NOTE: 'val' will always be sent as its 'str(..)'-i-fied representation.
     The controller will (attempt to) parse this back into its native data
@@ -25,27 +31,31 @@ def set_scalar_var(self, varname, val):
 
     TODO: add basic error checking (none performed right now).
 
-    :param varname: Name of the variable to write to
-    :type varname: str
-    :param val: Value to write to 'varname'
+    :param name: Name of the variable to write to
+    :type name: str
+    :param val: Value to write to 'name'
     :type val: any (must have str() support)
     """
-    self._exec_kcl(cmd=f'set var {varname}={val}')
+    exec_kcl(conx, cmd=f'set var {name}={val}')
 
 
-def get_scalar_var(self, varname):
-    """Retrieve the value of the variable named 'varname'.
+def get_scalar_var(conx, name):
+    """Retrieve the value of the variable named 'name'.
 
     NOTE: should only be used for scalar variables and individual array
     elements.
 
     TODO: see whether perhaps SHOW VAR could be used here instead.
 
-    :param varname: Name of the variable to write to
-    :type varname: str
-    :returns: JSON value for key 'varname'
+    :param name: Name of the variable to write to
+    :type name: str
+    :returns: JSON value for key 'name'
     :rtype: str (to be parsed by caller)
     """
-    ret = self._read_helper(
-        helper=HLPR_SCALAR_VAR, params={'_reqvar': varname})
-    return ret[varname.upper()]
+    ret = read_helper(conx, helper=HLPR_SCALAR_VAR, params={'_reqvar': name})
+    ret = ret[name.upper()]
+    if 'bad variable' in ret.lower():
+        raise DominhException(f"Error reading variable: '{ret}'")
+    if 'unknown variable' in ret.lower():
+        raise DominhException(ret)
+    return ret
