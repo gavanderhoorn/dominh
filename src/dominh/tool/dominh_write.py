@@ -34,7 +34,7 @@ import sys
 from docopt import docopt
 from requests import exceptions
 
-from dominh import Client, DominhException
+import dominh
 
 
 def main(argv, skip_upload=False):
@@ -47,11 +47,10 @@ def main(argv, skip_upload=False):
     check = args['--check']
 
     try:
-        c = Client(args['<host>'], skip_helper_upload=skip_upload)
-        c.initialise()
+        c = dominh.connect(host=args['<host>'], skip_helper_upload=skip_upload)
         val = c.io_write(port_type, index, val, check=check)
 
     except (exceptions.ConnectionError, OSError) as e:
         sys.stderr.write(f"Error trying to connect to the controller: {e}\n")
-    except DominhException as e:
+    except dominh.DominhException as e:
         sys.stderr.write(f"Error during write: {e}\n")

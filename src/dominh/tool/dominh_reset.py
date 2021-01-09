@@ -34,7 +34,7 @@ import sys
 from docopt import docopt
 from requests import exceptions
 
-from dominh import Client
+import dominh
 
 
 def main(argv):
@@ -46,12 +46,12 @@ def main(argv):
     need_helpers = args['--verify']
 
     try:
-        c = Client(args['<host>'], skip_helper_upload=not need_helpers)
-        c.initialise()
+        c = dominh.connect(
+            host=args['<host>'], skip_helper_upload=not need_helpers)
         c.reset()
 
         if (args['--verify']):
-            sys.exit(1 if c.is_faulted() else 0)
+            sys.exit(1 if c.is_faulted else 0)
         sys.exit(0)
     except exceptions.ConnectionError as e:
         sys.stderr.write(f"Error trying to connect to the controller: {e}\n")

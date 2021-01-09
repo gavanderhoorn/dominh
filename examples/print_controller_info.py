@@ -26,7 +26,7 @@ Usage: print_controller_info.py [(--user=<user> --pw=<pw>)] <host>
 
 from docopt import docopt
 
-from dominh import Client
+import dominh
 
 
 if __name__ == '__main__':
@@ -41,41 +41,40 @@ if __name__ == '__main__':
     if user:
         print("Assuming KCL and Karel resources share credentials.")
         auth = (user, pw)
-    c = Client(host, kcl_auth=auth, karel_auth=auth)
-    c.initialise()
+    c = dominh.connect(host, kcl_auth=auth, karel_auth=auth)
 
     print('\nController info:')
-    print(f'  Time                  : {c.get_clock()}')
-    print(f'  Series                : {c.get_controller_series()}')
-    print(f'  Application           : {c.get_application()}')
-    print(f'  Software version      : {c.get_system_software_version()}')
-    print(f'  $FNO                  : {c.get_scalar_var("$fno")}')
+    print(f'  Time                  : {c.current_time}')
+    print(f'  Series                : {c.series}')
+    print(f'  Application           : {c.application}')
+    print(f'  Software version      : {c.system_software_version}')
+    print(f'  $FNO                  : {c.variable("[*system*]$fno", typ=str).val}')
 
     print('\nRobot info:')
 
-    num_groups = c.get_num_groups()
+    num_groups = c.num_groups
     print(f'  Number of groups      : {num_groups}')
 
-    for grp in range(1, num_groups+1):
-        print(f'  Group {grp}:')
-        print(f'    ID                  : {c.get_robot_id(group=grp)}')
-        print(f'    Model               : {c.get_robot_model(group=grp)}')
+    for grp in [c.group(i + 1) for i in range(num_groups)]:
+        print(f'  Group {grp.id}:')
+        print(f'    ID                  : {grp.robot_id}')
+        print(f'    Model               : {grp.robot_model}')
 
-    print(f'\nGeneral override        : {c.get_general_override()}%')
+    print(f'\nGeneral override        : {c.general_override}%')
 
     print('\nController status:')
-    print(f'  TP enabled            : {c.tp_enabled()}')
-    print(f'  In AUTO               : {c.in_auto_mode()}')
-    print(f'  In error              : {c.is_faulted()}')
-    print(f'  E-stopped             : {c.is_e_stopped()}')
-    print(f'  Remote mode           : {c.in_remote_mode()}')
-    print(f'  Program running       : {c.is_program_running()}')
-    print(f'  Program paused        : {c.is_program_paused()}')
+    print(f'  TP enabled            : {c.tp_enabled}')
+    print(f'  In AUTO               : {c.in_auto_mode}')
+    print(f'  In error              : {c.is_faulted}')
+    print(f'  E-stopped             : {c.is_e_stopped}')
+    print(f'  Remote mode           : {c.in_remote_mode}')
+    print(f'  Program running       : {c.is_program_running}')
+    print(f'  Program paused        : {c.is_program_paused}')
 
-    numregs = ', '.join([str(c.get_numreg(i)) for i in range(1, 6)])
+    numregs = ', '.join([str(c.numreg(i + 1).val) for i in range(5)])
     print(f'\nFirst 5 numregs         : {numregs}')
 
-    pld = c.get_payload(idx=1)
+    pld = c.group(1).payload(1)
     pld_frame = f'({pld.payload_x}, {pld.payload_y}, {pld.payload_z})'
     pld_inertia = f'{pld.payload_ix}, {pld.payload_iy}, {pld.payload_iz}'
     print(f'\nPayload 1 in group 1    : {pld.payload} Kg at {pld_frame} (inertia: {pld_inertia})')
