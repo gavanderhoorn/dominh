@@ -22,8 +22,5 @@ IO_OFF = 0
 JSON_SUCCESS = 'success'
 JSON_REASON = 'reason'
 
-HELPER_DEVICE = 'td:'
-HELPER_DIR = ''
-
 HLPR_RAW_VAR = 'raw_var'
 HLPR_SCALAR_VAR = 'scalar_var'
