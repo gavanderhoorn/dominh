@@ -26,3 +26,7 @@ class LockedResourceException(DominhException):
 
 class AuthenticationException(DominhException):
     pass
+
+
+class UnsupportedVariableTypeException(DominhException):
+    pass
