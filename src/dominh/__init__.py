@@ -256,7 +256,7 @@ class PosReg(object):
         raise NotImplementedError("Can't retrieve comments on PosRegs (yet)")
 
     @cmt.setter
-    def cmt(self, cmt: str) -> int:
+    def cmt(self, cmt: str) -> None:
         """ Makes the comment on the posreg at 'idx' equal to 'cmt'
         """
         comments.cmt_posreg(self._conx, self._idx, cmt)
