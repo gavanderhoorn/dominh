@@ -45,6 +45,42 @@ class Connection(object):
                  kcl_auth: Optional[Tuple[str, str]] = None,
                  karel_auth: Optional[Tuple[str, str]] = None,
                  ftp_auth: Optional[Tuple[str, str]] = None):
+        """ Stores information about an active connection.
+
+        :param host: Hostname or IP address of the controller
+        :type host: str
+        :param base_path: Path to the directory (on the controller) which
+        stores the helpers
+        :type base_path: str
+        :param helpers_uploaded: Whether or not the helpers were uploaded to
+        the controller as part of the initialisation of this connection
+        :type helpers_uploaded: bool
+        :param skipped_helpers_upload: Whether or not skipping upload of the
+        helpers was requested (because they were uploaded as part of
+        initialisation of a prior session for instance)
+        :type skipped_helpers_upload: bool
+        :param request_timeout: Time after which requests should time out
+        (default: 5 sec)
+        :type request_timeout: float
+        :param kcl_auth: A tuple (username, password) providing the
+        credentials for access to KCL resources. If not set, the KCL resource
+        is assumed to be accessible by anonymous users and such access will
+        fail if the controller does have authentication configured for that
+        resource. Default: None
+        :type kcl_auth: tuple(str, str)
+        :param karel_auth: A tuple (username, password) providing the
+        credentials for access to Karel resources. If not set, the Karel
+        resource is assumed to be accessible by anonymous users and such access
+        will fail if the controller does have authentication configured for
+        that resource. Default: None
+        :type karel_auth: tuple(str, str)
+        :param ftp_auth: A tuple (username, password) providing the
+        credentials for access to FTP resources. If not set, the FTP resource
+        is assumed to be accessible by anonymous users and such access will
+        fail if the controller does have authentication configured for that
+        resource. Default: None
+        :type ftp_auth: tuple(str, str)
+        """
 
         # which remote system are we connected to?
         self._host = host
@@ -64,34 +100,60 @@ class Connection(object):
 
     @property
     def host(self) -> str:
+        """ Hostname or IP address of the controller
+        """
         return self._host
 
     @property
     def base_path(self) -> str:
+        """ Path to the directory (on the controller) which stores the helpers
+        """
         return self._base_path
 
     @property
     def request_timeout(self) -> float:
+        """ Time after which requests should time out
+        """
         return self._request_timeout
 
     @property
     def helpers_uploaded(self) -> bool:
+        """ Whether or not the helpers were uploaded to the controller as part
+        of the initialisation of this connection
+        """
         return self._helpers_uploaded
 
     @property
     def skipped_helpers_upload(self) -> bool:
+        """ Whether or not skipping upload of the helpers was requested
+
+        Because they were uploaded as part of initialisation of a prior session
+        for instance.
+        """
         return self._skipped_helpers_upload
 
     @property
     def kcl_auth(self) -> Optional[Tuple[str, str]]:
+        """ Credentials allowing access to KCL resources
+
+        If not provided, returns None.
+        """
         return self._kcl_auth
 
     @property
     def karel_auth(self) -> Optional[Tuple[str, str]]:
+        """ Credentials allowing access to Karel resources
+
+        If not provided, returns None.
+        """
         return self._karel_auth
 
     @property
     def ftp_auth(self) -> Optional[Tuple[str, str]]:
+        """ Credentials allowing access to FTP resources
+
+        If not provided, returns None.
+        """
         return self._ftp_auth
 
 
@@ -106,15 +168,21 @@ class NumReg(object):
 
     @property
     def val(self) -> int:
+        """ Returns the current value stored in the numreg at 'idx'
+        """
         return registers.get_numreg(self._conx, self._idx)
 
     @val.setter
     def val(self, val: int) -> None:
+        """ Sets the numreg at 'idx' to 'val'
+        """
         # TODO: should 'val' be bounds checked? We do know max values it can
         # take (32bit signed integer, 32bit float)
         registers.set_numreg(self._conx, self._idx, val)
 
     def reset(self, def_val: int = 0) -> None:
+        """ Resets the numreg at 'idx' to a default value (default: 0)
+        """
         self.val = def_val
 
     @property
@@ -123,6 +191,8 @@ class NumReg(object):
 
     @cmt.setter
     def cmt(self, cmt: str) -> None:
+        """ Makes the comment on the numreg at 'idx' equal to 'cmt'
+        """
         comments.cmt_numreg(self._conx, self._idx, cmt)
 
 
@@ -137,6 +207,8 @@ class StrReg(object):
 
     @property
     def val(self) -> str:
+        """ Returns the current value stored in the strreg at 'idx'
+        """
         return registers.get_strreg(self._conx, self._idx)
 
     @val.setter
@@ -144,6 +216,8 @@ class StrReg(object):
         raise NotImplementedError("Can't write to StrRegs (yet)")
 
     def reset(self, def_val: str = '') -> None:
+        """ Resets the strreg at 'idx' to a default value (default: '')
+        """
         self.val = def_val
 
     @property
@@ -166,6 +240,8 @@ class PosReg(object):
 
     @property
     def val(self):
+        """ Returns the current value stored in the posreg at 'idx'
+        """
         return registers.get_posreg(self._conx, self._idx)
 
     @val.setter
@@ -181,6 +257,8 @@ class PosReg(object):
 
     @cmt.setter
     def cmt(self, cmt: str) -> int:
+        """ Makes the comment on the posreg at 'idx' equal to 'cmt'
+        """
         comments.cmt_posreg(self._conx, self._idx, cmt)
 
 
@@ -196,10 +274,14 @@ class ToolFrame(object):
 
     @property
     def group(self) -> int:
+        """ Returns the motion group this toolframe is associated with
+        """
         return self._group
 
     @property
     def val(self):
+        """ Returns the toolframe at index 'idx' for group 'group'
+        """
         return frames.get_toolframe(self._conx, self._idx, self._group)
 
     @val.setter
@@ -231,10 +313,14 @@ class JogFrame(object):
 
     @property
     def group(self) -> int:
+        """ Returns the motion group this jogframe is associated with
+        """
         return self._group
 
     @property
     def val(self):
+        """ Returns the jogframe at index 'idx' for group 'group'
+        """
         return frames.get_jogframe(self._conx, self._idx, self._group)
 
     @val.setter
@@ -265,10 +351,14 @@ class UserFrame(object):
 
     @property
     def group(self) -> int:
+        """ Returns the motion group this userframe is associated with
+        """
         return self._group
 
     @property
     def val(self):
+        """ Returns the userframe at index 'idx' for group 'group'
+        """
         return frames.get_userframe(self._conx, self._idx, self._group)
 
     @val.setter
@@ -295,42 +385,68 @@ class MotionGroup(object):
 
     @property
     def id(self) -> int:
+        """ Returns the id of this group.
+
+        Note: id != index in the system variables. Group 3 could have index 2
+        for instance.
+        """
         return self._id
 
     @property
     def robot_id(self) -> str:
+        """ Returns the robot model ID for which this group is configured
+        """
         return group.get_robot_id(self._conx, group=self._id)
 
     @property
     def robot_model(self) -> str:
+        """ Returns the robot model for which this group is configured
+        """
         return group.get_robot_model(self._conx, group=self._id)
 
     @property
     def was_jogged(self) -> bool:
+        """ Whether or not this group was jogged since the last programmed
+        motion
+        """
         return group.was_jogged(self._conx, group=self._id)
 
     @property
     def active_jogframe(self) -> int:
+        """ The index of the currently active jogframe for this group
+        """
         return frames.get_active_jogframe(self._conx, group=self._id)
 
     @property
     def active_toolframe(self) -> int:
+        """ The index of the currently active toolframe for this group
+        """
         return frames.get_active_toolframe(self._conx, group=self._id)
 
     @property
     def active_userframe(self) -> int:
+        """ The index of the currently active userframe for this group
+        """
         return frames.get_active_userframe(self._conx, group=self._id)
 
     def payload(self, idx: int):
+        """ Returns the payload schedule at index 'idx' for this group
+        """
         return group.get_payload(self._conx, idx=idx, grp=self._id)
 
     def toolframe(self, idx: int) -> ToolFrame:
+        """ Returns the toolframe at index 'idx' for this group
+        """
         return ToolFrame(self._conx, idx, group=self._id)
 
     def userframe(self, idx: int) -> UserFrame:
+        """ Returns the userframe at index 'idx' for this group
+        """
         return UserFrame(self._conx, idx, group=self._id)
 
     def jogframe(self, idx: int) -> JogFrame:
+        """ Returns the jogframe at index 'idx' for this group
+        """
         return JogFrame(self._conx, idx, group=self._id)
 
 
@@ -392,6 +508,8 @@ class Controller(object):
         return ScalarVariable(self._conx, name, typ)
 
     def reset(self) -> None:
+        """ Attempts to RESET the controller
+        """
         controller.reset(self._conx)
 
     @property
@@ -408,14 +526,22 @@ class Controller(object):
 
     @property
     def active_program(self) -> str:
+        """ Returns the name of the program currently being executed
+        """
         return controller.get_active_prog(self._conx)
 
     @property
     def num_groups(self) -> int:
+        """ Returns the number of motion groups configured on the controller
+        """
         return controller.get_num_groups(self._conx)
 
     @property
     def current_time(self) -> datetime.datetime:
+        """ Returns the current (wallclock) time on the controller
+
+        Note: resolution is in minutes
+        """
         return controller.get_clock(self._conx)
 
     @property
