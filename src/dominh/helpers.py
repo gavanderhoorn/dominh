@@ -126,9 +126,15 @@ def exec_kcl(conx, cmd, wait_for_response=False):
     # always check for authentication issues, even if caller doesn't
     # necessarily want the response checked.
     if r.status_code == requests.codes.unauthorized:
-        raise AuthenticationException("Authentication failed (KCL)")
+        raise AuthenticationException(
+            "Authentication failed (KCL). "
+            "Are the username and password correct?"
+        )
     if r.status_code == requests.codes.forbidden:
-        raise LockedResourceException("Access is forbidden/locked (KCL)")
+        raise LockedResourceException(
+            "Access is forbidden/locked (KCL). Please check the 'Host Comm' "
+            "configuration on the teach pendant."
+        )
 
     # if we don't wait, we don't return anything, but we do check the
     # controller returned the appropriate HTTP result code
