@@ -72,6 +72,9 @@ def io_write(conx, port_type, idx, val, check=False):
     if 'Port name expected' in ret:
         raise DominhException(
             f"Illegal port type identifier: '{port_type}'")
+    if 'No ports of this type' in ret:
+        raise DominhException(
+            f"Controller does not have ports of this type: '{port_type}'")
     if 'Illegal port number' in ret:
         raise DominhException(
             f"Illegal port number for port {port_type}: {idx}")
@@ -170,6 +173,9 @@ def io_read(conx, port_type, idx):
     if 'unknown port type name' in ret[port_id].lower():
         raise DominhException(
             f"Illegal port type identifier: '{port_type}'")
+    if 'no ports of this type' in ret[port_id].lower():
+        raise DominhException(
+            f"Controller does not have ports of this type: '{port_type}'")
     if 'illegal port number' in ret[port_id].lower():
         raise DominhException(
             f"Illegal port number for port {port_type}: {idx}")
