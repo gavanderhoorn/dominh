@@ -32,6 +32,7 @@ from . import comments
 from . import controller
 from . import frames
 from . import group
+from . import io
 from . import registers
 from . import variables
 
@@ -488,6 +489,116 @@ class ScalarVariable(Variable):
         variables.set_scalar_var(self._conx, name=self._name, val=str(val))
 
 
+# TODO: fix this mess. This is not a nice way to wrap IO access
+class IoElement(object):
+    def __init__(
+        self, conx: Connection, idx: int, port_type: str, port_type_w: str
+    ):
+        self._conx = conx
+        self._idx = idx
+        self._port_type = port_type
+        self._port_type_w = port_type_w
+
+    @property
+    def idx(self) -> int:
+        return self._idx
+
+    @property
+    def port_type(self) -> str:
+        return self._port_type
+
+    @property
+    def port_type_w(self) -> str:
+        return self._port_type_w
+
+
+class BooleanIoElement(IoElement):
+    def __init__(
+        self,
+        conx: Connection,
+        idx: int,
+        port_type: str,
+        port_type_w: Optional[str] = None,
+    ):
+        assert port_type in [
+            "BRAKE",
+            "DIN",
+            "DOUT",
+            "ESTOP",
+            "LDIN",
+            "LDOUT",
+            "PLCIN",
+            "PLCOUT",
+            "RDI",
+            "RDO",
+            "SOPIN",
+            "SOPOUT",
+            "TOOL",
+            "TPIN",
+            "TPOUT",
+            "UOPIN",
+            "UOPOUT",
+            "WDI",
+            "WDO",
+            "WSIN",
+            "WSOUT",
+        ]
+        if port_type_w:
+            # KCL's 'set port' uses different port identifiers
+            assert port_type_w in [
+                "DIN",
+                "DOUT",
+                "RDO",
+                "OPOUT",
+                "TPOUT",
+                "WDI",
+                "WDO",
+            ]
+        else:
+            port_type_w = port_type
+        super().__init__(conx, idx, port_type, port_type_w)
+
+    @property
+    def val(self) -> bool:
+        return io.io_read(self._conx, self._port_type, self._idx) == 'ON'
+
+    @val.setter
+    def val(self, val: bool) -> None:
+        io.io_write(self._conx, self._port_type_w, self._idx, 1 if val else 0)
+
+
+class IntegerIoElement(IoElement):
+    def __init__(
+        self,
+        conx: Connection,
+        idx: int,
+        port_type: str,
+        port_type_w: Optional[str] = None,
+    ):
+        assert port_type in [
+            'ANIN',
+            'ANOUT',
+            'GPIN',
+            'GPOUT',
+            'LANIN',
+            'LANOUT',
+        ]
+        if port_type_w:
+            # KCL's 'set port' uses different port identifiers
+            assert port_type_w in ['AIN', 'AOUT', 'GIN', 'GOUT']
+        else:
+            port_type_w = port_type
+        super().__init__(conx, idx, port_type, port_type_w)
+
+    @property
+    def val(self) -> int:
+        return io.io_read(self._conx, self._port_type, self._idx)
+
+    @val.setter
+    def val(self, val: int) -> None:
+        io.io_write(self._conx, self._port_type_w, self._idx, val)
+
+
 class Controller(object):
     def __init__(self, conx):
         self._conx = conx
@@ -506,6 +617,36 @@ class Controller(object):
 
     def variable(self, name: str, typ: Type = str) -> ScalarVariable:
         return ScalarVariable(self._conx, name, typ)
+
+    def din(self, idx: int) -> IoElement:
+        return BooleanIoElement(self._conx, idx, 'DIN')
+
+    def dout(self, idx: int) -> IoElement:
+        return BooleanIoElement(self._conx, idx, 'DOUT')
+
+    def gin(self, idx: int) -> IoElement:
+        return IntegerIoElement(self._conx, idx, 'GPIN', 'GIN')
+
+    def gout(self, idx: int) -> IoElement:
+        return IntegerIoElement(self._conx, idx, 'GPOUT', 'GOUT')
+
+    def rdi(self, idx: int) -> IoElement:
+        return BooleanIoElement(self._conx, idx, 'RDI')
+
+    def rdo(self, idx: int) -> IoElement:
+        return BooleanIoElement(self._conx, idx, 'RDO')
+
+    def sopin(self, idx: int) -> IoElement:
+        return BooleanIoElement(self._conx, idx, 'SOPIN')
+
+    def sopout(self, idx: int) -> IoElement:
+        return BooleanIoElement(self._conx, idx, 'SOPOUT', 'OPOUT')
+
+    def uopin(self, idx: int) -> IoElement:
+        return BooleanIoElement(self._conx, idx, 'UOPIN')
+
+    def uopout(self, idx: int) -> IoElement:
+        return BooleanIoElement(self._conx, idx, 'UOPOUT')
 
     def reset(self) -> None:
         """ Attempts to RESET the controller
