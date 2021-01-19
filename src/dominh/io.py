@@ -32,18 +32,18 @@ def io_write(conx, port_type, idx, val, check=False):
     Valid values for 'port_type':
 
         BOOLEAN:
-        -  DIN
-        -  DOUT
-        -  RDO
-        -  OPOUT
-        -  TPOUT
-        -  WDI
-        -  WDO
+        - DIN
+        - DOUT
+        - RDO
+        - OPOUT
+        - TPOUT
+        - WDI
+        - WDO
         INTEGER:
-        -  AIN
-        -  AOUT
-        -  GIN
-        -  GOUT
+        - AIN
+        - AOUT
+        - GIN
+        - GOUT
 
     TODO: use an enum to limit port types
     TODO: add proper support for Group IO and Analog
@@ -116,34 +116,34 @@ def io_read(conx, port_type, idx):
     Valid values for 'port_type':
 
         BOOLEAN:
-        BRAKE
-        DIN
-        DOUT
-        ESTOP
-        LDIN
-        LDOUT
-        PLCIN
-        PLCOUT
-        RDI
-        RDO
-        SOPIN
-        SOPOUT
-        TOOL
-        TPIN
-        TPOUT
-        UOPIN
-        UOPOUT
-        WDI
-        WDO
-        WSIN
-        WSOUT
+        - BRAKE
+        - DIN
+        - DOUT
+        - ESTOP
+        - LDIN
+        - LDOUT
+        - PLCIN
+        - PLCOUT
+        - RDI
+        - RDO
+        - SOPIN
+        - SOPOUT
+        - TOOL
+        - TPIN
+        - TPOUT
+        - UOPIN
+        - UOPOUT
+        - WDI
+        - WDO
+        - WSIN
+        - WSOUT
         INTEGER:
-        ANIN
-        ANOUT
-        GPIN
-        GPOUT
-        LANIN
-        LANOUT
+        - ANIN
+        - ANOUT
+        - GPIN
+        - GPOUT
+        - LANIN
+        - LANOUT
 
     From: R-J3iC Controller Internet Options Setup and Operations Manual
     (MAROCINOP08051E REV B).
