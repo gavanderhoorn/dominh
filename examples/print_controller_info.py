@@ -74,6 +74,9 @@ if __name__ == '__main__':
     numregs = ', '.join([str(c.numreg(i + 1).val) for i in range(5)])
     print(f'\nFirst 5 numregs         : {numregs}')
 
+    sopins = ', '.join([str(c.sopin(i + 1).val) for i in range(5)])
+    print(f'\nFirst 5 SOP inputs      : {sopins}')
+
     pld = c.group(1).payload(1)
     pld_frame = f'({pld.payload_x}, {pld.payload_y}, {pld.payload_z})'
     pld_inertia = f'{pld.payload_ix}, {pld.payload_iy}, {pld.payload_iz}'
