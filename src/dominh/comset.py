@@ -1,4 +1,3 @@
-
 # Copyright (c) 2021, G.A. vd. Hoorn
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,7 +15,7 @@
 # author: G.A. vd. Hoorn
 
 
-from . helpers import exec_karel_prg
+from .helpers import exec_karel_prg
 
 
 def _get_cmt_fc(cmt):
@@ -94,20 +93,11 @@ def comset(conx, fc, idx, val=None, comment=''):
     if val:
         sfc = _get_val_fc(fc)
         real_flag = 1 if type(val) == float else -1
-        params = {
-            'sValue': val,
-            'sIndx': idx,
-            'sRealFlag': real_flag,
-            'sFc': sfc
-        }
+        params = {'sValue': val, 'sIndx': idx, 'sRealFlag': real_flag, 'sFc': sfc}
 
     if comment:
         sfc = _get_cmt_fc(fc)
-        params = {
-            'sComment': comment,
-            'sIndx': idx,
-            'sFc': sfc
-        }
+        params = {'sComment': comment, 'sIndx': idx, 'sFc': sfc}
 
     # make sure to request 'return_raw', as 'ComSet' does not return JSON
     # TODO: check return value

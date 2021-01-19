@@ -1,4 +1,3 @@
-
 # Copyright (c) 2021, G.A. vd. Hoorn
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,21 +21,21 @@ import re
 from . import kliosop
 from . import kliouop
 
-from . constants import IO_OFF
-from . constants import IO_ON
-from . constants import JSON_REASON
-from . constants import JSON_SUCCESS
-from . exceptions import DominhException
-from . ftp import FtpClient
-from . helpers import exec_karel_prg
-from . helpers import exec_kcl
-from . io import io_read_sopin
-from . io import io_read_sopout
-from . io import io_read_uopout
-from . variables import get_scalar_var
-from . variables import set_scalar_var
-from . web_server import disable_web_server_headers
-from . web_server import enable_web_server_headers
+from .constants import IO_OFF
+from .constants import IO_ON
+from .constants import JSON_REASON
+from .constants import JSON_SUCCESS
+from .exceptions import DominhException
+from .ftp import FtpClient
+from .helpers import exec_karel_prg
+from .helpers import exec_kcl
+from .io import io_read_sopin
+from .io import io_read_sopout
+from .io import io_read_uopout
+from .variables import get_scalar_var
+from .variables import set_scalar_var
+from .web_server import disable_web_server_headers
+from .web_server import enable_web_server_headers
 
 
 def reset(conx):
@@ -58,8 +57,7 @@ def select_tpe(conx, program):
     :type program: str
     """
     raise DominhException('Not implemented')
-    ret = exec_karel_prg(
-        conx, prg_name='dmh_selprg', params={'prog_name': program})
+    ret = exec_karel_prg(conx, prg_name='dmh_selprg', params={'prog_name': program})
     if not ret[JSON_SUCCESS]:
         raise DominhException("Select_TPE error: " + ret[JSON_REASON])
 
@@ -112,10 +110,7 @@ def list_programs(conx, types=[]):
     matches = re.findall(r'(\S+)\s+(\S+)\s+Task', ret.strip(), re.DOTALL)
 
     types = [t.lower() for t in types]
-    return [
-        m for m in matches
-        if (types and m[1].lower() in types) or not types
-    ]
+    return [m for m in matches if (types and m[1].lower() in types) or not types]
 
 
 def get_controller_series(conx):
@@ -283,11 +278,18 @@ def list_errors(conx):
         fields = list(map(str.strip, line.split('"')))
         level_state = fields[4].split()
         if len(level_state) > 1:
-            err_level, err_state, = level_state
+            (
+                err_level,
+                err_state,
+            ) = level_state
         else:
-            err_level, err_state, = '', level_state[0]
-        res.append((int(fields[0]), fields[1], fields[2], fields[3],
-                    err_level, err_state))
+            err_level, err_state, = (
+                '',
+                level_state[0],
+            )
+        res.append(
+            (int(fields[0]), fields[1], fields[2], fields[3], err_level, err_state)
+        )
     return res
 
 
@@ -320,7 +322,7 @@ def get_num_groups(conx):
 
 
 def get_clock(conx):
-    """ Return the current date and time on the controller.
+    """Return the current date and time on the controller.
 
     NOTE: this method is rather slow, as it parses a web page.
 

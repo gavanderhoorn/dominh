@@ -1,4 +1,3 @@
-
 # Copyright (c) 2021, G.A. vd. Hoorn
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,11 +17,11 @@
 
 import re
 
-from . exceptions import DominhException
-from . helpers import get_var_raw
-from . variables import get_scalar_var
-from . types import Config_t
-from . types import Position_t
+from .exceptions import DominhException
+from .helpers import get_var_raw
+from .variables import get_scalar_var
+from .types import Config_t
+from .types import Position_t
 
 
 def _match_position(text):
@@ -45,7 +44,8 @@ def _match_position(text):
         r"  (J1) =\s*(-?\d*.\d+|[*]+) deg   J2 =\s*(-?\d*.\d+|[*]+) deg   J3 =\s*(-?\d*.\d+|[*]+) deg \r?\n"  # noqa
         r"  J4 =\s*(-?\d*.\d+|[*]+) deg   J5 =\s*(-?\d*.\d+|[*]+) deg   J6 =\s*(-?\d*.\d+|[*]+) deg"  # noqa
         r")",
-        text)
+        text,
+    )
     return matches[0] if matches else None
 
 
@@ -65,8 +65,7 @@ def _get_frame_var(conx, varname):
     match = _match_position(ret.replace('\r\n', '', 1))
 
     if not match:
-        raise DominhException(
-            f"Could not match value returned for '{varname}'")
+        raise DominhException(f"Could not match value returned for '{varname}'")
 
     # some nasty fiddling
     # TODO: this won't work for non-6-axis systems
@@ -109,18 +108,19 @@ def get_jogframe(conx, idx, group=1, include_comment=False):
     :rtype: tuple(Position_t, str)
     """
     if group < 1 or group > 8:
-        raise ValueError("Requested group id invalid (must be "
-                         f"between 1 and 8, got: {group})")
+        raise ValueError(
+            f"Requested group id invalid (must be between 1 and 8, got: {group})"
+        )
     if idx < 1 or idx > 5:
-        raise ValueError("Requested jog frame idx invalid (must be "
-                         f"between 1 and 5, got: {idx})")
+        raise ValueError(
+            f"Requested jog frame idx invalid (must be between 1 and 5, got: {idx})"
+        )
     varname = f'[TPFDEF]JOGFRAMES[{group},{idx}]'
     frame = _get_frame_var(conx, varname)
     cmt = None
     if include_comment:
         JOGFRAME = 2
-        cmt = _get_frame_comment(
-            conx, frame_type=JOGFRAME, group=group, idx=idx)
+        cmt = _get_frame_comment(conx, frame_type=JOGFRAME, group=group, idx=idx)
     return (frame, cmt)
 
 
@@ -137,18 +137,20 @@ def get_toolframe(conx, idx, group=1, include_comment=False):
     :rtype: tuple(Position_t,) or tuple(Position_t, str)
     """
     if group < 1 or group > 8:
-        raise ValueError("Requested group id invalid (must be "
-                         f"between 1 and 8, got: {group})")
+        raise ValueError(
+            f"Requested group id invalid (must be between 1 and 8, got: {group})"
+        )
     if idx < 1 or idx > 10:
-        raise ValueError("Requested tool frame idx invalid (must be "
-                         f"between 1 and 10, got: {idx})")
+        raise ValueError(
+            "Requested tool frame idx invalid (must be "
+            f"between 1 and 10, got: {idx})"
+        )
     varname = f'[*SYSTEM*]$MNUTOOL[{group},{idx}]'
     frame = _get_frame_var(conx, varname)
     cmt = None
     if include_comment:
         TOOLFRAME = 1
-        cmt = _get_frame_comment(
-            conx, frame_type=TOOLFRAME, group=group, idx=idx)
+        cmt = _get_frame_comment(conx, frame_type=TOOLFRAME, group=group, idx=idx)
     return (frame, cmt)
 
 
@@ -165,37 +167,42 @@ def get_userframe(conx, idx, group=1, include_comment=False):
     :rtype: tuple(Position_t, str)
     """
     if group < 1 or group > 8:
-        raise ValueError("Requested group id invalid (must be "
-                         f"between 1 and 8, got: {group})")
+        raise ValueError(
+            f"Requested group id invalid (must be between 1 and 8, got: {group})"
+        )
     if idx < 1 or idx > 10:
-        raise ValueError("Requested user frame idx invalid (must be "
-                         f"between 1 and 10, got: {idx})")
+        raise ValueError(
+            "Requested user frame idx invalid (must be "
+            f"between 1 and 10, got: {idx})"
+        )
     varname = f'[*SYSTEM*]$MNUFRAME[{group},{idx}]'
     frame = _get_frame_var(conx, varname)
     cmt = None
     if include_comment:
         USERFRAME = 3
-        cmt = _get_frame_comment(
-            conx, frame_type=USERFRAME, group=group, idx=idx)
+        cmt = _get_frame_comment(conx, frame_type=USERFRAME, group=group, idx=idx)
     return (frame, cmt)
 
 
 def get_active_jogframe(conx, group=1):
     if group < 1 or group > 8:
-        raise ValueError("Requested group id invalid (must be "
-                         f"between 1 and 8, got: {group})")
+        raise ValueError(
+            f"Requested group id invalid (must be between 1 and 8, got: {group})"
+        )
     return get_scalar_var(conx, name=f'[TPFDEF]JOGFRAMNUM[{group}]')
 
 
 def get_active_toolframe(conx, group=1):
     if group < 1 or group > 8:
-        raise ValueError("Requested group id invalid (must be "
-                         f"between 1 and 8, got: {group})")
+        raise ValueError(
+            f"Requested group id invalid (must be between 1 and 8, got: {group})"
+        )
     return get_scalar_var(conx, name=f'[*SYSTEM*]$MNUTOOLNUM[{group}]')
 
 
 def get_active_userframe(conx, group=1):
     if group < 1 or group > 8:
-        raise ValueError("Requested group id invalid (must be "
-                         f"between 1 and 8, got: {group})")
+        raise ValueError(
+            f"Requested group id invalid (must be between 1 and 8, got: {group})"
+        )
     return get_scalar_var(conx, name=f'[*SYSTEM*]$MNUFRAMENUM[{group}]')

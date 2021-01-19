@@ -80,10 +80,17 @@ if __name__ == '__main__':
     pld = c.group(1).payload(1)
     pld_frame = f'({pld.payload_x}, {pld.payload_y}, {pld.payload_z})'
     pld_inertia = f'{pld.payload_ix}, {pld.payload_iy}, {pld.payload_iz}'
-    print(f'\nPayload 1 in group 1    : {pld.payload} Kg at {pld_frame} (inertia: {pld_inertia})')
+    print(
+        f'\nPayload 1 in group 1    : {pld.payload} Kg at {pld_frame} (inertia: {pld_inertia})'
+    )
 
     prgs = '; '.join([f"{nam}.{ext}" for nam, ext in c.list_programs()[:5]])
     print(f'\nFirst five programs     : {prgs}')
 
-    errs = '\n  '.join([f'{stamp:15s} {lvl:7s} {msg}' for _, stamp, msg, _, lvl, _ in c.list_errors()[:5]])
+    errs = '\n  '.join(
+        [
+            f'{stamp:15s} {lvl:7s} {msg}'
+            for _, stamp, msg, _, lvl, _ in c.list_errors()[:5]
+        ]
+    )
     print(f'\nFive most recent errors:\n  {errs}')

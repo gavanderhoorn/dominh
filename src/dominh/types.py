@@ -1,4 +1,3 @@
-
 # Copyright (c) 2020, G.A. vd. Hoorn
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,41 +18,53 @@
 from collections import namedtuple
 
 
-Plst_Grp_t = namedtuple('Plst_Grp_t', [
-    'comment',
-    'payload',
-    'payload_x',
-    'payload_y',
-    'payload_z',
-    'payload_ix',
-    'payload_iy',
-    'payload_iz',
-])
+Plst_Grp_t = namedtuple(
+    'Plst_Grp_t',
+    [
+        'comment',
+        'payload',
+        'payload_x',
+        'payload_y',
+        'payload_z',
+        'payload_ix',
+        'payload_iy',
+        'payload_iz',
+    ],
+)
 
-Config_t = namedtuple('Config_t', [
-    'flip',
-    'up',
-    'top',
-    'turn_no1',
-    'turn_no2',
-    'turn_no3',
-])
+Config_t = namedtuple(
+    'Config_t',
+    [
+        'flip',
+        'up',
+        'top',
+        'turn_no1',
+        'turn_no2',
+        'turn_no3',
+    ],
+)
 
-Position_t = namedtuple('Position_t', [
-    'config',
-    'x',
-    'y',
-    'z',
-    'w',
-    'p',
-    'r',
-])
+Position_t = namedtuple(
+    'Position_t',
+    [
+        'config',
+        'x',
+        'y',
+        'z',
+        'w',
+        'p',
+        'r',
+    ],
+)
 
-JointPos_t = namedtuple('JointPos_t', [
-    'j1',
-    'j2',
-    'j3',
-    'j4',
-    'j5',
-    'j6',
-])
+JointPos_t = namedtuple(
+    'JointPos_t',
+    [
+        'j1',
+        'j2',
+        'j3',
+        'j4',
+        'j5',
+        'j6',
+    ],
+)

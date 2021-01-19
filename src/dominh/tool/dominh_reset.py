@@ -46,11 +46,10 @@ def main(argv):
     need_helpers = args['--verify']
 
     try:
-        c = dominh.connect(
-            host=args['<host>'], skip_helper_upload=not need_helpers)
+        c = dominh.connect(host=args['<host>'], skip_helper_upload=not need_helpers)
         c.reset()
 
-        if (args['--verify']):
+        if args['--verify']:
             sys.exit(1 if c.is_faulted else 0)
         sys.exit(0)
     except exceptions.ConnectionError as e:

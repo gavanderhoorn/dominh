@@ -1,4 +1,3 @@
-
 # Copyright (c) 2021, G.A. vd. Hoorn
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,12 +18,12 @@
 import re
 import requests
 
-from . constants import HLPR_RAW_VAR
-from . constants import HLPR_SCALAR_VAR
-from . exceptions import AuthenticationException
-from . exceptions import DominhException
-from . exceptions import LockedResourceException
-from . ftp import FtpClient
+from .constants import HLPR_RAW_VAR
+from .constants import HLPR_SCALAR_VAR
+from .exceptions import AuthenticationException
+from .exceptions import DominhException
+from .exceptions import LockedResourceException
+from .ftp import FtpClient
 
 
 def upload_helpers(host, remote_path, request_timeout=5, ftp_auth=None):
@@ -57,7 +56,9 @@ def upload_helpers(host, remote_path, request_timeout=5, ftp_auth=None):
     # this is much faster than downloading and parsing the output of
     # KCL 'SHOW VAR', but should be limited to non-array variables (or
     # individual array elements)
-    content = rb'{ "<!-- #ECHO var="_reqvar" -->": "<!-- #ECHO var="{_reqvar}" -->" }'  # noqa
+    content = (
+        rb'{ "<!-- #ECHO var="_reqvar" -->": "<!-- #ECHO var="{_reqvar}" -->" }'  # noqa
+    )
     ftpc.upload_as_file(f'/{remote_path}/{HLPR_SCALAR_VAR}.stm', content)
     content = rb'<!-- #ECHO var="{_reqvar}" -->'
     ftpc.upload_as_file(f'/{remote_path}/{HLPR_RAW_VAR}.stm', content)
@@ -79,7 +80,8 @@ def get_stm(conx, page, params={}):
     r = requests.get(url, params=params, timeout=conx.request_timeout)
     if r.status_code != requests.codes.ok:
         raise DominhException(
-            f"Controller web server returned an error: {r.status_code}")
+            f"Controller web server returned an error: {r.status_code}"
+        )
     return r
 
 
@@ -127,8 +129,7 @@ def exec_kcl(conx, cmd, wait_for_response=False):
     # necessarily want the response checked.
     if r.status_code == requests.codes.unauthorized:
         raise AuthenticationException(
-            "Authentication failed (KCL). "
-            "Are the username and password correct?"
+            "Authentication failed (KCL). Are the username and password correct?"
         )
     if r.status_code == requests.codes.forbidden:
         raise LockedResourceException(
@@ -142,14 +143,16 @@ def exec_kcl(conx, cmd, wait_for_response=False):
         if r.status_code != requests.codes.no_content:
             raise DominhException(
                 "Unexpected result code. Expected: "
-                f"{requests.codes.no_content}, got: {r.status_code}")
+                f"{requests.codes.no_content}, got: {r.status_code}"
+            )
 
     # caller requested we check return value
     else:
         if r.status_code != requests.codes.ok:
             raise DominhException(
                 f"Unexpected result code. Expected: {requests.codes.ok}, "
-                f"got: {r.status_code}")
+                f"got: {r.status_code}"
+            )
         # retrieve KCL command response from doc
         # TODO: could compile these and store them as we might use them
         # more often
@@ -179,7 +182,8 @@ def exec_karel_prg(conx, prg_name, params={}, return_raw=False):
         raise ValueError(f"Program name includes extension ('{prg_name}')")
     url = f'http://{conx.host}/KAREL/{prg_name}'
     r = requests.get(
-        url, auth=conx.karel_auth, params=params, timeout=conx.request_timeout)
+        url, auth=conx.karel_auth, params=params, timeout=conx.request_timeout
+    )
     # provide caller with appropriate exceptions
     if r.status_code == requests.codes.unauthorized:
         raise AuthenticationException("Authentication failed (Karel)")
@@ -188,11 +192,13 @@ def exec_karel_prg(conx, prg_name, params={}, return_raw=False):
     if r.status_code != requests.codes.ok:
         raise DominhException(
             f"Unexpected result code. Expected: {requests.codes.ok}, "
-            f"got: {r.status_code}")
+            f"got: {r.status_code}"
+        )
     if 'Unable to run' in r.text:
         raise DominhException(
             f"Karel program '{prg_name}' cannot be started on controller: "
-            "has it been uploaded?")
+            "has it been uploaded?"
+        )
     return r.json() if not return_raw else r.text
 
 
@@ -206,6 +212,5 @@ def get_var_raw(conx, varname):
     """
     # use get_stm(..) directly here as what we get returned is not actually
     # json, and read_helper(..) will try to parse it as such and then fail
-    ret = get_stm(
-        conx, page=HLPR_RAW_VAR + '.stm', params={'_reqvar': varname})
+    ret = get_stm(conx, page=HLPR_RAW_VAR + '.stm', params={'_reqvar': varname})
     return ret.text

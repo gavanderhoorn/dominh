@@ -1,4 +1,3 @@
-
 # Copyright (c) 2020-2021, G.A. vd. Hoorn
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -24,9 +23,9 @@ from typing import Tuple
 from typing import Type
 from typing import Union
 
-from . exceptions import DominhException
-from . exceptions import UnsupportedVariableTypeException
-from . helpers import upload_helpers
+from .exceptions import DominhException
+from .exceptions import UnsupportedVariableTypeException
+from .helpers import upload_helpers
 
 from . import comments
 from . import controller
@@ -41,12 +40,18 @@ __all__ = ["connect", "DominhException"]
 
 
 class Connection(object):
-    def __init__(self, host: str, base_path: str, helpers_uploaded: bool,
-                 skipped_helpers_upload: bool, request_timeout: float = 5,
-                 kcl_auth: Optional[Tuple[str, str]] = None,
-                 karel_auth: Optional[Tuple[str, str]] = None,
-                 ftp_auth: Optional[Tuple[str, str]] = None):
-        """ Stores information about an active connection.
+    def __init__(
+        self,
+        host: str,
+        base_path: str,
+        helpers_uploaded: bool,
+        skipped_helpers_upload: bool,
+        request_timeout: float = 5,
+        kcl_auth: Optional[Tuple[str, str]] = None,
+        karel_auth: Optional[Tuple[str, str]] = None,
+        ftp_auth: Optional[Tuple[str, str]] = None,
+    ):
+        """Stores information about an active connection.
 
         :param host: Hostname or IP address of the controller
         :type host: str
@@ -101,32 +106,29 @@ class Connection(object):
 
     @property
     def host(self) -> str:
-        """ Hostname or IP address of the controller
-        """
+        """Hostname or IP address of the controller"""
         return self._host
 
     @property
     def base_path(self) -> str:
-        """ Path to the directory (on the controller) which stores the helpers
-        """
+        """Path to the directory (on the controller) which stores the helpers"""
         return self._base_path
 
     @property
     def request_timeout(self) -> float:
-        """ Time after which requests should time out
-        """
+        """Time after which requests should time out"""
         return self._request_timeout
 
     @property
     def helpers_uploaded(self) -> bool:
-        """ Whether or not the helpers were uploaded to the controller as part
+        """Whether or not the helpers were uploaded to the controller as part
         of the initialisation of this connection
         """
         return self._helpers_uploaded
 
     @property
     def skipped_helpers_upload(self) -> bool:
-        """ Whether or not skipping upload of the helpers was requested
+        """Whether or not skipping upload of the helpers was requested
 
         Because they were uploaded as part of initialisation of a prior session
         for instance.
@@ -135,7 +137,7 @@ class Connection(object):
 
     @property
     def kcl_auth(self) -> Optional[Tuple[str, str]]:
-        """ Credentials allowing access to KCL resources
+        """Credentials allowing access to KCL resources
 
         If not provided, returns None.
         """
@@ -143,7 +145,7 @@ class Connection(object):
 
     @property
     def karel_auth(self) -> Optional[Tuple[str, str]]:
-        """ Credentials allowing access to Karel resources
+        """Credentials allowing access to Karel resources
 
         If not provided, returns None.
         """
@@ -151,7 +153,7 @@ class Connection(object):
 
     @property
     def ftp_auth(self) -> Optional[Tuple[str, str]]:
-        """ Credentials allowing access to FTP resources
+        """Credentials allowing access to FTP resources
 
         If not provided, returns None.
         """
@@ -169,21 +171,18 @@ class NumReg(object):
 
     @property
     def val(self) -> int:
-        """ Returns the current value stored in the numreg at 'idx'
-        """
+        """Returns the current value stored in the numreg at 'idx'"""
         return registers.get_numreg(self._conx, self._idx)
 
     @val.setter
     def val(self, val: int) -> None:
-        """ Sets the numreg at 'idx' to 'val'
-        """
+        """Sets the numreg at 'idx' to 'val'"""
         # TODO: should 'val' be bounds checked? We do know max values it can
         # take (32bit signed integer, 32bit float)
         registers.set_numreg(self._conx, self._idx, val)
 
     def reset(self, def_val: int = 0) -> None:
-        """ Resets the numreg at 'idx' to a default value (default: 0)
-        """
+        """Resets the numreg at 'idx' to a default value (default: 0)"""
         self.val = def_val
 
     @property
@@ -192,8 +191,7 @@ class NumReg(object):
 
     @cmt.setter
     def cmt(self, cmt: str) -> None:
-        """ Makes the comment on the numreg at 'idx' equal to 'cmt'
-        """
+        """Makes the comment on the numreg at 'idx' equal to 'cmt'"""
         comments.cmt_numreg(self._conx, self._idx, cmt)
 
 
@@ -208,8 +206,7 @@ class StrReg(object):
 
     @property
     def val(self) -> str:
-        """ Returns the current value stored in the strreg at 'idx'
-        """
+        """Returns the current value stored in the strreg at 'idx'"""
         return registers.get_strreg(self._conx, self._idx)
 
     @val.setter
@@ -217,8 +214,7 @@ class StrReg(object):
         raise NotImplementedError("Can't write to StrRegs (yet)")
 
     def reset(self, def_val: str = '') -> None:
-        """ Resets the strreg at 'idx' to a default value (default: '')
-        """
+        """Resets the strreg at 'idx' to a default value (default: '')"""
         self.val = def_val
 
     @property
@@ -241,15 +237,14 @@ class PosReg(object):
 
     @property
     def val(self):
-        """ Returns the current value stored in the posreg at 'idx'
-        """
+        """Returns the current value stored in the posreg at 'idx'"""
         return registers.get_posreg(self._conx, self._idx)
 
     @val.setter
     def val(self, val) -> int:
         raise NotImplementedError("Can't write to PosRegs (yet)")
 
-    def reset(self, def_val=[0.0]*6) -> None:
+    def reset(self, def_val=[0.0] * 6) -> None:
         self.val = def_val
 
     @property
@@ -258,8 +253,7 @@ class PosReg(object):
 
     @cmt.setter
     def cmt(self, cmt: str) -> None:
-        """ Makes the comment on the posreg at 'idx' equal to 'cmt'
-        """
+        """Makes the comment on the posreg at 'idx' equal to 'cmt'"""
         comments.cmt_posreg(self._conx, self._idx, cmt)
 
 
@@ -275,27 +269,24 @@ class ToolFrame(object):
 
     @property
     def group(self) -> int:
-        """ Returns the motion group this toolframe is associated with
-        """
+        """Returns the motion group this toolframe is associated with"""
         return self._group
 
     @property
     def val(self):
-        """ Returns the toolframe at index 'idx' for group 'group'
-        """
+        """Returns the toolframe at index 'idx' for group 'group'"""
         return frames.get_toolframe(self._conx, self._idx, self._group)
 
     @val.setter
     def val(self, val) -> None:
         raise NotImplementedError("Can't write to ToolFrames (yet)")
 
-    def reset(self, def_val=[0.0]*6) -> None:
+    def reset(self, def_val=[0.0] * 6) -> None:
         self.val = def_val
 
     @property
     def cmt(self) -> str:
-        raise NotImplementedError(
-            "Can't retrieve comments on ToolFrames (yet)")
+        raise NotImplementedError("Can't retrieve comments on ToolFrames (yet)")
 
     @cmt.setter
     def cmt(self, cmt: str) -> None:
@@ -314,21 +305,19 @@ class JogFrame(object):
 
     @property
     def group(self) -> int:
-        """ Returns the motion group this jogframe is associated with
-        """
+        """Returns the motion group this jogframe is associated with"""
         return self._group
 
     @property
     def val(self):
-        """ Returns the jogframe at index 'idx' for group 'group'
-        """
+        """Returns the jogframe at index 'idx' for group 'group'"""
         return frames.get_jogframe(self._conx, self._idx, self._group)
 
     @val.setter
     def val(self, val) -> None:
         raise NotImplementedError("Can't write to JogFrames (yet)")
 
-    def reset(self, def_val=[0.0]*6) -> None:
+    def reset(self, def_val=[0.0] * 6) -> None:
         self.val = def_val
 
     @property
@@ -352,27 +341,24 @@ class UserFrame(object):
 
     @property
     def group(self) -> int:
-        """ Returns the motion group this userframe is associated with
-        """
+        """Returns the motion group this userframe is associated with"""
         return self._group
 
     @property
     def val(self):
-        """ Returns the userframe at index 'idx' for group 'group'
-        """
+        """Returns the userframe at index 'idx' for group 'group'"""
         return frames.get_userframe(self._conx, self._idx, self._group)
 
     @val.setter
     def val(self, val) -> None:
         raise NotImplementedError("Can't write to UserFrames (yet)")
 
-    def reset(self, def_val=[0.0]*6) -> None:
+    def reset(self, def_val=[0.0] * 6) -> None:
         self.val = def_val
 
     @property
     def cmt(self) -> str:
-        raise NotImplementedError(
-            "Can't retrieve comments on UserFrames (yet)")
+        raise NotImplementedError("Can't retrieve comments on UserFrames (yet)")
 
     @cmt.setter
     def cmt(self, cmt: str) -> None:
@@ -386,7 +372,7 @@ class MotionGroup(object):
 
     @property
     def id(self) -> int:
-        """ Returns the id of this group.
+        """Returns the id of this group.
 
         Note: id != index in the system variables. Group 3 could have index 2
         for instance.
@@ -395,59 +381,50 @@ class MotionGroup(object):
 
     @property
     def robot_id(self) -> str:
-        """ Returns the robot model ID for which this group is configured
-        """
+        """Returns the robot model ID for which this group is configured"""
         return group.get_robot_id(self._conx, group=self._id)
 
     @property
     def robot_model(self) -> str:
-        """ Returns the robot model for which this group is configured
-        """
+        """Returns the robot model for which this group is configured"""
         return group.get_robot_model(self._conx, group=self._id)
 
     @property
     def was_jogged(self) -> bool:
-        """ Whether or not this group was jogged since the last programmed
+        """Whether or not this group was jogged since the last programmed
         motion
         """
         return group.was_jogged(self._conx, group=self._id)
 
     @property
     def active_jogframe(self) -> int:
-        """ The index of the currently active jogframe for this group
-        """
+        """The index of the currently active jogframe for this group"""
         return frames.get_active_jogframe(self._conx, group=self._id)
 
     @property
     def active_toolframe(self) -> int:
-        """ The index of the currently active toolframe for this group
-        """
+        """The index of the currently active toolframe for this group"""
         return frames.get_active_toolframe(self._conx, group=self._id)
 
     @property
     def active_userframe(self) -> int:
-        """ The index of the currently active userframe for this group
-        """
+        """The index of the currently active userframe for this group"""
         return frames.get_active_userframe(self._conx, group=self._id)
 
     def payload(self, idx: int):
-        """ Returns the payload schedule at index 'idx' for this group
-        """
+        """Returns the payload schedule at index 'idx' for this group"""
         return group.get_payload(self._conx, idx=idx, grp=self._id)
 
     def toolframe(self, idx: int) -> ToolFrame:
-        """ Returns the toolframe at index 'idx' for this group
-        """
+        """Returns the toolframe at index 'idx' for this group"""
         return ToolFrame(self._conx, idx, group=self._id)
 
     def userframe(self, idx: int) -> UserFrame:
-        """ Returns the userframe at index 'idx' for this group
-        """
+        """Returns the userframe at index 'idx' for this group"""
         return UserFrame(self._conx, idx, group=self._id)
 
     def jogframe(self, idx: int) -> JogFrame:
-        """ Returns the jogframe at index 'idx' for this group
-        """
+        """Returns the jogframe at index 'idx' for this group"""
         return JogFrame(self._conx, idx, group=self._id)
 
 
@@ -467,23 +444,23 @@ class Variable(object):
 
 
 class ScalarVariable(Variable):
-    def __init__(self, conx: Connection, name: str, typ: Type[Union[bool, float, int, str]] = str):
+    def __init__(
+        self, conx: Connection, name: str, typ: Type[Union[bool, float, int, str]] = str
+    ):
         if typ not in [bool, float, int, str]:
             raise UnsupportedVariableTypeException(
-                "Only scalar variable types are supported ("
-                f"got '{type(typ)}')")
+                "Only scalar variable types are supported (" f"got '{type(typ)}')"
+            )
         super().__init__(conx, name, typ=typ)
 
     @property
     def val(self):
-        return self.typ(
-            variables.get_scalar_var(self._conx, name=self._name))
+        return self.typ(variables.get_scalar_var(self._conx, name=self._name))
 
     @val.setter
     def val(self, val):
         if type(val) != self.typ:
-            raise ValueError(
-                f"Cannot write {type(val)} to variable of type {self.typ}")
+            raise ValueError(f"Cannot write {type(val)} to variable of type {self.typ}")
         # we explicitly convert to str here, as set_scalar_var(..) will always
         # send values as strings
         variables.set_scalar_var(self._conx, name=self._name, val=str(val))
@@ -491,9 +468,7 @@ class ScalarVariable(Variable):
 
 # TODO: fix this mess. This is not a nice way to wrap IO access
 class IoElement(object):
-    def __init__(
-        self, conx: Connection, idx: int, port_type: str, port_type_w: str
-    ):
+    def __init__(self, conx: Connection, idx: int, port_type: str, port_type_w: str):
         self._conx = conx
         self._idx = idx
         self._port_type = port_type
@@ -649,8 +624,7 @@ class Controller(object):
         return BooleanIoElement(self._conx, idx, 'UOPOUT')
 
     def reset(self) -> None:
-        """ Attempts to RESET the controller
-        """
+        """Attempts to RESET the controller"""
         controller.reset(self._conx)
 
     @property
@@ -667,19 +641,17 @@ class Controller(object):
 
     @property
     def active_program(self) -> str:
-        """ Returns the name of the program currently being executed
-        """
+        """Returns the name of the program currently being executed"""
         return controller.get_active_prog(self._conx)
 
     @property
     def num_groups(self) -> int:
-        """ Returns the number of motion groups configured on the controller
-        """
+        """Returns the number of motion groups configured on the controller"""
         return controller.get_num_groups(self._conx)
 
     @property
     def current_time(self) -> datetime.datetime:
-        """ Returns the current (wallclock) time on the controller
+        """Returns the current (wallclock) time on the controller
 
         Note: resolution is in minutes
         """
@@ -736,11 +708,16 @@ class Controller(object):
         return controller.list_programs(self._conx, types)
 
 
-def connect(host: str, helper_dev: str = 'td:', helper_dir: str = '',
-            skip_helper_upload: bool = False, request_timeout: float = 5,
-            kcl_auth: Optional[Tuple[str, str]] = None,
-            karel_auth: Optional[Tuple[str, str]] = None,
-            ftp_auth: Optional[Tuple[str, str]] = None) -> Controller:
+def connect(
+    host: str,
+    helper_dev: str = 'td:',
+    helper_dir: str = '',
+    skip_helper_upload: bool = False,
+    request_timeout: float = 5,
+    kcl_auth: Optional[Tuple[str, str]] = None,
+    karel_auth: Optional[Tuple[str, str]] = None,
+    ftp_auth: Optional[Tuple[str, str]] = None,
+) -> Controller:
     """Connect to the controller at 'host' and initialise a connection.
 
     Note: use 'skip_helper_upload' to override the default behaviour which
@@ -784,7 +761,7 @@ def connect(host: str, helper_dev: str = 'td:', helper_dir: str = '',
 
     # TODO: do this some other way
     base_path = f'{helper_dev}/{helper_dir}'
-    while ('//' in base_path):
+    while '//' in base_path:
         base_path = base_path.replace('//', '/')
     if base_path.endswith('/'):
         base_path = base_path[:-1]
@@ -795,9 +772,14 @@ def connect(host: str, helper_dev: str = 'td:', helper_dir: str = '',
         helpers_uploaded = True
 
     conx = Connection(
-        host, base_path, helpers_uploaded,
+        host,
+        base_path,
+        helpers_uploaded,
         skipped_helpers_upload=skip_helper_upload,
         request_timeout=request_timeout,
-        kcl_auth=kcl_auth, karel_auth=karel_auth, ftp_auth=ftp_auth)
+        kcl_auth=kcl_auth,
+        karel_auth=karel_auth,
+        ftp_auth=ftp_auth,
+    )
 
     return Controller(conx)

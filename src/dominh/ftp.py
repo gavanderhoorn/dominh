@@ -1,4 +1,3 @@
-
 # Copyright (c) 2020, G.A. vd. Hoorn
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -21,7 +20,7 @@ import ftplib
 from io import BytesIO
 
 
-class FtpClient():
+class FtpClient(object):
     def __init__(self, host, timeout=5):
         self.host = host
         self.ftpc = ftplib.FTP(host, timeout=timeout)

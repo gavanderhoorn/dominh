@@ -1,4 +1,3 @@
-
 # Copyright (c) 2021, G.A. vd. Hoorn
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,14 +17,14 @@
 
 import re
 
-from . comset import comset
-from . constants import HLPR_RAW_VAR
-from . exceptions import DominhException
-from . helpers import get_stm
-from . types import Config_t
-from . types import JointPos_t
-from . types import Position_t
-from . variables import get_scalar_var
+from .comset import comset
+from .constants import HLPR_RAW_VAR
+from .exceptions import DominhException
+from .helpers import get_stm
+from .types import Config_t
+from .types import JointPos_t
+from .types import Position_t
+from .variables import get_scalar_var
 
 
 def get_strreg(conx, idx):
@@ -93,13 +92,13 @@ def get_posreg(conx, idx, group=1):
     :rtype: tuple(Position_t, str) or tuple(JointPos_t, str)
     """
     if group < 1 or group > 8:
-        raise ValueError("Requested group id invalid (must be "
-                         f"between 1 and 8, got: {group})")
+        raise ValueError(
+            f"Requested group id invalid (must be between 1 and 8, got: {group})"
+        )
     varname = f'$POSREG[{group},{idx}]'
     # use get_stm(..) directly here as what we get returned is not actually
     # json, and read_helper(..) will try to parse it as such and then fail
-    ret = get_stm(
-        conx, page=HLPR_RAW_VAR + '.stm', params={'_reqvar': varname})
+    ret = get_stm(conx, page=HLPR_RAW_VAR + '.stm', params={'_reqvar': varname})
 
     # use Jay's regex (thanks!)
     # TODO: merge with get_frame_var(..)
@@ -117,11 +116,11 @@ def get_posreg(conx, idx, group=1):
         r"  Group: (\d)\r?\n"
         r"  (J1) =\s*(-?\d*.\d+|[*]+) deg   J2 =\s*(-?\d*.\d+|[*]+) deg   J3 =\s*(-?\d*.\d+|[*]+) deg \r?\n"  # noqa
         r"  J4 =\s*(-?\d*.\d+|[*]+) deg   J5 =\s*(-?\d*.\d+|[*]+) deg   J6 =\s*(-?\d*.\d+|[*]+) deg)",  # noqa
-        ret.text)
+        ret.text,
+    )
 
     if not match:
-        raise DominhException(
-            f"Could not match value returned for '{varname}'")
+        raise DominhException(f"Could not match value returned for '{varname}'")
 
     posreg = match[0]
     if 'Uninitialized' in posreg:

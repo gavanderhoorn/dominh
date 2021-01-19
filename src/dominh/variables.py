@@ -1,4 +1,3 @@
-
 # Copyright (c) 2021, G.A. vd. Hoorn
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,10 +15,10 @@
 # author: G.A. vd. Hoorn
 
 
-from . constants import HLPR_SCALAR_VAR
-from . exceptions import DominhException
-from . helpers import exec_kcl
-from . helpers import read_helper
+from .constants import HLPR_SCALAR_VAR
+from .exceptions import DominhException
+from .helpers import exec_kcl
+from .helpers import read_helper
 
 
 def set_scalar_var(conx, name, val):

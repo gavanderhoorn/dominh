@@ -1,4 +1,3 @@
-
 # Copyright (c) 2021, G.A. vd. Hoorn
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,7 +15,7 @@
 # author: G.A. vd. Hoorn
 
 
-from . comset import comset
+from .comset import comset
 
 
 def cmt_numreg(conx, idx, comment):

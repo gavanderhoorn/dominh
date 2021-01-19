@@ -1,4 +1,3 @@
-
 # Copyright (c) 2021, G.A. vd. Hoorn
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,12 +17,12 @@
 
 import re
 
-from . constants import HLPR_SCALAR_VAR
-from . constants import IO_OFF
-from . constants import IO_ON
-from . exceptions import DominhException
-from . helpers import exec_kcl
-from . helpers import read_helper
+from .constants import HLPR_SCALAR_VAR
+from .constants import IO_OFF
+from .constants import IO_ON
+from .exceptions import DominhException
+from .helpers import exec_kcl
+from .helpers import read_helper
 
 
 def io_write(conx, port_type, idx, val, check=False):
@@ -62,29 +61,28 @@ def io_write(conx, port_type, idx, val, check=False):
     :rtype: None or bool (see above)
     """
     ret = exec_kcl(
-        conx, cmd=f'set port {port_type}[{idx}]={val}',
-        wait_for_response=check)
+        conx, cmd=f'set port {port_type}[{idx}]={val}', wait_for_response=check
+    )
     if not check:
         return
 
     # get some simple errors out of the way
     ret = ret.strip()
     if 'Port name expected' in ret:
-        raise DominhException(
-            f"Illegal port type identifier: '{port_type}'")
+        raise DominhException(f"Illegal port type identifier: '{port_type}'")
     if 'No ports of this type' in ret:
         raise DominhException(
-            f"Controller does not have ports of this type: '{port_type}'")
+            f"Controller does not have ports of this type: '{port_type}'"
+        )
     if 'Illegal port number' in ret:
-        raise DominhException(
-            f"Illegal port number for port {port_type}: {idx}")
+        raise DominhException(f"Illegal port number for port {port_type}: {idx}")
     if 'Value out of range' in ret:
-        raise DominhException(
-            f"Value out of range for port type {port_type}: {val}")
+        raise DominhException(f"Value out of range for port type {port_type}: {val}")
     if 'ERROR' in ret:
         raise DominhException(
             "Unrecognised error trying to set port:\n"
-            f"\n________________\n\n{ret}\n________________")
+            f"\n________________\n\n{ret}\n________________"
+        )
 
     # check for successful write
     is_ok = re.match(r'Value was: (0|1).*Value is:  (0|1)', ret, re.DOTALL)
@@ -166,19 +164,17 @@ def io_read(conx, port_type, idx):
     """
     port_type = port_type.upper()
     port_id = f'{port_type}[{idx}]'
-    ret = read_helper(
-        conx, helper=HLPR_SCALAR_VAR, params={'_reqvar': port_id})
+    ret = read_helper(conx, helper=HLPR_SCALAR_VAR, params={'_reqvar': port_id})
 
     # check for some common problems
     if 'unknown port type name' in ret[port_id].lower():
-        raise DominhException(
-            f"Illegal port type identifier: '{port_type}'")
+        raise DominhException(f"Illegal port type identifier: '{port_type}'")
     if 'no ports of this type' in ret[port_id].lower():
         raise DominhException(
-            f"Controller does not have ports of this type: '{port_type}'")
+            f"Controller does not have ports of this type: '{port_type}'"
+        )
     if 'illegal port number' in ret[port_id].lower():
-        raise DominhException(
-            f"Illegal port number for port {port_type}: {idx}")
+        raise DominhException(f"Illegal port number for port {port_type}: {idx}")
 
     return ret[port_id]
 
