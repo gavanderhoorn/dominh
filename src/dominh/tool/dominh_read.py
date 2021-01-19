@@ -38,6 +38,7 @@ from docopt import docopt
 from requests import exceptions
 
 import dominh
+from dominh.io import io_read
 
 
 def main(argv, skip_upload=False):
@@ -50,7 +51,8 @@ def main(argv, skip_upload=False):
     try:
         c = dominh.connect(host=args['<host>'], skip_helper_upload=skip_upload)
 
-        val = c.io_read(port_type, index)
+        # work-around
+        val = io_read(c._conx, port_type, index)
         valp = 1 if val == 'ON' else 0
         if status:
             sys.exit(valp)
