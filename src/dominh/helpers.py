@@ -191,8 +191,8 @@ def exec_karel_prg(conx, prg_name, params={}, return_raw=False):
             f"got: {r.status_code}")
     if 'Unable to run' in r.text:
         raise DominhException(
-            f"Error: Karel program '{prg_name}' cannot be started on "
-            "controller")
+            f"Karel program '{prg_name}' cannot be started on controller: "
+            "has it been uploaded?")
     return r.json() if not return_raw else r.text
 
 
