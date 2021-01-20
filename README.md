@@ -115,6 +115,8 @@ Controller status:
 
 First 5 numregs         : 1.234, 0, 0, 0, 0
 
+First 5 SOP inputs      : False, True, True, False, False
+
 Payload 1 in group 1    : 10.0 Kg at (0.0, 0.0, 0.0) (inertia: 0.0, 0.0, 0.0)
 
 First five programs     : -BCKED8-.TP; -BCKED9-.TP; -BCKEDT-.TP; ATERRJOB.VR; GEMDATA.PC
