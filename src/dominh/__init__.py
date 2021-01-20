@@ -211,7 +211,7 @@ class StrReg(object):
 
     @val.setter
     def val(self, val: str) -> None:
-        raise NotImplementedError("Can't write to StrRegs (yet)")
+        registers.set_strreg(self._conx, self._idx, val)
 
     def reset(self, def_val: str = '') -> None:
         """Resets the strreg at 'idx' to a default value (default: '')"""

@@ -41,6 +41,20 @@ def get_strreg(conx, idx):
     return get_scalar_var(conx, name=f'[*STRREG*]$STRREG[{idx}]')
 
 
+def set_strreg(conx, idx, val):
+    """Update the value stored in 'SR[idx]' to 'val'.
+
+    Note: 'val' must be a string.
+
+    :param idx: The index of the register to update
+    :type idx: int
+    :param val: The value to write to the register
+    :type val: str
+    """
+    assert type(val) == str
+    comset(conx, 'STRREG', idx, val=val)
+
+
 def get_num_strreg(conx):
     """Retrieve total number of string registers available on the
     controller.
