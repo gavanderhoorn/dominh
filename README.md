@@ -187,7 +187,7 @@ dominh read $ROBOT_IP SOPOUT 3
 
 ## Supported functionality
 
-Dominh can currently be used to:
+Dominh can currently be used to (incomplete list):
 
 * fault reset the controller
 * determine whether the controller is:
@@ -205,7 +205,8 @@ Dominh can currently be used to:
 * read/write (system) variables (scalar variables are mostly supported)
 * read/write IO elements (digital, analogue, group, UOP, SOP, TP, flags, markers, etc)
 * read/write numerical registers
-* read string registers
+* read/write string registers
+* retrieve the number of numerical and string registers
 * read/write the general override
 * retrieve the number of defined groups
 * retrieve the ID and model of configured robots
@@ -214,9 +215,9 @@ Dominh can currently be used to:
 * retrieve payload schedules
 * retrieve the list of errors (including history)
 * retrieve a list of programs (filtered by program type)
-* update the comments of numeric and position registers and digital IO in and out elements
+* update the comments of numeric, string and position registers and digital IO in and out elements
 
-The above list only includes the functionality offered by the `Client` class' public interface.
+The above list only includes the functionality offered by the `Controller` class' public interface and that of the returned objects.
 Much more is possible (especially in the area of system variable wrapping/retrieving), but would require adding more convenience methods.
 
 ## Limitations / Known issues
