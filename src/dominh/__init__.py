@@ -223,7 +223,7 @@ class StrReg(object):
 
     @cmt.setter
     def cmt(self, cmt: str) -> None:
-        raise NotImplementedError("Can't set comments on StrRegs (yet)")
+        comments.cmt_strreg(self._conx, self._idx, cmt)
 
 
 class PosReg(object):

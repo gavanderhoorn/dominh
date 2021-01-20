@@ -40,6 +40,17 @@ def cmt_posreg(conx, idx, comment):
     comset(conx, 'POSREG', idx, comment=comment)
 
 
+def cmt_strreg(conx, idx, comment):
+    """Update the comment on string register at 'idx'.
+
+    :param idx: Numeric ID of register
+    :type idx: int
+    :param comment: Comment to set
+    :type comment: str
+    """
+    comset(conx, 'STRREG', idx, comment=comment)
+
+
 def cmt_din(conx, idx, comment):
     """Update the comment on 'DIN[idx]'.
 
