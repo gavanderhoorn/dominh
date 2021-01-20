@@ -21,7 +21,6 @@ The author recommends using PCDK and/or any of the supported fieldbuses in those
 
 **NOTE 2**: on R-30iB+ controllers, option `R912` can do some of the things this library supports.
 
-
 ## TOC
 
 1. [Requirements](#requirements)
@@ -36,7 +35,6 @@ The author recommends using PCDK and/or any of the supported fieldbuses in those
 1. [FAQ](#faq)
 1. [Disclaimer](#disclaimer)
 
-
 ## Requirements
 
 This needs the base *Web Server* (`HTTP`) and the *Web Svr Enhancements* (`R626`) options (note: contrary to what the manual states, this is not a separate option: all functionality is already built-in, at least for R-30iA and newer controllers).
@@ -46,7 +44,6 @@ Other requirements include a functioning networking setup (make sure you can pin
 Either unlock the *KAREL* and *KCL* resources completely or configure sets of credentials for both resources.
 Configuration for the built-in FTP server should be OK by default, but may be changed to also require a username and password.
 Refer to section 6.5 *HTTP AUTHENTICATION* of the *FANUC Robot series - Ethernet Function - Operator's Manual* (document `B-82974EN` for the R-30iA) for more information.
-
 
 ## Compatibility
 
@@ -59,7 +56,6 @@ Compatibility has only been tested with R-30iA and R-30iB+ controllers running V
 The library and CLI tools have been written for Python version 3.
 No specific OS dependencies are known, so all platforms with a Python 3 interpreter should be supported.
 Only Ubuntu Xenial and Bionic have been extensively tested however.
-
 
 ## Installation
 
@@ -81,7 +77,6 @@ The author has primarily used Python 3.8, but other versions are expected to wor
 
 Future versions may be released to PyPi.
 
-
 ## Example usage
 
 ### Example script
@@ -90,7 +85,7 @@ The `examples` directory contains an example script which uses some of the funct
 
 Example output for an R-30iA with an M-10iA in Roboguide:
 
-```
+```console
 $ python examples/print_controller_info.py localhost
 Attempting to connect to: localhost
 
@@ -137,23 +132,23 @@ Five most recent errors:
 The following shows a short example of how this library could be used to connect to a controller with credentials for access to the `KAREL` resource, reset the controller, then set the override to 100% and finally read the `DOUT[1]` IO element.
 
 ```python
-from dominh import Client
+from dominh import connect
 
-c = Client('ip.of.robot.ctrlr', karel_auth=('user', 'pass'))
-c.initialise()
+# replace '<robot_ip>' with the IP of the controller
+c = connect('<robot_ip>', karel_auth=('user', 'pass'))
 
 c.reset()
 # Karel RefMan suggests waiting for 1 second
 time.sleep(1.0)
 
-if (c.is_faulted()):
+if (c.is_faulted):
     print ("Still faulted")
 else:
     print ("All green")
 
-c.set_general_override(100)
+c.general_override = 100
 
-dout1_state = c.read_dout(1)
+dout1_state = c.dout(1).val
 
 ...
 ```
@@ -161,7 +156,8 @@ dout1_state = c.read_dout(1)
 ## CLI
 
 ```bash
-export ROBOT_IP=<ip.of.robot.ctrlr>
+# replace '<robot_ip>' with the IP of the controller
+export ROBOT_IP=<robot_ip>
 
 # reset a controller (fire-and-forget)
 dominh reset $ROBOT_IP
@@ -187,41 +183,39 @@ dominh write $ROBOT_IP DOUT 1 0
 dominh read $ROBOT_IP SOPOUT 3
 ```
 
-
 ## Supported functionality
 
 Dominh can currently be used to:
 
- * fault reset the controller
- * determine whether the controller is:
-   * faulted
-   * e-stopped
-   * executing a program
-   * paused
-   * in AUTO or MANUAL mode
-   * in REMOTE mode
- * determine whether the TP is enabled
- * determine the controller series (ie: R-30iA, R-30iB, R-30iB+)
- * retrieve the application software (ie: HandlingTool, etc)
- * retrieve the version of the application software
- * retrieve the controller's time and date
- * read/write (system) variables (scalar variables are mostly supported)
- * read/write IO elements (digital, analogue, group, UOP, SOP, TP, flags, markers, etc)
- * read/write numerical registers
- * read string registers
- * read/write the general override
- * retrieve the number of defined groups
- * retrieve the ID and model of configured robots
- * retrieve jog, tool and user frames
- * retrieve currently active jog, tool or user frame
- * retrieve payload schedules
- * retrieve the list of errors (including history)
- * retrieve a list of programs (filtered by program type)
- * update the comments of numeric and position registers and digital IO in and out elements
+* fault reset the controller
+* determine whether the controller is:
+  * faulted
+  * e-stopped
+  * executing a program
+  * paused
+  * in AUTO or MANUAL mode
+  * in REMOTE mode
+* determine whether the TP is enabled
+* determine the controller series (ie: R-30iA, R-30iB, R-30iB+)
+* retrieve the application software (ie: HandlingTool, etc)
+* retrieve the version of the application software
+* retrieve the controller's time and date
+* read/write (system) variables (scalar variables are mostly supported)
+* read/write IO elements (digital, analogue, group, UOP, SOP, TP, flags, markers, etc)
+* read/write numerical registers
+* read string registers
+* read/write the general override
+* retrieve the number of defined groups
+* retrieve the ID and model of configured robots
+* retrieve jog, tool and user frames
+* retrieve currently active jog, tool or user frame
+* retrieve payload schedules
+* retrieve the list of errors (including history)
+* retrieve a list of programs (filtered by program type)
+* update the comments of numeric and position registers and digital IO in and out elements
 
 The above list only includes the functionality offered by the `Client` class' public interface.
 Much more is possible (especially in the area of system variable wrapping/retrieving), but would require adding more convenience methods.
-
 
 ## Limitations / Known issues
 
@@ -241,7 +235,6 @@ The following limitations and known issues exist:
 * HTTP status return codes do not reflect the result of operations in all cases.
   This is again a limitation of the web server used by Fanuc.
 
-
 ## Performance
 
 As an indication of the performance: reading `DOUT[1]` from an idle R-30iB+ takes about 300 to 400 ms.
@@ -249,16 +242,13 @@ Retrieving the value of the `$FNO` system variable from the same controller take
 
 In both cases the helpers were already present on the controller.
 
-
 ## Related projects
 
 For a similar library, but written in Go, see [onerobotics/go-fanuc](https://github.com/onerobotics/go-fanuc).
 
-
 ## Bugs, feature requests, etc
 
 Please use the [GitHub issue tracker](https://github.com/gavanderhoorn/dominh/issues).
-
 
 ## FAQ
 
@@ -276,12 +266,12 @@ Python was a natural choice for me.
 
 Time and application requirements: target framework supported Python, so writing Dominh in Python made sense.
 
-### This is far from production-ready code.
+### This is far from production-ready code
 
 Yes, I agree.
 See also the *NOTE* in the *Overview* section.
 
-### Performance is really bad.
+### Performance is really bad
 
 Compared to the PCDK: certainly, but if you need a more performant solution, ask Fanuc for a PCDK license or use a fieldbus.
 If you have ideas on how to improve performance, post an issue [on the tracker](https://github.com/gavanderhoorn/dominh/issues).
@@ -306,7 +296,6 @@ As long as new features (or enhancements of existing functionality) pass CI and 
 ### How should Dominh be pronounced?
 
 Domin-a (the `h` is silent).
-
 
 ## Disclaimer
 
