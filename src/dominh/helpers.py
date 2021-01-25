@@ -17,6 +17,7 @@
 
 import re
 import requests
+import typing as t
 
 from .constants import HLPR_RAW_VAR
 from .constants import HLPR_SCALAR_VAR
@@ -26,7 +27,12 @@ from .exceptions import LockedResourceException
 from .ftp import FtpClient
 
 
-def upload_helpers(host, remote_path, request_timeout=5, ftp_auth=None):
+def upload_helpers(
+    host,
+    remote_path: str,
+    request_timeout: float = 5,
+    ftp_auth: t.Optional[t.Tuple[str, str]] = None,
+) -> None:
     """Upload the (set of) helper(s) files to the controller.
 
     These helpers are used by the various other functionality provided by
@@ -64,7 +70,7 @@ def upload_helpers(host, remote_path, request_timeout=5, ftp_auth=None):
     ftpc.upload_as_file(f'/{remote_path}/{HLPR_RAW_VAR}.stm', content)
 
 
-def get_stm(conx, page, params={}):
+def get_stm(conx, page: str, params: t.Dict[str, str] = {}) -> requests.Response:
     """Retrieve a '.stm' file from the controller (rendered by the web
     server).
 
@@ -85,7 +91,7 @@ def get_stm(conx, page, params={}):
     return r
 
 
-def read_helper(conx, helper, params={}):
+def read_helper(conx, helper: str, params: t.Dict[str, str] = {}) -> t.Any:
     """Retrieve JSON from helper on controller.
 
     NOTE: 'helper' should not include the extension
@@ -105,7 +111,7 @@ def read_helper(conx, helper, params={}):
     return get_stm(conx, page=f'{helper}.stm', params=params).json()
 
 
-def exec_kcl(conx, cmd, wait_for_response=False):
+def exec_kcl(conx, cmd: str, wait_for_response: bool = False) -> t.Optional[str]:
     """Execute the specified KCL command line on the controller.
 
     NOTE: any expected parameters must be supplied as part of 'cmd'.
@@ -162,7 +168,9 @@ def exec_kcl(conx, cmd, wait_for_response=False):
         raise DominhException("Could not find KCL output in returned document")
 
 
-def exec_karel_prg(conx, prg_name, params={}, return_raw=False):
+def exec_karel_prg(
+    conx, prg_name: str, params: t.Dict[str, str] = {}, return_raw: bool = False
+):
     """Execute a Karel program on the controller (via the web server).
 
     NOTE: 'prg_name' should not include the '.pc' extension.
@@ -202,7 +210,7 @@ def exec_karel_prg(conx, prg_name, params={}, return_raw=False):
     return r.json() if not return_raw else r.text
 
 
-def get_var_raw(conx, varname):
+def get_var_raw(conx, varname: str) -> str:
     """Retrieve raw text dump of variable with name 'varname'.
 
     :param varname: Name of the variable to retrieve.

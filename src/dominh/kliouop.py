@@ -16,5 +16,5 @@
 
 # Constants defined in kliouop.kl
 
-UOPO_PROGRUN = 3
-UOPO_PAUSED = 4
+UOPO_PROGRUN: int = 3
+UOPO_PAUSED: int = 4

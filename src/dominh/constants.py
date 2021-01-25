@@ -15,11 +15,11 @@
 # author: G.A. vd. Hoorn
 
 
-IO_ON = 1
-IO_OFF = 0
+IO_ON: int = 1
+IO_OFF: int = 0
 
-JSON_SUCCESS = 'success'
-JSON_REASON = 'reason'
+JSON_SUCCESS: str = 'success'
+JSON_REASON: str = 'reason'
 
-HLPR_RAW_VAR = 'raw_var'
-HLPR_SCALAR_VAR = 'scalar_var'
+HLPR_RAW_VAR: str = 'raw_var'
+HLPR_SCALAR_VAR: str = 'scalar_var'

@@ -16,8 +16,8 @@
 
 # Constants defined in kliosop.kl
 
-SOPI_ESTOP = 0
+SOPI_ESTOP: int = 0
 
-SOPO_REMOTE = 0
-SOPO_FAULT = 3
-SOPO_TPENBL = 7
+SOPO_REMOTE: int = 0
+SOPO_FAULT: int = 3
+SOPO_TPENBL: int = 7

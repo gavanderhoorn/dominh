@@ -16,6 +16,7 @@
 
 
 import re
+import typing as t
 
 from .constants import HLPR_SCALAR_VAR
 from .constants import IO_OFF
@@ -25,7 +26,9 @@ from .helpers import exec_kcl
 from .helpers import read_helper
 
 
-def io_write(conx, port_type, idx, val, check=False):
+def io_write(
+    conx, port_type: str, idx: int, val: int, check: bool = False
+) -> t.Optional[bool]:
     """Set port 'idx' of type 'port_type' to value 'val'.
 
     Valid values for 'port_type':
@@ -89,7 +92,7 @@ def io_write(conx, port_type, idx, val, check=False):
     return is_ok and is_ok.group(2) == str(val)
 
 
-def io_write_dout(conx, idx, val):
+def io_write_dout(conx, idx: int, val: bool) -> None:
     """Write 'val' to 'DOUT[idx]'.
 
     :param idx: Index to write to
@@ -100,7 +103,7 @@ def io_write_dout(conx, idx, val):
     io_write(conx, 'DOUT', idx, val)
 
 
-def io_write_rout(conx, idx, val):
+def io_write_rout(conx, idx: int, val: bool) -> None:
     """Write 'val' to 'ROUT[idx]'.
 
     :param idx: Index to write to
@@ -111,7 +114,7 @@ def io_write_rout(conx, idx, val):
     io_write(conx, 'ROUT', idx, val)
 
 
-def io_read(conx, port_type, idx):
+def io_read(conx, port_type: str, idx: int) -> str:
     """Read port 'idx' of type 'port_type'.
 
     Valid values for 'port_type':
@@ -179,7 +182,7 @@ def io_read(conx, port_type, idx):
     return ret[port_id]
 
 
-def io_read_sopout(conx, idx):
+def io_read_sopout(conx, idx: int) -> int:
     """Read from 'SOPOUT[idx]'.
 
     :param idx: Index to read from
@@ -192,7 +195,7 @@ def io_read_sopout(conx, idx):
     return IO_OFF
 
 
-def io_read_sopin(conx, idx):
+def io_read_sopin(conx, idx: int) -> int:
     """Read from 'SOPIN[idx]'.
 
     :param idx: Index to read from
@@ -205,7 +208,7 @@ def io_read_sopin(conx, idx):
     return IO_OFF
 
 
-def io_read_uopout(conx, idx):
+def io_read_uopout(conx, idx: int) -> int:
     """Read from 'UOPOUT[idx]'.
 
     :param idx: Index to read from
@@ -218,7 +221,7 @@ def io_read_uopout(conx, idx):
     return IO_OFF
 
 
-def io_read_rout(conx, idx):
+def io_read_rout(conx, idx: int) -> int:
     """Read from 'RDO[idx]'.
 
     :param idx: Index to write to

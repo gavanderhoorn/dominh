@@ -15,10 +15,12 @@
 # author: G.A. vd. Hoorn
 
 
+import typing as t
+
 from .helpers import exec_karel_prg
 
 
-def _get_cmt_fc(cmt):
+def _get_cmt_fc(cmt: str) -> int:
     return {
         'NUMREG': 1,
         'POSREG': 3,
@@ -36,7 +38,7 @@ def _get_cmt_fc(cmt):
     }.get(cmt.upper())
 
 
-def _get_val_fc(valt):
+def _get_val_fc(valt: str) -> int:
     return {
         'NUMREG': 2,
         'UALARM': 5,  # actually sets 'severity'
@@ -44,7 +46,13 @@ def _get_val_fc(valt):
     }.get(valt.upper())
 
 
-def comset(conx, fc, idx, val=None, comment=''):
+def comset(
+    conx,
+    fc: str,
+    idx: int,
+    val: t.Optional[t.Union[int, float, str]] = None,
+    comment: str = '',
+) -> None:
     """Low-level wrapper around the 'karel/ComSet' program.
 
     This method uses the COMSET Karel program on the controller, which is

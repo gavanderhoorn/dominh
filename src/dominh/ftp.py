@@ -21,26 +21,26 @@ from io import BytesIO
 
 
 class FtpClient(object):
-    def __init__(self, host, timeout=5):
+    def __init__(self, host: str, timeout: float = 5) -> None:
         self.host = host
         self.ftpc = ftplib.FTP(host, timeout=timeout)
         self.__welcome_msg = self.ftpc.getwelcome()
 
-    def get_welcome_msg(self):
+    def get_welcome_msg(self) -> str:
         return self.__welcome_msg
 
-    def connect(self, user='anonymous', pw='anonymous'):
+    def connect(self, user: str = 'anonymous', pw: str = 'anonymous') -> None:
         self.ftpc.login(user, pw)
 
-    def get_file_as_str(self, remote_name):
+    def get_file_as_str(self, remote_name: str) -> bytes:
         buf = BytesIO()
         self.ftpc.retrbinary(f'RETR {remote_name}', buf.write)
         return buf.getvalue()
 
-    def upload_as_file(self, remote_name, contents):
+    def upload_as_file(self, remote_name: str, contents: bytes) -> None:
         buf = BytesIO(contents)
         buf.seek(0)
         self.ftpc.storbinary(f'STOR {remote_name}', buf)
 
-    def remove_file(self, remote_name):
+    def remove_file(self, remote_name: str) -> None:
         self.ftpc.delete(remote_name)

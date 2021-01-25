@@ -15,13 +15,16 @@
 # author: G.A. vd. Hoorn
 
 
+import typing as t
+
+
 from .constants import HLPR_SCALAR_VAR
 from .exceptions import DominhException
 from .helpers import exec_kcl
 from .helpers import read_helper
 
 
-def set_scalar_var(conx, name, val):
+def set_scalar_var(conx, name: str, val: t.Any) -> None:
     """Update the value of variable 'name' to 'val'.
 
     NOTE: 'val' will always be sent as its 'str(..)'-i-fied representation.
@@ -38,7 +41,7 @@ def set_scalar_var(conx, name, val):
     exec_kcl(conx, cmd=f'set var {name}={val}')
 
 
-def get_scalar_var(conx, name):
+def get_scalar_var(conx, name: str) -> str:
     """Retrieve the value of the variable named 'name'.
 
     NOTE: should only be used for scalar variables and individual array

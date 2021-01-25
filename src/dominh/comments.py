@@ -18,7 +18,7 @@
 from .comset import comset
 
 
-def cmt_numreg(conx, idx, comment):
+def cmt_numreg(conx, idx: int, comment: str) -> None:
     """Update the comment on numerical register at 'idx'.
 
     :param idx: Numeric ID of register
@@ -29,7 +29,7 @@ def cmt_numreg(conx, idx, comment):
     comset(conx, 'NUMREG', idx, comment=comment)
 
 
-def cmt_posreg(conx, idx, comment):
+def cmt_posreg(conx, idx: int, comment: str) -> None:
     """Update the comment on position register at 'idx'.
 
     :param idx: Numeric ID of register
@@ -40,7 +40,7 @@ def cmt_posreg(conx, idx, comment):
     comset(conx, 'POSREG', idx, comment=comment)
 
 
-def cmt_strreg(conx, idx, comment):
+def cmt_strreg(conx, idx: int, comment: str) -> None:
     """Update the comment on string register at 'idx'.
 
     :param idx: Numeric ID of register
@@ -51,7 +51,7 @@ def cmt_strreg(conx, idx, comment):
     comset(conx, 'STRREG', idx, comment=comment)
 
 
-def cmt_din(conx, idx, comment):
+def cmt_din(conx, idx: int, comment: str) -> None:
     """Update the comment on 'DIN[idx]'.
 
     :param idx: Numeric ID of port
@@ -62,7 +62,7 @@ def cmt_din(conx, idx, comment):
     comset(conx, 'DIN', idx, comment=comment)
 
 
-def cmt_dout(conx, idx, comment):
+def cmt_dout(conx, idx: int, comment: str) -> None:
     """Update the comment on 'DOUT[idx]'.
 
     :param idx: Numeric ID of port

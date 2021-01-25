@@ -17,15 +17,12 @@
 
 import datetime
 
-from typing import List
-from typing import Optional
-from typing import Tuple
-from typing import Type
-from typing import Union
+import typing as t
 
 from .exceptions import DominhException
 from .exceptions import UnsupportedVariableTypeException
 from .helpers import upload_helpers
+from .types import JointPos_t, Plst_Grp_t, Position_t
 
 from . import comments
 from . import controller
@@ -47,10 +44,10 @@ class Connection(object):
         helpers_uploaded: bool,
         skipped_helpers_upload: bool,
         request_timeout: float = 5,
-        kcl_auth: Optional[Tuple[str, str]] = None,
-        karel_auth: Optional[Tuple[str, str]] = None,
-        ftp_auth: Optional[Tuple[str, str]] = None,
-    ):
+        kcl_auth: t.Optional[t.Tuple[str, str]] = None,
+        karel_auth: t.Optional[t.Tuple[str, str]] = None,
+        ftp_auth: t.Optional[t.Tuple[str, str]] = None,
+    ) -> None:
         """Stores information about an active connection.
 
         :param host: Hostname or IP address of the controller
@@ -136,7 +133,7 @@ class Connection(object):
         return self._skipped_helpers_upload
 
     @property
-    def kcl_auth(self) -> Optional[Tuple[str, str]]:
+    def kcl_auth(self) -> t.Optional[t.Tuple[str, str]]:
         """Credentials allowing access to KCL resources
 
         If not provided, returns None.
@@ -144,7 +141,7 @@ class Connection(object):
         return self._kcl_auth
 
     @property
-    def karel_auth(self) -> Optional[Tuple[str, str]]:
+    def karel_auth(self) -> t.Optional[t.Tuple[str, str]]:
         """Credentials allowing access to Karel resources
 
         If not provided, returns None.
@@ -152,7 +149,7 @@ class Connection(object):
         return self._karel_auth
 
     @property
-    def ftp_auth(self) -> Optional[Tuple[str, str]]:
+    def ftp_auth(self) -> t.Optional[t.Tuple[str, str]]:
         """Credentials allowing access to FTP resources
 
         If not provided, returns None.
@@ -161,7 +158,7 @@ class Connection(object):
 
 
 class NumReg(object):
-    def __init__(self, conx: Connection, idx: int):
+    def __init__(self, conx: Connection, idx: int) -> None:
         self._conx = conx
         self._idx = idx
 
@@ -170,7 +167,7 @@ class NumReg(object):
         return self._idx
 
     @property
-    def val(self) -> int:
+    def val(self) -> t.Union[float, int]:
         """Returns the current value stored in the numreg at 'idx'"""
         return registers.get_numreg(self._conx, self._idx)
 
@@ -196,7 +193,7 @@ class NumReg(object):
 
 
 class StrReg(object):
-    def __init__(self, conx: Connection, idx: int):
+    def __init__(self, conx: Connection, idx: int) -> None:
         self._conx = conx
         self._idx = idx
 
@@ -227,7 +224,7 @@ class StrReg(object):
 
 
 class PosReg(object):
-    def __init__(self, conx: Connection, idx: int):
+    def __init__(self, conx: Connection, idx: int) -> None:
         self._conx = conx
         self._idx = idx
 
@@ -236,14 +233,19 @@ class PosReg(object):
         return self._idx
 
     @property
-    def val(self):
+    def val(
+        self,
+    ) -> t.Union[
+        t.Tuple[t.Optional[JointPos_t], str], t.Tuple[t.Optional[Position_t], str]
+    ]:
         """Returns the current value stored in the posreg at 'idx'"""
         return registers.get_posreg(self._conx, self._idx)
 
     @val.setter
-    def val(self, val) -> int:
+    def val(self, val) -> None:
         raise NotImplementedError("Can't write to PosRegs (yet)")
 
+    # TODO: figure out what type default value should be for PosReg
     def reset(self, def_val=[0.0] * 6) -> None:
         self.val = def_val
 
@@ -258,7 +260,7 @@ class PosReg(object):
 
 
 class ToolFrame(object):
-    def __init__(self, conx: Connection, idx: int, group: int = 1):
+    def __init__(self, conx: Connection, idx: int, group: int = 1) -> None:
         self._conx = conx
         self._idx = idx
         self._group = group
@@ -273,7 +275,7 @@ class ToolFrame(object):
         return self._group
 
     @property
-    def val(self):
+    def val(self) -> t.Tuple[Position_t, t.Optional[str]]:
         """Returns the toolframe at index 'idx' for group 'group'"""
         return frames.get_toolframe(self._conx, self._idx, self._group)
 
@@ -294,7 +296,7 @@ class ToolFrame(object):
 
 
 class JogFrame(object):
-    def __init__(self, conx: Connection, idx: int, group: int = 1):
+    def __init__(self, conx: Connection, idx: int, group: int = 1) -> None:
         self._conx = conx
         self._idx = idx
         self._group = group
@@ -309,7 +311,7 @@ class JogFrame(object):
         return self._group
 
     @property
-    def val(self):
+    def val(self) -> t.Tuple[Position_t, t.Optional[str]]:
         """Returns the jogframe at index 'idx' for group 'group'"""
         return frames.get_jogframe(self._conx, self._idx, self._group)
 
@@ -330,7 +332,7 @@ class JogFrame(object):
 
 
 class UserFrame(object):
-    def __init__(self, conx: Connection, idx: int, group: int = 1):
+    def __init__(self, conx: Connection, idx: int, group: int = 1) -> None:
         self._conx = conx
         self._idx = idx
         self._group = group
@@ -345,7 +347,7 @@ class UserFrame(object):
         return self._group
 
     @property
-    def val(self):
+    def val(self) -> t.Tuple[Position_t, t.Optional[str]]:
         """Returns the userframe at index 'idx' for group 'group'"""
         return frames.get_userframe(self._conx, self._idx, self._group)
 
@@ -366,7 +368,7 @@ class UserFrame(object):
 
 
 class MotionGroup(object):
-    def __init__(self, conx: Connection, id):
+    def __init__(self, conx: Connection, id: int) -> None:
         self._conx = conx
         self._id = id
 
@@ -411,7 +413,7 @@ class MotionGroup(object):
         """The index of the currently active userframe for this group"""
         return frames.get_active_userframe(self._conx, group=self._id)
 
-    def payload(self, idx: int):
+    def payload(self, idx: int) -> Plst_Grp_t:
         """Returns the payload schedule at index 'idx' for this group"""
         return group.get_payload(self._conx, idx=idx, grp=self._id)
 
@@ -429,7 +431,7 @@ class MotionGroup(object):
 
 
 class Variable(object):
-    def __init__(self, conx: Connection, name: str, typ: Type):
+    def __init__(self, conx: Connection, name: str, typ: t.Type) -> None:
         self._conx = conx
         self._name = name
         self._type = typ
@@ -439,14 +441,17 @@ class Variable(object):
         return self._name
 
     @property
-    def typ(self) -> Type:
+    def typ(self) -> t.Type:
         return self._type
 
 
 class ScalarVariable(Variable):
     def __init__(
-        self, conx: Connection, name: str, typ: Type[Union[bool, float, int, str]] = str
-    ):
+        self,
+        conx: Connection,
+        name: str,
+        typ: t.Type[t.Union[bool, float, int, str]] = str,
+    ) -> None:
         if typ not in [bool, float, int, str]:
             raise UnsupportedVariableTypeException(
                 "Only scalar variable types are supported (" f"got '{type(typ)}')"
@@ -454,11 +459,11 @@ class ScalarVariable(Variable):
         super().__init__(conx, name, typ=typ)
 
     @property
-    def val(self):
+    def val(self) -> t.Type[t.Union[bool, float, int, str]]:
         return self.typ(variables.get_scalar_var(self._conx, name=self._name))
 
     @val.setter
-    def val(self, val):
+    def val(self, val: t.Type[t.Union[bool, float, int, str]]) -> None:
         if type(val) != self.typ:
             raise ValueError(f"Cannot write {type(val)} to variable of type {self.typ}")
         # we explicitly convert to str here, as set_scalar_var(..) will always
@@ -468,7 +473,9 @@ class ScalarVariable(Variable):
 
 # TODO: fix this mess. This is not a nice way to wrap IO access
 class IoElement(object):
-    def __init__(self, conx: Connection, idx: int, port_type: str, port_type_w: str):
+    def __init__(
+        self, conx: Connection, idx: int, port_type: str, port_type_w: str
+    ) -> None:
         self._conx = conx
         self._idx = idx
         self._port_type = port_type
@@ -493,8 +500,8 @@ class BooleanIoElement(IoElement):
         conx: Connection,
         idx: int,
         port_type: str,
-        port_type_w: Optional[str] = None,
-    ):
+        port_type_w: t.Optional[str] = None,
+    ) -> None:
         assert port_type in [
             "BRAKE",
             "DIN",
@@ -548,8 +555,8 @@ class IntegerIoElement(IoElement):
         conx: Connection,
         idx: int,
         port_type: str,
-        port_type_w: Optional[str] = None,
-    ):
+        port_type_w: t.Optional[str] = None,
+    ) -> None:
         assert port_type in [
             'ANIN',
             'ANOUT',
@@ -575,7 +582,7 @@ class IntegerIoElement(IoElement):
 
 
 class Controller(object):
-    def __init__(self, conx):
+    def __init__(self, conx: Connection) -> None:
         self._conx = conx
 
     def numreg(self, idx: int) -> NumReg:
@@ -590,7 +597,7 @@ class Controller(object):
     def group(self, idx: int) -> MotionGroup:
         return MotionGroup(self._conx, idx)
 
-    def variable(self, name: str, typ: Type = str) -> ScalarVariable:
+    def variable(self, name: str, typ: t.Type = str) -> ScalarVariable:
         return ScalarVariable(self._conx, name, typ)
 
     def din(self, idx: int) -> IoElement:
@@ -701,10 +708,10 @@ class Controller(object):
     def is_program_running(self) -> bool:
         return controller.is_program_running(self._conx)
 
-    def list_errors(self) -> List[Tuple[int, str, str, str, str, str]]:
+    def list_errors(self) -> t.List[t.Tuple[int, str, str, str, str, str]]:
         return controller.list_errors(self._conx)
 
-    def list_programs(self, types: List[str] = []):
+    def list_programs(self, types: t.List[str] = []) -> t.List[t.Tuple[str, str]]:
         return controller.list_programs(self._conx, types)
 
 
@@ -714,9 +721,9 @@ def connect(
     helper_dir: str = '',
     skip_helper_upload: bool = False,
     request_timeout: float = 5,
-    kcl_auth: Optional[Tuple[str, str]] = None,
-    karel_auth: Optional[Tuple[str, str]] = None,
-    ftp_auth: Optional[Tuple[str, str]] = None,
+    kcl_auth: t.Optional[t.Tuple[str, str]] = None,
+    karel_auth: t.Optional[t.Tuple[str, str]] = None,
+    ftp_auth: t.Optional[t.Tuple[str, str]] = None,
 ) -> Controller:
     """Connect to the controller at 'host' and initialise a connection.
 
