@@ -55,7 +55,7 @@ Compatibility has only been tested with R-30iA and R-30iB+ controllers running V
 
 The library and CLI tools have been written for Python version 3.
 No specific OS dependencies are known, so all platforms with a Python 3 interpreter should be supported.
-Only Ubuntu Xenial and Bionic have been extensively tested however.
+Only Ubuntu Xenial, Bionic and Focal have been extensively tested however.
 
 ## Installation
 
