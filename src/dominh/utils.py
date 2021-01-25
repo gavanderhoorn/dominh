@@ -15,7 +15,10 @@
 # author: G.A. vd. Hoorn
 
 
-def format_sysvar(path):
+import typing as t
+
+
+def format_sysvar(path: t.List[str]) -> str:
     assert type(path) == list
     if not path:
         raise ValueError("Need at least one variable name")

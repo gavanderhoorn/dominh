@@ -17,6 +17,7 @@
 
 import datetime
 import re
+import typing as t
 
 from . import kliosop
 from . import kliouop
@@ -38,12 +39,12 @@ from .web_server import disable_web_server_headers
 from .web_server import enable_web_server_headers
 
 
-def reset(conx):
+def reset(conx) -> None:
     """Attempt to RESET the controller."""
     exec_kcl(conx, cmd='reset')
 
 
-def select_tpe(conx, program):
+def select_tpe(conx, program: str) -> None:
     """Attempt to make 'program' the SELECTed program on the TP.
 
     Wraps the Karel SELECT_TPE(..) routine.
@@ -62,7 +63,7 @@ def select_tpe(conx, program):
         raise DominhException("Select_TPE error: " + ret[JSON_REASON])
 
 
-def get_general_override(conx):
+def get_general_override(conx) -> int:
     """Retrieve the currently configured General Override.
 
     :returns: Value of $MCR.$GENOVERRIDE
@@ -71,7 +72,7 @@ def get_general_override(conx):
     return int(get_scalar_var(conx, name='$MCR.$GENOVERRIDE'))
 
 
-def set_general_override(conx, val):
+def set_general_override(conx, val: int) -> None:
     """Set the General Override to 'val'.
 
     :param val: New value for $MCR.$GENOVERRIDE
@@ -80,7 +81,7 @@ def set_general_override(conx, val):
     set_scalar_var(conx, name='$MCR.$GENOVERRIDE', val=val)
 
 
-def list_programs(conx, types=[]):
+def list_programs(conx, types: t.List[str] = []) -> t.List[t.Tuple[str, str]]:
     """Retrieve the list of all programs stored on the controller.
 
     NOTE: this is a rather naive implementation which should not be used in
@@ -113,7 +114,7 @@ def list_programs(conx, types=[]):
     return [m for m in matches if (types and m[1].lower() in types) or not types]
 
 
-def get_controller_series(conx):
+def get_controller_series(conx) -> str:
     """Returns the controller series identifier (ie: R-30iA, 30iB, etc).
 
     Note: this method maps known major versions to controller series. It
@@ -131,7 +132,7 @@ def get_controller_series(conx):
     }.get(major, f'Unknown ("{software_version}")')
 
 
-def get_application(conx):
+def get_application(conx) -> str:
     """Returns the application identifier installed on the controller.
 
     The application is the '*Tool', such as HandlingTool, SpotTool, etc.
@@ -143,7 +144,7 @@ def get_application(conx):
     return get_scalar_var(conx, name=f'$application[{APPL_ID_IDX}]')
 
 
-def get_system_software_version(conx):
+def get_system_software_version(conx) -> str:
     """Returns the version (major.minor and patch) of the system software.
 
     :returns: The version of the system software on the controller
@@ -153,7 +154,7 @@ def get_system_software_version(conx):
     return get_scalar_var(conx, name=f'$application[{APPL_VER_IDX}]')
 
 
-def in_auto_mode(conx):
+def in_auto_mode(conx) -> bool:
     """Determine whether the controller is in AUTO or one of the MANUAL
     modes.
 
@@ -171,7 +172,7 @@ def in_auto_mode(conx):
     return ret['in_auto_mode']
 
 
-def tp_enabled(conx):
+def tp_enabled(conx) -> bool:
     """Determine whether the Teach Pendant is currently enabled.
 
     Checks SOP output index 7 (from kliosop.kl).
@@ -182,7 +183,7 @@ def tp_enabled(conx):
     return io_read_sopout(conx, idx=kliosop.SOPO_TPENBL) == IO_ON
 
 
-def is_faulted(conx):
+def is_faulted(conx) -> bool:
     """Determine whether the controller is currently faulted.
 
     Checks SOP output index 3 (from kliosop.kl).
@@ -193,7 +194,7 @@ def is_faulted(conx):
     return io_read_sopout(conx, idx=kliosop.SOPO_FAULT) == IO_ON
 
 
-def is_e_stopped(conx):
+def is_e_stopped(conx) -> bool:
     """Determine whether the controller is currently e-stopped.
 
     Checks SOP input index 0 (from kliosop.kl).
@@ -205,7 +206,7 @@ def is_e_stopped(conx):
     return io_read_sopin(conx, idx=kliosop.SOPI_ESTOP) == IO_OFF
 
 
-def in_remote_mode(conx):
+def in_remote_mode(conx) -> bool:
     """Determine whether the controller is in remote mode.
 
     Checks SOP output index 0 (from kliosop.kl).
@@ -216,7 +217,7 @@ def in_remote_mode(conx):
     return io_read_sopout(conx, idx=kliosop.SOPO_REMOTE) == IO_ON
 
 
-def is_program_running(conx):
+def is_program_running(conx) -> bool:
     """Determine whether the controller is executing a program.
 
     NOTE: this does not check for any specific program, but will return
@@ -231,7 +232,7 @@ def is_program_running(conx):
     return io_read_uopout(conx, idx=kliouop.UOPO_PROGRUN) == IO_ON
 
 
-def is_program_paused(conx):
+def is_program_paused(conx) -> bool:
     """Determine whether there is a paused program on the controller.
 
     NOTE: this does not check for any specific program, but will return
@@ -245,7 +246,7 @@ def is_program_paused(conx):
     return io_read_uopout(conx, idx=kliouop.UOPO_PAUSED) == IO_ON
 
 
-def list_errors(conx):
+def list_errors(conx) -> t.List[t.Tuple[int, str, str, str, str, str]]:
     """Return list of all errors.
 
     The list returned contains each error as an element in the list. Each
@@ -293,35 +294,35 @@ def list_errors(conx):
     return res
 
 
-def get_active_prog(conx):
+def get_active_prog(conx) -> str:
     ret = get_scalar_var(conx, name='$SHELL_WRK.$ACTIVEPROG')
     if 'bad variable' in ret.lower():
         raise DominhException(f"Could not read sysvar: '{ret}'")
     return ret
 
 
-def get_curr_routine(conx):
+def get_curr_routine(conx) -> str:
     ret = get_scalar_var(conx, name='$SHELL_WRK.$ROUT_NAME')
     if 'bad variable' in ret.lower():
         raise DominhException(f"Could not read sysvar: '{ret}'")
     return ret
 
 
-def get_curr_line(conx):
+def get_curr_line(conx) -> int:
     ret = get_scalar_var(conx, name='$SHELL_WRK.$CURR_LINE')
     if 'bad variable' in ret.lower():
         raise DominhException(f"Could not read sysvar: '{ret}'")
     return int(ret)
 
 
-def get_num_groups(conx):
+def get_num_groups(conx) -> int:
     ret = get_scalar_var(conx, name='$SCR.$NUM_GROUP')
     if 'bad variable' in ret.lower():
         raise DominhException(f"Could not read sysvar: '{ret}'")
     return int(ret)
 
 
-def get_clock(conx):
+def get_clock(conx) -> datetime.datetime:
     """Return the current date and time on the controller.
 
     NOTE: this method is rather slow, as it parses a web page.

@@ -21,7 +21,7 @@ from .types import Plst_Grp_t
 from .utils import format_sysvar
 
 
-def was_jogged(conx, group=1):
+def was_jogged(conx, group: int = 1) -> bool:
     if group < 1 or group > 8:
         raise ValueError(
             f"Requested group id invalid (must be between 1 and 8, got: {group})"
@@ -32,21 +32,21 @@ def was_jogged(conx, group=1):
     return ret.lower() == 'true'
 
 
-def get_robot_id(conx, group=1):
+def get_robot_id(conx, group: int = 1) -> str:
     ret = get_scalar_var(conx, name=f'$SCR_GRP[{group}].$ROBOT_ID')
     if 'bad variable' in ret.lower():
         raise DominhException(f"Could not read sysvar: '{ret}'")
     return ret
 
 
-def get_robot_model(conx, group=1):
+def get_robot_model(conx, group: int = 1) -> str:
     ret = get_scalar_var(conx, name=f'$SCR_GRP[{group}].$ROBOT_MODEL')
     if 'bad variable' in ret.lower():
         raise DominhException(f"Could not read sysvar: '{ret}'")
     return ret
 
 
-def get_payload(conx, idx, grp=1):
+def get_payload(conx, idx: int, grp: int = 1) -> Plst_Grp_t:
     """Retrieve payload nr 'idx' for group 'grp'.
 
     NOTE: this method is expensive and slow, as it retrieves the individual
