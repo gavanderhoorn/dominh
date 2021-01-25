@@ -100,7 +100,7 @@ def io_write_dout(conx, idx: int, val: bool) -> None:
     :param val: Value to write
     :type val: int
     """
-    io_write(conx, 'DOUT', idx, val)
+    io_write(conx, 'DOUT', idx, 1 if val else 0)
 
 
 def io_write_rout(conx, idx: int, val: bool) -> None:
@@ -111,7 +111,7 @@ def io_write_rout(conx, idx: int, val: bool) -> None:
     :param val: Value to write
     :type val: int
     """
-    io_write(conx, 'ROUT', idx, val)
+    io_write(conx, 'ROUT', idx, 1 if val else 0)
 
 
 def io_read(conx, port_type: str, idx: int) -> str:
