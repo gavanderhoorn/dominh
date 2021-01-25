@@ -38,7 +38,7 @@ def set_scalar_var(conx, name: str, val: t.Any) -> None:
     :param val: Value to write to 'name'
     :type val: any (must have str() support)
     """
-    exec_kcl(conx, cmd=f'set var {name}={val}')
+    exec_kcl(conx, cmd=f'set var {name}={str(val)}')
 
 
 def get_scalar_var(conx, name: str) -> str:
