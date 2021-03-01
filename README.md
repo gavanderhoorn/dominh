@@ -177,7 +177,7 @@ dout1_state = c.dout(1).val
 
 </details>
 
-## CLI
+### CLI
 
 <details><summary>Click to expand</summary>
 
