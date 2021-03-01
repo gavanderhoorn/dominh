@@ -42,10 +42,12 @@ See 'dominh <command> --help' for more information on a specific command.
 from docopt import docopt
 import sys
 
+import dominh
+
 
 if __name__ == '__main__':
     args = docopt(__doc__, help=True, options_first=True,
-        version='dominh 0.3.0')
+        version=f'dominh {dominh.__version__}')
     argv = [args['<command>']] + args['<args>']
 
     # print(args)

@@ -34,6 +34,7 @@ from . import variables
 
 
 __all__ = ["connect", "DominhException"]
+__version__ = '0.3.0'
 
 
 class Connection(object):

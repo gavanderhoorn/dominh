@@ -20,7 +20,6 @@ from setuptools import setup
 
 setup(
     name='dominh',
-    version='0.3.0',
     packages=['dominh', 'dominh.tool'],
     package_dir={'': 'src'},
     scripts=['bin/dominh'],
