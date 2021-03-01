@@ -102,6 +102,8 @@ def get_posreg(
 
     NOTE: this method is expensive and slow, as it parses a web page.
 
+    NOTE 2: returns None for uninitialised posregs.
+
     :param idx: Numeric ID of the position register.
     :type idx: int
     :param group: Numeric ID of the motion group the position register is
