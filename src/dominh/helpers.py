@@ -151,6 +151,7 @@ def exec_kcl(conx, cmd: str, wait_for_response: bool = False) -> t.Optional[str]
                 "Unexpected result code. Expected: "
                 f"{requests.codes.no_content}, got: {r.status_code}"
             )
+        return None
 
     # caller requested we check return value
     else:
@@ -169,7 +170,7 @@ def exec_kcl(conx, cmd: str, wait_for_response: bool = False) -> t.Optional[str]
 
 
 def exec_karel_prg(
-    conx, prg_name: str, params: t.Dict[str, str] = {}, return_raw: bool = False
+    conx, prg_name: str, params: t.Dict[str, t.Any] = {}, return_raw: bool = False
 ):
     """Execute a Karel program on the controller (via the web server).
 

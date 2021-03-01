@@ -67,7 +67,7 @@ def io_write(
         conx, cmd=f'set port {port_type}[{idx}]={val}', wait_for_response=check
     )
     if not check:
-        return
+        return None
 
     # get some simple errors out of the way
     ret = ret.strip()
@@ -89,7 +89,7 @@ def io_write(
 
     # check for successful write
     is_ok = re.match(r'Value was: (0|1).*Value is:  (0|1)', ret, re.DOTALL)
-    return is_ok and is_ok.group(2) == str(val)
+    return is_ok and (is_ok.group(2) == str(val))
 
 
 def io_write_dout(conx, idx: int, val: bool) -> None:
