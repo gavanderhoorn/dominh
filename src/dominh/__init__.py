@@ -574,7 +574,7 @@ class IntegerIoElement(IoElement):
 
     @property
     def val(self) -> int:
-        return io.io_read(self._conx, self._port_type, self._idx)
+        return int(io.io_read(self._conx, self._port_type, self._idx))
 
     @val.setter
     def val(self, val: int) -> None:

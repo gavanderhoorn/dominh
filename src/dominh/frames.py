@@ -196,7 +196,7 @@ def get_active_jogframe(conx, group: int = 1) -> int:
         raise ValueError(
             f"Requested group id invalid (must be between 1 and 8, got: {group})"
         )
-    return get_scalar_var(conx, name=f'[TPFDEF]JOGFRAMNUM[{group}]')
+    return int(get_scalar_var(conx, name=f'[TPFDEF]JOGFRAMNUM[{group}]'))
 
 
 def get_active_toolframe(conx, group: int = 1) -> int:
@@ -204,7 +204,7 @@ def get_active_toolframe(conx, group: int = 1) -> int:
         raise ValueError(
             f"Requested group id invalid (must be between 1 and 8, got: {group})"
         )
-    return get_scalar_var(conx, name=f'[*SYSTEM*]$MNUTOOLNUM[{group}]')
+    return int(get_scalar_var(conx, name=f'[*SYSTEM*]$MNUTOOLNUM[{group}]'))
 
 
 def get_active_userframe(conx, group: int = 1) -> int:
@@ -212,4 +212,4 @@ def get_active_userframe(conx, group: int = 1) -> int:
         raise ValueError(
             f"Requested group id invalid (must be between 1 and 8, got: {group})"
         )
-    return get_scalar_var(conx, name=f'[*SYSTEM*]$MNUFRAMENUM[{group}]')
+    return int(get_scalar_var(conx, name=f'[*SYSTEM*]$MNUFRAMENUM[{group}]'))
