@@ -35,7 +35,7 @@ def _get_cmt_fc(cmt: str) -> int:
         'AOUT': 13,
         'STRREG': 14,
         'FLG': 19,
-    }.get(cmt.upper())
+    }[cmt.upper()]
 
 
 def _get_val_fc(valt: str) -> int:
@@ -43,7 +43,7 @@ def _get_val_fc(valt: str) -> int:
         'NUMREG': 2,
         'UALARM': 5,  # actually sets 'severity'
         'STRREG': 15,
-    }.get(valt.upper())
+    }[valt.upper()]
 
 
 def comset(
