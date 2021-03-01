@@ -269,7 +269,7 @@ The following limitations and known issues exist:
 As an indication of the performance: reading `DOUT[1]` from an idle R-30iB+ takes about 300 to 400 ms.
 Retrieving the value of the `$FNO` system variable from the same controller takes also about 300 to 400 ms.
 
-In both cases the helpers were already present on the controller.
+In both cases the helpers were already present on the controller and the controller was idle (ie: no user TP or Karel programs were running).
 
 ## Related projects
 
