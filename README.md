@@ -97,6 +97,8 @@ The `examples` directory contains an example script which uses some of the funct
 
 Example output for an R-30iA with an M-10iA in Roboguide:
 
+<details><summary>Click to expand</summary>
+
 ```console
 $ python examples/print_controller_info.py localhost
 Attempting to connect to: localhost
@@ -141,9 +143,13 @@ Five most recent errors:
   23-NOV-20 09:47         R E S E T
 ```
 
+</details>
+
 ### Library
 
 The following shows a short example of how this library could be used to connect to a controller with credentials for access to the `KAREL` resource, reset the controller, then set the override to 100% and finally read the `DOUT[1]` IO element.
+
+<details><summary>Click to expand</summary>
 
 ```python
 from dominh import connect
@@ -167,7 +173,11 @@ dout1_state = c.dout(1).val
 ...
 ```
 
+</details>
+
 ## CLI
+
+<details><summary>Click to expand</summary>
 
 ```bash
 # replace '<robot_ip>' with the IP of the controller
@@ -196,6 +206,8 @@ dominh write $ROBOT_IP DOUT 1 0
 # check whether controller is faulted (SO[3] = Fault LED)
 dominh read $ROBOT_IP SOPOUT 3
 ```
+
+</details>
 
 ## Supported functionality
 
