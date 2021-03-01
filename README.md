@@ -145,6 +145,8 @@ Five most recent errors:
 
 </details>
 
+Note: this script *may* fail on controllers which do not have `UOP` and `SOP` configured ([gavanderhoorn/dominh#7](https://github.com/gavanderhoorn/dominh/issues/7)).
+
 ### Library
 
 The following shows a short example of how this library could be used to connect to a controller with credentials for access to the `KAREL` resource, reset the controller, then set the override to 100% and finally read the `DOUT[1]` IO element.
