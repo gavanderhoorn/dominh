@@ -4,6 +4,11 @@
 [![CI](https://github.com/gavanderhoorn/dominh/workflows/CI/badge.svg?branch=master)](https://github.com/gavanderhoorn/dominh/actions?query=workflow%3ACI)
 [![Github Issues](https://img.shields.io/github/issues/gavanderhoorn/dominh.svg)](https://github.com/gavanderhoorn/dominh/issues)
 
+## Discussion
+
+If you happen to find this useful, leave a quick note in the [Discussions section](https://github.com/gavanderhoorn/dominh/discussions).
+If something doesn't work, open an issue [on the tracker](https://github.com/gavanderhoorn/dominh/issues).
+
 ## Overview
 
 This is a poor man's version of a subset of the RPC functionality provided by the (Windows-only) Fanuc PCDK implemented in Python.
