@@ -15,56 +15,47 @@
 # author: G.A. vd. Hoorn
 
 
-from collections import namedtuple
+from dataclasses import dataclass
 
 
-Plst_Grp_t = namedtuple(
-    'Plst_Grp_t',
-    [
-        'comment',
-        'payload',
-        'payload_x',
-        'payload_y',
-        'payload_z',
-        'payload_ix',
-        'payload_iy',
-        'payload_iz',
-    ],
-)
+@dataclass
+class Plst_Grp_t:
+    comment: str
+    payload: float
+    payload_x: float
+    payload_y: float
+    payload_z: float
+    payload_ix: float
+    payload_iy: float
+    payload_iz: float
 
-Config_t = namedtuple(
-    'Config_t',
-    [
-        'flip',
-        'up',
-        'top',
-        'turn_no1',
-        'turn_no2',
-        'turn_no3',
-    ],
-)
 
-Position_t = namedtuple(
-    'Position_t',
-    [
-        'config',
-        'x',
-        'y',
-        'z',
-        'w',
-        'p',
-        'r',
-    ],
-)
+@dataclass
+class Config_t:
+    flip: bool
+    up: bool
+    top: bool
+    turn_no1: int
+    turn_no2: int
+    turn_no3: int
 
-JointPos_t = namedtuple(
-    'JointPos_t',
-    [
-        'j1',
-        'j2',
-        'j3',
-        'j4',
-        'j5',
-        'j6',
-    ],
-)
+
+@dataclass
+class Position_t:
+    config: Config_t
+    x: float
+    y: float
+    z: float
+    w: float
+    p: float
+    r: float
+
+
+@dataclass
+class JointPos_t:
+    j1: float
+    j2: float
+    j3: float
+    j4: float
+    j5: float
+    j6: float
