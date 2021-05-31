@@ -177,6 +177,9 @@ def tp_enabled(conx) -> bool:
 
     Checks SOP output index 7 (from kliosop.kl).
 
+    NOTE: this may fail if SOP is not configured.
+    https://github.com/gavanderhoorn/dominh/issues/7
+
     :returns: True if the TP is 'ON'
     :rtype: bool
     """
@@ -187,6 +190,9 @@ def is_faulted(conx) -> bool:
     """Determine whether the controller is currently faulted.
 
     Checks SOP output index 3 (from kliosop.kl).
+
+    NOTE: this may fail if SOP is not configured.
+    https://github.com/gavanderhoorn/dominh/issues/7
 
     :returns: True if there is an active fault on the controller
     :rtype: bool
@@ -199,6 +205,9 @@ def is_e_stopped(conx) -> bool:
 
     Checks SOP input index 0 (from kliosop.kl).
 
+    NOTE: this may fail if SOP is not configured.
+    https://github.com/gavanderhoorn/dominh/issues/7
+
     :returns: True if the e-stop is active
     :rtype: bool
     """
@@ -210,6 +219,9 @@ def in_remote_mode(conx) -> bool:
     """Determine whether the controller is in remote mode.
 
     Checks SOP output index 0 (from kliosop.kl).
+
+    NOTE: this may fail if SOP is not configured.
+    https://github.com/gavanderhoorn/dominh/issues/7
 
     :returns: True if a program is running.
     :rtype: bool
@@ -226,6 +238,9 @@ def is_program_running(conx) -> bool:
 
     Checks UOP output index 3 (from kliouop.kl).
 
+    NOTE: this may fail if UOP is not configured.
+    https://github.com/gavanderhoorn/dominh/issues/7
+
     :returns: True if a program is running.
     :rtype: bool
     """
@@ -239,6 +254,9 @@ def is_program_paused(conx) -> bool:
     True whenever the currently selected program is PAUSED.
 
     Checks UOP output index 4 (from kliouop.kl).
+
+    NOTE: this may fail if UOP is not configured.
+    https://github.com/gavanderhoorn/dominh/issues/7
 
     :returns: True if a program is paused.
     :rtype: bool
