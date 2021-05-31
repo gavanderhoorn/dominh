@@ -16,8 +16,12 @@
 
 
 from .exceptions import DominhException
+
+# TODO(gavanderhoorn): refactor frames._match_position
+from .frames import _match_position
+from .helpers import exec_kcl
 from .variables import get_scalar_var
-from .types import Plst_Grp_t
+from .types import Config_t, Plst_Grp_t, Position_t
 from .utils import format_sysvar
 
 
@@ -84,3 +88,61 @@ def get_payload(conx, idx: int, grp: int = 1) -> Plst_Grp_t:
             get_scalar_var(conx, format_sysvar([base_vname, 'payload_iz']))
         ),
     )
+
+
+def get_current_pose(conx, group: int = 1, restore_grp: bool = False) -> Position_t:
+    """Retrieve the current Cartesian pose for group 'group'.
+
+    NOTE: this method can be slow if 'restore_grp' is True, as in that case
+    multiple KCL commands have to be used.
+
+    :param group: The motion group to retrieve the payload for
+    :type group: int
+    :param restore_grp: Whether or not the currently default KCL group should
+    be restored after retrieving the pose of group 'group'
+    :type restore_grp: bool
+    :returns: The current Cartesian pose of the motion group with id 'group'
+    :rtype: Position_t
+    """
+    # user could request us to restore the current 'default group'. This is
+    # only really important if other KCL commands which are group-specific will
+    # be used in the future.
+    saved_grp = None
+    if restore_grp:
+        resp = exec_kcl(conx, cmd='show group', wait_for_response=True)
+        if "Default group number" not in resp:
+            raise DominhException("Unexpected response for 'show group'")
+        # TODO(gavanderhoorn): could've used a regex
+        resp = resp.strip()
+        saved_grp = int(resp[resp.index('=') + 1 :])
+
+    # select grp first, then execute command
+    cmds = [f'set group {group}', 'show curpos']
+    # see if we need to restore the default KCL group
+    if saved_grp:
+        cmds.append(f'set group {saved_grp}')
+
+    # run the cmds
+    # TODO(gavanderhoorn): add proper support for "multi-line" KCL cmds
+    resp = exec_kcl(conx, cmd="\n".join(cmds), wait_for_response=True)
+
+    # user could have specified an invalid group
+    if "Group number is not in valid range" in resp:
+        raise DominhException(f"No such group on controller: {group}")
+
+    # try to match returned position
+    match = _match_position(resp.strip())
+    if not match:
+        raise DominhException("Could not match value returned by 'show curpos'")
+
+    # some nasty fiddling
+    # TODO: this won't work for non-6-axis systems
+    f = match[2] == 'F'  # N
+    u = match[3] == 'U'  # D
+    t = match[4] == 'T'  # B
+    turn_nos = list(map(int, match[5:8]))
+    xyzwpr = list(map(float, match[8:14]))
+    curr_pose = Position_t(Config_t(f, u, t, *turn_nos), *xyzwpr)
+
+    # done
+    return curr_pose

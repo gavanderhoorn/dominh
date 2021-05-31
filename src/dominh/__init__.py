@@ -383,6 +383,11 @@ class MotionGroup(object):
         return self._id
 
     @property
+    def curpos(self) -> Position_t:
+        """Returns the current Cartesian pose"""
+        return group.get_current_pose(self._conx, group=self._id)
+
+    @property
     def robot_id(self) -> str:
         """Returns the robot model ID for which this group is configured"""
         return group.get_robot_id(self._conx, group=self._id)
