@@ -91,7 +91,10 @@ def get_payload(conx, idx: int, grp: int = 1) -> Plst_Grp_t:
 
 
 def get_current_pose(conx, group: int = 1, restore_grp: bool = False) -> Position_t:
-    """Retrieve the current Cartesian pose for group 'group'.
+    """Return the position of the TCP relative to the current user frame.
+
+    x, y, and z are in millimeters.
+    w, p, and r are in degrees.
 
     NOTE: this method can be slow if 'restore_grp' is True, as in that case
     multiple KCL commands have to be used.
