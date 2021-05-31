@@ -40,15 +40,26 @@ def cmt_posreg(conx, idx: int, comment: str) -> None:
     comset(conx, 'POSREG', idx, comment=comment)
 
 
-def cmt_strreg(conx, idx: int, comment: str) -> None:
-    """Update the comment on string register at 'idx'.
+def cmt_rdi(conx, idx: int, comment: str) -> None:
+    """Update the comment on 'RDI[idx]'.
 
-    :param idx: Numeric ID of register
+    :param idx: Numeric ID of port
     :type idx: int
     :param comment: Comment to set
     :type comment: str
     """
-    comset(conx, 'STRREG', idx, comment=comment)
+    comset(conx, 'RDI', idx, comment=comment)
+
+
+def cmt_rdo(conx, idx: int, comment: str) -> None:
+    """Update the comment on 'RDO[idx]'.
+
+    :param idx: Numeric ID of port
+    :type idx: int
+    :param comment: Comment to set
+    :type comment: str
+    """
+    comset(conx, 'RDO', idx, comment=comment)
 
 
 def cmt_din(conx, idx: int, comment: str) -> None:
@@ -71,3 +82,91 @@ def cmt_dout(conx, idx: int, comment: str) -> None:
     :type comment: str
     """
     comset(conx, 'DOUT', idx, comment=comment)
+
+
+def cmt_flag(conx, idx: int, comment: str) -> None:
+    """Update the comment on 'FLG[idx]'.
+
+    :param idx: Numeric ID of the flag
+    :type idx: int
+    :param comment: Comment to set
+    :type comment: str
+    """
+    comset(conx, 'FLG', idx, comment=comment)
+
+
+def cmt_gin(conx, idx: int, comment: str) -> None:
+    """Update the comment on 'GIN[idx]'.
+
+    :param idx: Numeric ID of port
+    :type idx: int
+    :param comment: Comment to set
+    :type comment: str
+    """
+    comset(conx, 'GIN', idx, comment=comment)
+
+
+def cmt_gout(conx, idx: int, comment: str) -> None:
+    """Update the comment on 'GOUT[idx]'.
+
+    :param idx: Numeric ID of port
+    :type idx: int
+    :param comment: Comment to set
+    :type comment: str
+    """
+    comset(conx, 'GOUT', idx, comment=comment)
+
+
+def cmt_ain(conx, idx: int, comment: str) -> None:
+    """Update the comment on 'AIN[idx]'.
+
+    :param idx: Numeric ID of port
+    :type idx: int
+    :param comment: Comment to set
+    :type comment: str
+    """
+    comset(conx, 'AIN', idx, comment=comment)
+
+
+def cmt_aout(conx, idx: int, comment: str) -> None:
+    """Update the comment on 'AOUT[idx]'.
+
+    :param idx: Numeric ID of port
+    :type idx: int
+    :param comment: Comment to set
+    :type comment: str
+    """
+    comset(conx, 'AOUT', idx, comment=comment)
+
+
+def cmt_strreg(conx, idx: int, comment: str) -> None:
+    """Update the comment on string register at 'idx'.
+
+    :param idx: Numeric ID of register
+    :type idx: int
+    :param comment: Comment to set
+    :type comment: str
+    """
+    comset(conx, 'STRREG', idx, comment=comment)
+
+
+def cmt_ualarm(conx, idx: int, comment: str) -> None:
+    """Update the comment on 'UALARM[idx]'.
+
+    :param idx: Numeric ID of the user alarm
+    :type idx: int
+    :param comment: Comment to set
+    :type comment: str
+    """
+    comset(conx, 'UALARM', idx, comment=comment)
+
+
+def cmt_flg(conx, idx: int, comment: str) -> None:
+    """Update the comment on 'FLG[idx]'.
+
+    :param idx: Numeric ID of flag
+    :type idx: int
+    :param comment: Comment to set
+    :type comment: str
+    """
+    comset(conx, 'FLG', idx, comment=comment)
