@@ -27,37 +27,20 @@ from .exceptions import LockedResourceException
 from .ftp import FtpClient
 
 
-def upload_helpers(
-    host,
-    remote_path: str,
-    request_timeout: float = 5,
-    ftp_auth: t.Optional[t.Tuple[str, str]] = None,
-) -> None:
+def upload_helpers(ftpc: FtpClient, remote_path: str) -> None:
     """Upload the (set of) helper(s) files to the controller.
 
     These helpers are used by the various other functionality provided by
     this class to read and write variables and in general to access
     controller functions.
 
-    :param host: Hostname or IP address of the controller
-    :type host: str
+    :param ftpc: FTP client session to use
+    :type ftpc: FtpClient
     :param remote_path: Location (within the controller's file system) to
     store the helpers at. Note: do not include any forward slash pre- or
     suffixes
     :type remote_path: str
-    :param reupload: Whether to force uploading the helpers, even if this
-    has been done before by this object (default: False)
-    :type reupload: bool
     """
-    ftpc = FtpClient(host, timeout=request_timeout)
-
-    # log in using username and pw, if provided by user
-    if ftp_auth:
-        user, pw = ftp_auth
-        ftpc.connect(user=user, pw=pw)
-    else:
-        ftpc.connect()
-
     # non array var reader helper
     # this is much faster than downloading and parsing the output of
     # KCL 'SHOW VAR', but should be limited to non-array variables (or

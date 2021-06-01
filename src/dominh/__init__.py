@@ -27,6 +27,7 @@ from .types import JointPos_t, Plst_Grp_t, Position_t
 from . import comments
 from . import controller
 from . import frames
+from . import ftp
 from . import group
 from . import io
 from . import registers
@@ -779,9 +780,17 @@ def connect(
     if base_path.endswith('/'):
         base_path = base_path[:-1]
 
+    # log in using username and pw, if provided by user
+    ftpc = ftp.FtpClient(host, timeout=request_timeout)
+    if ftp_auth:
+        user, pw = ftp_auth
+        ftpc.connect(user=user, pw=pw)
+    else:
+        ftpc.connect()
+
     helpers_uploaded = False
     if not skip_helper_upload:
-        upload_helpers(host, base_path)
+        upload_helpers(ftpc, base_path)
         helpers_uploaded = True
 
     conx = Connection(
