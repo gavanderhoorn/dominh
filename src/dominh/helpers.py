@@ -206,3 +206,22 @@ def get_var_raw(conx, varname: str) -> str:
     # json, and read_helper(..) will try to parse it as such and then fail
     ret = get_stm(conx, page=HLPR_RAW_VAR + '.stm', params={'_reqvar': varname})
     return ret.text
+
+
+def get_file_as_bytes(conx, remote_name: str) -> bytes:
+    """Retrieve the file named 'remote_name' from the controller using FTP.
+
+    Note: this creates a new connection for every request.
+
+    :param remote_name: Path to the file to retrieve. This may include directories
+    :type remote_name: str
+    :returns: Contents of the file named 'remote_name'
+    :rtype: bytes
+    """
+    ftpc = FtpClient(conx.host, timeout=conx.request_timeout)
+    if conx.ftp_auth:
+        user, pw = conx.ftp_auth
+        ftpc.connect(user=user, pw=pw)
+    else:
+        ftpc.connect()
+    return ftpc.get_file_as_str(remote_name=remote_name)

@@ -27,9 +27,9 @@ from .constants import IO_ON
 from .constants import JSON_REASON
 from .constants import JSON_SUCCESS
 from .exceptions import DominhException
-from .ftp import FtpClient
 from .helpers import exec_karel_prg
 from .helpers import exec_kcl
+from .helpers import get_file_as_bytes
 from .io import io_read_sopin
 from .io import io_read_sopout
 from .io import io_read_uopout
@@ -281,14 +281,7 @@ def list_errors(conx) -> t.List[t.Tuple[int, datetime.datetime, str, str, str, s
     :returns: A list of all errors and their details
     :rtype: list(tuple(int, datetime.datetime, str, str, str, str))
     """
-    ftpc = FtpClient(conx.host, timeout=conx.request_timeout)
-    # log in using username and pw, if provided by user
-    if conx.ftp_auth:
-        user, pw = conx.ftp_auth
-        ftpc.connect(user=user, pw=pw)
-    else:
-        ftpc.connect()
-    errs = ftpc.get_file_as_str('/md:/errall.ls')
+    errs = get_file_as_bytes(conx, remote_name='/md:/errall.ls')
 
     res = []
     for line in errs.decode('ascii').splitlines():
