@@ -39,6 +39,12 @@ class Config_t:
     turn_no2: int
     turn_no3: int
 
+    def __repr__(self):
+        f = "F" if self.flip else "N"
+        u = "U" if self.up else "D"
+        t = "T" if self.top else "B"
+        return f"{f} {u} {t}, {self.turn_no1}, {self.turn_no2}, {self.turn_no3}"
+
 
 @dataclass
 class Position_t:
@@ -49,6 +55,12 @@ class Position_t:
     w: float
     p: float
     r: float
+
+    def __repr__(self):
+        return (
+            f"[{self.x}, {self.y}, {self.z}, {self.w}, {self.p}, {self.r} | "
+            f"{self.config}]"
+        )
 
 
 @dataclass
