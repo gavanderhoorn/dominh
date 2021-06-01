@@ -18,7 +18,8 @@
 import re
 import typing as t
 
-from .comset import comset
+from .comset import comset_val
+from .comset import ValueFuncCode
 from .constants import HLPR_RAW_VAR
 from .exceptions import DominhException
 from .helpers import get_stm
@@ -53,7 +54,7 @@ def set_strreg(conx, idx: int, val: str) -> None:
     :type val: str
     """
     assert type(val) == str
-    comset(conx, 'STRREG', idx, val=val)
+    comset_val(conx, ValueFuncCode.STRREG, idx, val=val)
 
 
 def get_num_strreg(conx) -> int:
@@ -90,7 +91,7 @@ def set_numreg(conx, idx: int, val: t.Union[float, int]) -> None:
     :type val: int or float
     """
     assert type(val) in [float, int]
-    comset(conx, 'NUMREG', idx, val=val)
+    comset_val(conx, ValueFuncCode.NUMREG, idx, val=val)
 
 
 def get_posreg(

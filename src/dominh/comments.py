@@ -15,7 +15,8 @@
 # author: G.A. vd. Hoorn
 
 
-from .comset import comset
+from .comset import comset_cmt
+from .comset import CommentFuncCode
 
 
 def cmt_numreg(conx, idx: int, comment: str) -> None:
@@ -26,7 +27,7 @@ def cmt_numreg(conx, idx: int, comment: str) -> None:
     :param comment: Comment to set
     :type comment: str
     """
-    comset(conx, 'NUMREG', idx, comment=comment)
+    comset_cmt(conx, CommentFuncCode.NUMREG, idx, comment=comment)
 
 
 def cmt_posreg(conx, idx: int, comment: str) -> None:
@@ -37,7 +38,7 @@ def cmt_posreg(conx, idx: int, comment: str) -> None:
     :param comment: Comment to set
     :type comment: str
     """
-    comset(conx, 'POSREG', idx, comment=comment)
+    comset_cmt(conx, CommentFuncCode.POSREG, idx, comment=comment)
 
 
 def cmt_rdi(conx, idx: int, comment: str) -> None:
@@ -48,7 +49,7 @@ def cmt_rdi(conx, idx: int, comment: str) -> None:
     :param comment: Comment to set
     :type comment: str
     """
-    comset(conx, 'RDI', idx, comment=comment)
+    comset_cmt(conx, CommentFuncCode.RDI, idx, comment=comment)
 
 
 def cmt_rdo(conx, idx: int, comment: str) -> None:
@@ -59,7 +60,7 @@ def cmt_rdo(conx, idx: int, comment: str) -> None:
     :param comment: Comment to set
     :type comment: str
     """
-    comset(conx, 'RDO', idx, comment=comment)
+    comset_cmt(conx, CommentFuncCode.RDO, idx, comment=comment)
 
 
 def cmt_din(conx, idx: int, comment: str) -> None:
@@ -70,7 +71,7 @@ def cmt_din(conx, idx: int, comment: str) -> None:
     :param comment: Comment to set
     :type comment: str
     """
-    comset(conx, 'DIN', idx, comment=comment)
+    comset_cmt(conx, CommentFuncCode.DIN, idx, comment=comment)
 
 
 def cmt_dout(conx, idx: int, comment: str) -> None:
@@ -81,7 +82,7 @@ def cmt_dout(conx, idx: int, comment: str) -> None:
     :param comment: Comment to set
     :type comment: str
     """
-    comset(conx, 'DOUT', idx, comment=comment)
+    comset_cmt(conx, CommentFuncCode.DOUT, idx, comment=comment)
 
 
 def cmt_flag(conx, idx: int, comment: str) -> None:
@@ -92,7 +93,7 @@ def cmt_flag(conx, idx: int, comment: str) -> None:
     :param comment: Comment to set
     :type comment: str
     """
-    comset(conx, 'FLG', idx, comment=comment)
+    comset_cmt(conx, CommentFuncCode.FLG, idx, comment=comment)
 
 
 def cmt_gin(conx, idx: int, comment: str) -> None:
@@ -103,7 +104,7 @@ def cmt_gin(conx, idx: int, comment: str) -> None:
     :param comment: Comment to set
     :type comment: str
     """
-    comset(conx, 'GIN', idx, comment=comment)
+    comset_cmt(conx, CommentFuncCode.GIN, idx, comment=comment)
 
 
 def cmt_gout(conx, idx: int, comment: str) -> None:
@@ -114,7 +115,7 @@ def cmt_gout(conx, idx: int, comment: str) -> None:
     :param comment: Comment to set
     :type comment: str
     """
-    comset(conx, 'GOUT', idx, comment=comment)
+    comset_cmt(conx, CommentFuncCode.GOUT, idx, comment=comment)
 
 
 def cmt_ain(conx, idx: int, comment: str) -> None:
@@ -125,7 +126,7 @@ def cmt_ain(conx, idx: int, comment: str) -> None:
     :param comment: Comment to set
     :type comment: str
     """
-    comset(conx, 'AIN', idx, comment=comment)
+    comset_cmt(conx, CommentFuncCode.AIN, idx, comment=comment)
 
 
 def cmt_aout(conx, idx: int, comment: str) -> None:
@@ -136,7 +137,7 @@ def cmt_aout(conx, idx: int, comment: str) -> None:
     :param comment: Comment to set
     :type comment: str
     """
-    comset(conx, 'AOUT', idx, comment=comment)
+    comset_cmt(conx, CommentFuncCode.AOUT, idx, comment=comment)
 
 
 def cmt_strreg(conx, idx: int, comment: str) -> None:
@@ -147,7 +148,7 @@ def cmt_strreg(conx, idx: int, comment: str) -> None:
     :param comment: Comment to set
     :type comment: str
     """
-    comset(conx, 'STRREG', idx, comment=comment)
+    comset_cmt(conx, CommentFuncCode.STRREG, idx, comment=comment)
 
 
 def cmt_ualarm(conx, idx: int, comment: str) -> None:
@@ -158,7 +159,7 @@ def cmt_ualarm(conx, idx: int, comment: str) -> None:
     :param comment: Comment to set
     :type comment: str
     """
-    comset(conx, 'UALARM', idx, comment=comment)
+    comset_cmt(conx, CommentFuncCode.UALARM, idx, comment=comment)
 
 
 def cmt_flg(conx, idx: int, comment: str) -> None:
@@ -169,4 +170,4 @@ def cmt_flg(conx, idx: int, comment: str) -> None:
     :param comment: Comment to set
     :type comment: str
     """
-    comset(conx, 'FLG', idx, comment=comment)
+    comset_cmt(conx, CommentFuncCode.FLG, idx, comment=comment)
