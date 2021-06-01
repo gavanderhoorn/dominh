@@ -59,6 +59,7 @@ if __name__ == '__main__':
         print(f'  Group {grp.id}:')
         print(f'    ID                  : {grp.robot_id}')
         print(f'    Model               : {grp.robot_model}')
+        print(f'    Current pose        : {grp.curpos}')
 
     print(f'\nGeneral override        : {c.general_override}%')
 
