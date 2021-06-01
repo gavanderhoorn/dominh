@@ -292,12 +292,14 @@ def list_errors(conx) -> t.List[t.Tuple[int, str, str, str, str, str]]:
 
     res = []
     for line in errs.decode('ascii').splitlines():
+        # check for really empty lines
         if ('Robot Name' in line) or (line == ''):
             continue
         fields = list(map(str.strip, line.split('"')))
         # check for empty rows (seen on just installed controllers)
         if not fields[2]:
             continue
+        # probably OK, try to continue parsing
         level_state = fields[4].split()
         if len(level_state) > 1:
             (
