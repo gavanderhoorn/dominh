@@ -295,6 +295,9 @@ def list_errors(conx) -> t.List[t.Tuple[int, str, str, str, str, str]]:
         if ('Robot Name' in line) or (line == ''):
             continue
         fields = list(map(str.strip, line.split('"')))
+        # check for empty rows (seen on just installed controllers)
+        if not fields[2]:
+            continue
         level_state = fields[4].split()
         if len(level_state) > 1:
             (
