@@ -264,7 +264,7 @@ def is_program_paused(conx) -> bool:
     return io_read_uopout(conx, idx=kliouop.UOPO_PAUSED) == IO_ON
 
 
-def list_errors(conx) -> t.List[t.Tuple[int, str, str, str, str, str]]:
+def list_errors(conx) -> t.List[t.Tuple[int, datetime.datetime, str, str, str, str]]:
     """Return list of all errors.
 
     The list returned contains each error as an element in the list. Each
@@ -279,7 +279,7 @@ def list_errors(conx) -> t.List[t.Tuple[int, str, str, str, str, str]]:
     the controller over FTP and parses it.
 
     :returns: A list of all errors and their details
-    :rtype: list(tuple(int, str, str, str, str, str))
+    :rtype: list(tuple(int, datetime.datetime, str, str, str, str))
     """
     ftpc = FtpClient(conx.host, timeout=conx.request_timeout)
     # log in using username and pw, if provided by user
@@ -311,9 +311,8 @@ def list_errors(conx) -> t.List[t.Tuple[int, str, str, str, str, str]]:
                 '',
                 level_state[0],
             )
-        res.append(
-            (int(fields[0]), fields[1], fields[2], fields[3], err_level, err_state)
-        )
+        stamp = datetime.datetime.strptime(fields[1], '%d-%b-%y %H:%M:%S')
+        res.append((int(fields[0]), stamp, fields[2], fields[3], err_level, err_state))
     return res
 
 

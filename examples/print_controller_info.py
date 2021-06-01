@@ -89,7 +89,7 @@ if __name__ == '__main__':
 
     errs = '\n  '.join(
         [
-            f'{stamp:15s} {lvl:7s} {msg}'
+            f'{stamp} {lvl:7s} {msg}'
             for _, stamp, msg, _, lvl, _ in c.list_errors()[:5]
         ]
     )
