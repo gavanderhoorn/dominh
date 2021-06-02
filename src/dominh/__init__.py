@@ -31,6 +31,7 @@ from . import frames
 from . import ftp
 from . import group
 from . import io
+from . import options
 from . import registers
 from . import variables
 
@@ -600,6 +601,19 @@ class Controller(object):
 
     def list_programs(self, types: t.List[str] = []) -> t.List[t.Tuple[str, str]]:
         return controller.list_programs(self._conx, types)
+
+    def list_options(self) -> t.List[t.Tuple[str, str]]:
+        return options.get_features(self._conx)
+
+    def has_option(self, option_no: str) -> bool:
+        """Check whether a specific option is present on the controller.
+
+        :param option_no: Option ID (ie: H769 or R507 or ATUI)
+        :type option_no: str
+        :returns: True IFF 'option_no' is installed
+        :rtype: bool
+        """
+        return options.has_feature(self._conx, option_no=option_no)
 
 
 def connect(
