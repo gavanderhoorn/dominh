@@ -22,6 +22,6 @@ setup(
     packages=['dominh', 'dominh.tool'],
     package_dir={'': 'src'},
     scripts=['bin/dominh'],
-    python_requires='>=3.6',
+    python_requires='>=3.8',
     install_requires=['docopt', 'requests'],
 )
