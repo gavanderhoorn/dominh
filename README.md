@@ -120,6 +120,7 @@ Robot info:
   Group 1:
     ID                  : M-10iA
     Model               : M-10iA
+    Current pose        : [1024.636, 0.0, 1500.902, 120.957, -46.323, 66.547 | N D T, 0, 0, 0]
 
 General override        : 100%
 
@@ -230,8 +231,10 @@ Dominh can currently be used to (incomplete list):
   * in REMOTE mode
 * determine whether the TP is enabled
 * determine the controller series (ie: R-30iA, R-30iB, R-30iB+)
+* determine whether a specific options is installed
 * retrieve the application software (ie: HandlingTool, etc)
 * retrieve the version of the application software
+* retrieve the list of installed options
 * retrieve the controller's time and date
 * read/write (system) variables (scalar variables are mostly supported)
 * read/write IO elements (digital, analogue, group, UOP, SOP, TP, flags, markers, etc)
@@ -243,10 +246,11 @@ Dominh can currently be used to (incomplete list):
 * retrieve the ID and model of configured robots
 * retrieve jog, tool and user frames
 * retrieve currently active jog, tool or user frame
+* retrieve the current TCP pose (in the currently active User Frame)
 * retrieve payload schedules
 * retrieve the list of errors (including history)
 * retrieve a list of programs (filtered by program type)
-* update the comments of numeric, string and position registers and digital IO in and out elements
+* update the comments of numeric, string and position registers and IO ports
 
 The above list only includes the functionality offered by the `Controller` class' public interface and that of the returned objects.
 Much more is possible (especially in the area of system variable wrapping/retrieving), but would require adding more convenience methods.
