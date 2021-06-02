@@ -596,7 +596,9 @@ class Controller(object):
     def is_program_running(self) -> bool:
         return controller.is_program_running(self._conx)
 
-    def list_errors(self) -> t.List[t.Tuple[int, str, str, str, str, str]]:
+    def list_errors(
+        self,
+    ) -> t.List[t.Tuple[int, datetime.datetime, str, str, str, str]]:
         return controller.list_errors(self._conx)
 
     def list_programs(self, types: t.List[str] = []) -> t.List[t.Tuple[str, str]]:
