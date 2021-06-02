@@ -82,17 +82,17 @@ The author has primarily used Python 3.8, but other versions are expected to wor
 
 Future versions may be released to PyPi.
 
-Example (install dominh `0.4.0`; be sure to update the URL to download the desired version):
+Example (install dominh `0.4.2`; be sure to update the URL to download the desired version):
 
 ```shell
 python3 -m venv $HOME/venv_dominh
 source $HOME/venv_dominh/bin/activate
 pip install -U pip wheel setuptools
-pip install https://github.com/gavanderhoorn/dominh/archive/0.4.0.tar.gz
+pip install https://github.com/gavanderhoorn/dominh/archive/0.4.2.tar.gz
 dominh --version
 ```
 
-The last command should then print "`dominh 0.4.0`".
+The last command should then print "`dominh 0.4.2`".
 
 ## Example usage
 
