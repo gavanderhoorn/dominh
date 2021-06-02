@@ -18,11 +18,12 @@
 import re
 import typing as t
 
+from .connection import Connection
 from .exceptions import DominhException
 from .helpers import get_var_raw
-from .variables import get_scalar_var
 from .types import Config_t
 from .types import Position_t
+from .variables import get_scalar_var
 
 
 def _match_position(text: str) -> t.Tuple[str, ...]:
@@ -50,7 +51,7 @@ def _match_position(text: str) -> t.Tuple[str, ...]:
     return matches[0] if matches else None
 
 
-def _get_frame_var(conx, varname: str) -> Position_t:
+def _get_frame_var(conx: Connection, varname: str) -> Position_t:
     """Retrieve the POSITION variable 'varname'.
 
     :param varname: Name of the variable to retrieve.
@@ -78,7 +79,7 @@ def _get_frame_var(conx, varname: str) -> Position_t:
     return Position_t(Config_t(f, u, t, *turn_nos), *xyzwpr)
 
 
-def _get_frame_comment(conx, frame_type: int, group: int, idx: int) -> str:
+def _get_frame_comment(conx: Connection, frame_type: int, group: int, idx: int) -> str:
     """Return the comment for the jog/tool/user frame 'idx'.
 
     :param frame_type: Type of frame the comment is associated with (
@@ -97,7 +98,7 @@ def _get_frame_comment(conx, frame_type: int, group: int, idx: int) -> str:
 
 
 def get_jogframe(
-    conx, idx: int, group: int = 1, include_comment: bool = False
+    conx: Connection, idx: int, group: int = 1, include_comment: bool = False
 ) -> t.Tuple[Position_t, t.Optional[str]]:
     """Return the jog frame at index 'idx'.
 
@@ -128,7 +129,7 @@ def get_jogframe(
 
 
 def get_toolframe(
-    conx, idx: int, group: int = 1, include_comment: bool = False
+    conx: Connection, idx: int, group: int = 1, include_comment: bool = False
 ) -> t.Tuple[Position_t, t.Optional[str]]:
     """Return the tool frame at index 'idx'.
 
@@ -160,7 +161,7 @@ def get_toolframe(
 
 
 def get_userframe(
-    conx, idx: int, group: int = 1, include_comment: bool = False
+    conx: Connection, idx: int, group: int = 1, include_comment: bool = False
 ) -> t.Tuple[Position_t, t.Optional[str]]:
     """Return the user frame at index 'idx'.
 
@@ -191,7 +192,7 @@ def get_userframe(
     return (frame, cmt)
 
 
-def get_active_jogframe(conx, group: int = 1) -> int:
+def get_active_jogframe(conx: Connection, group: int = 1) -> int:
     if group < 1 or group > 8:
         raise ValueError(
             f"Requested group id invalid (must be between 1 and 8, got: {group})"
@@ -199,7 +200,7 @@ def get_active_jogframe(conx, group: int = 1) -> int:
     return int(get_scalar_var(conx, name=f'[TPFDEF]JOGFRAMNUM[{group}]'))
 
 
-def get_active_toolframe(conx, group: int = 1) -> int:
+def get_active_toolframe(conx: Connection, group: int = 1) -> int:
     if group < 1 or group > 8:
         raise ValueError(
             f"Requested group id invalid (must be between 1 and 8, got: {group})"
@@ -207,7 +208,7 @@ def get_active_toolframe(conx, group: int = 1) -> int:
     return int(get_scalar_var(conx, name=f'[*SYSTEM*]$MNUTOOLNUM[{group}]'))
 
 
-def get_active_userframe(conx, group: int = 1) -> int:
+def get_active_userframe(conx: Connection, group: int = 1) -> int:
     if group < 1 or group > 8:
         raise ValueError(
             f"Requested group id invalid (must be between 1 and 8, got: {group})"

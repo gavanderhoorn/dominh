@@ -19,6 +19,7 @@ import re
 import requests
 import typing as t
 
+from .connection import Connection
 from .constants import HLPR_RAW_VAR
 from .constants import HLPR_SCALAR_VAR
 from .exceptions import AuthenticationException
@@ -53,7 +54,9 @@ def upload_helpers(ftpc: FtpClient, remote_path: str) -> None:
     ftpc.upload_as_file(f'/{remote_path}/{HLPR_RAW_VAR}.stm', content)
 
 
-def get_stm(conx, page: str, params: t.Dict[str, str] = {}) -> requests.Response:
+def get_stm(
+    conx: Connection, page: str, params: t.Dict[str, str] = {}
+) -> requests.Response:
     """Retrieve a '.stm' file from the controller (rendered by the web
     server).
 
@@ -74,7 +77,7 @@ def get_stm(conx, page: str, params: t.Dict[str, str] = {}) -> requests.Response
     return r
 
 
-def read_helper(conx, helper: str, params: t.Dict[str, str] = {}) -> t.Any:
+def read_helper(conx: Connection, helper: str, params: t.Dict[str, str] = {}) -> t.Any:
     """Retrieve JSON from helper on controller.
 
     NOTE: 'helper' should not include the extension
@@ -94,7 +97,9 @@ def read_helper(conx, helper: str, params: t.Dict[str, str] = {}) -> t.Any:
     return get_stm(conx, page=f'{helper}.stm', params=params).json()
 
 
-def exec_kcl(conx, cmd: str, wait_for_response: bool = False) -> t.Optional[str]:
+def exec_kcl(
+    conx: Connection, cmd: str, wait_for_response: bool = False
+) -> t.Optional[str]:
     """Execute the specified KCL command line on the controller.
 
     NOTE: any expected parameters must be supplied as part of 'cmd'.
@@ -153,7 +158,10 @@ def exec_kcl(conx, cmd: str, wait_for_response: bool = False) -> t.Optional[str]
 
 
 def exec_karel_prg(
-    conx, prg_name: str, params: t.Dict[str, t.Any] = {}, return_raw: bool = False
+    conx: Connection,
+    prg_name: str,
+    params: t.Dict[str, t.Any] = {},
+    return_raw: bool = False,
 ):
     """Execute a Karel program on the controller (via the web server).
 
@@ -194,7 +202,7 @@ def exec_karel_prg(
     return r.json() if not return_raw else r.text
 
 
-def get_var_raw(conx, varname: str) -> str:
+def get_var_raw(conx: Connection, varname: str) -> str:
     """Retrieve raw text dump of variable with name 'varname'.
 
     :param varname: Name of the variable to retrieve.
@@ -208,7 +216,7 @@ def get_var_raw(conx, varname: str) -> str:
     return ret.text
 
 
-def get_file_as_bytes(conx, remote_name: str) -> bytes:
+def get_file_as_bytes(conx: Connection, remote_name: str) -> bytes:
     """Retrieve the file named 'remote_name' from the controller using FTP.
 
     Note: this creates a new connection for every request.

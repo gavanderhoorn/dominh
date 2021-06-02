@@ -18,6 +18,7 @@
 import re
 import typing as t
 
+from .connection import Connection
 from .constants import HLPR_SCALAR_VAR
 from .constants import IO_OFF
 from .constants import IO_ON
@@ -27,7 +28,7 @@ from .helpers import read_helper
 
 
 def io_write(
-    conx, port_type: str, idx: int, val: int, check: bool = False
+    conx: Connection, port_type: str, idx: int, val: int, check: bool = False
 ) -> t.Optional[bool]:
     """Set port 'idx' of type 'port_type' to value 'val'.
 
@@ -92,7 +93,7 @@ def io_write(
     return is_ok and (is_ok.group(2) == str(val))
 
 
-def io_write_dout(conx, idx: int, val: bool) -> None:
+def io_write_dout(conx: Connection, idx: int, val: bool) -> None:
     """Write 'val' to 'DOUT[idx]'.
 
     :param idx: Index to write to
@@ -103,7 +104,7 @@ def io_write_dout(conx, idx: int, val: bool) -> None:
     io_write(conx, 'DOUT', idx, 1 if val else 0)
 
 
-def io_write_rout(conx, idx: int, val: bool) -> None:
+def io_write_rout(conx: Connection, idx: int, val: bool) -> None:
     """Write 'val' to 'ROUT[idx]'.
 
     :param idx: Index to write to
@@ -114,7 +115,7 @@ def io_write_rout(conx, idx: int, val: bool) -> None:
     io_write(conx, 'ROUT', idx, 1 if val else 0)
 
 
-def io_read(conx, port_type: str, idx: int) -> str:
+def io_read(conx: Connection, port_type: str, idx: int) -> str:
     """Read port 'idx' of type 'port_type'.
 
     Valid values for 'port_type':
@@ -182,7 +183,7 @@ def io_read(conx, port_type: str, idx: int) -> str:
     return ret[port_id]
 
 
-def io_read_sopout(conx, idx: int) -> int:
+def io_read_sopout(conx: Connection, idx: int) -> int:
     """Read from 'SOPOUT[idx]'.
 
     :param idx: Index to read from
@@ -195,7 +196,7 @@ def io_read_sopout(conx, idx: int) -> int:
     return IO_OFF
 
 
-def io_read_sopin(conx, idx: int) -> int:
+def io_read_sopin(conx: Connection, idx: int) -> int:
     """Read from 'SOPIN[idx]'.
 
     :param idx: Index to read from
@@ -208,7 +209,7 @@ def io_read_sopin(conx, idx: int) -> int:
     return IO_OFF
 
 
-def io_read_uopout(conx, idx: int) -> int:
+def io_read_uopout(conx: Connection, idx: int) -> int:
     """Read from 'UOPOUT[idx]'.
 
     :param idx: Index to read from
@@ -221,7 +222,7 @@ def io_read_uopout(conx, idx: int) -> int:
     return IO_OFF
 
 
-def io_read_rout(conx, idx: int) -> int:
+def io_read_rout(conx: Connection, idx: int) -> int:
     """Read from 'RDO[idx]'.
 
     :param idx: Index to write to

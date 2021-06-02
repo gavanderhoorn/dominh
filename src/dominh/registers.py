@@ -20,6 +20,7 @@ import typing as t
 
 from .comset import comset_val
 from .comset import ValueFuncCode
+from .connection import Connection
 from .constants import HLPR_RAW_VAR
 from .exceptions import DominhException
 from .helpers import get_stm
@@ -29,7 +30,7 @@ from .types import Position_t
 from .variables import get_scalar_var
 
 
-def get_strreg(conx, idx: int) -> str:
+def get_strreg(conx: Connection, idx: int) -> str:
     """Retrieve the value stored in the string register at 'idx'.
 
     :param idx: The index of the register to retrieve.
@@ -43,7 +44,7 @@ def get_strreg(conx, idx: int) -> str:
     return get_scalar_var(conx, name=f'[*STRREG*]$STRREG[{idx}]')
 
 
-def set_strreg(conx, idx: int, val: str) -> None:
+def set_strreg(conx: Connection, idx: int, val: str) -> None:
     """Update the value stored in 'SR[idx]' to 'val'.
 
     Note: 'val' must be a string.
@@ -57,7 +58,7 @@ def set_strreg(conx, idx: int, val: str) -> None:
     comset_val(conx, ValueFuncCode.STRREG, idx, val=val)
 
 
-def get_num_strreg(conx) -> int:
+def get_num_strreg(conx: Connection) -> int:
     """Retrieve total number of string registers available on the
     controller.
 
@@ -67,7 +68,7 @@ def get_num_strreg(conx) -> int:
     return int(get_scalar_var(conx, name='[*STRREG*]$MAXSREGNUM'))
 
 
-def get_numreg(conx, idx: int) -> t.Union[float, int]:
+def get_numreg(conx: Connection, idx: int) -> t.Union[float, int]:
     """Retrieve the value stored in the numerical register at 'idx'.
 
     :param idx: The index of the register to retrieve.
@@ -80,7 +81,7 @@ def get_numreg(conx, idx: int) -> t.Union[float, int]:
     return float(ret) if '.' in ret else int(ret)
 
 
-def set_numreg(conx, idx: int, val: t.Union[float, int]) -> None:
+def set_numreg(conx: Connection, idx: int, val: t.Union[float, int]) -> None:
     """Update the value stored in 'R[idx]' to 'val'.
 
     Note: 'val' must be either int or float.
@@ -95,7 +96,7 @@ def set_numreg(conx, idx: int, val: t.Union[float, int]) -> None:
 
 
 def get_posreg(
-    conx, idx: int, group: int = 1
+    conx: Connection, idx: int, group: int = 1
 ) -> t.Union[
     t.Tuple[t.Optional[JointPos_t], str], t.Tuple[t.Optional[Position_t], str]
 ]:

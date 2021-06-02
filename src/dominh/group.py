@@ -15,17 +15,18 @@
 # author: G.A. vd. Hoorn
 
 
+from .connection import Connection
 from .exceptions import DominhException
 
 # TODO(gavanderhoorn): refactor frames._match_position
 from .frames import _match_position
 from .helpers import exec_kcl
-from .variables import get_scalar_var
 from .types import Config_t, Plst_Grp_t, Position_t
 from .utils import format_sysvar
+from .variables import get_scalar_var
 
 
-def was_jogged(conx, group: int = 1) -> bool:
+def was_jogged(conx: Connection, group: int = 1) -> bool:
     if group < 1 or group > 8:
         raise ValueError(
             f"Requested group id invalid (must be between 1 and 8, got: {group})"
@@ -36,21 +37,21 @@ def was_jogged(conx, group: int = 1) -> bool:
     return ret.lower() == 'true'
 
 
-def get_robot_id(conx, group: int = 1) -> str:
+def get_robot_id(conx: Connection, group: int = 1) -> str:
     ret = get_scalar_var(conx, name=f'$SCR_GRP[{group}].$ROBOT_ID')
     if 'bad variable' in ret.lower():
         raise DominhException(f"Could not read sysvar: '{ret}'")
     return ret
 
 
-def get_robot_model(conx, group: int = 1) -> str:
+def get_robot_model(conx: Connection, group: int = 1) -> str:
     ret = get_scalar_var(conx, name=f'$SCR_GRP[{group}].$ROBOT_MODEL')
     if 'bad variable' in ret.lower():
         raise DominhException(f"Could not read sysvar: '{ret}'")
     return ret
 
 
-def get_payload(conx, idx: int, grp: int = 1) -> Plst_Grp_t:
+def get_payload(conx: Connection, idx: int, grp: int = 1) -> Plst_Grp_t:
     """Retrieve payload nr 'idx' for group 'grp'.
 
     NOTE: this method is expensive and slow, as it retrieves the individual
@@ -90,7 +91,9 @@ def get_payload(conx, idx: int, grp: int = 1) -> Plst_Grp_t:
     )
 
 
-def get_current_pose(conx, group: int = 1, restore_grp: bool = False) -> Position_t:
+def get_current_pose(
+    conx: Connection, group: int = 1, restore_grp: bool = False
+) -> Position_t:
     """Return the position of the TCP relative to the current user frame.
 
     x, y, and z are in millimeters.

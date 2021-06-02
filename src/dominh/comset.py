@@ -18,6 +18,7 @@
 from enum import IntEnum
 import typing as t
 
+from .connection import Connection
 from .helpers import exec_karel_prg
 
 
@@ -44,7 +45,7 @@ class ValueFuncCode(IntEnum):
 
 
 def comset(
-    conx,
+    conx: Connection,
     fc: int,
     idx: int,
     val: t.Optional[t.Union[int, float, str]] = None,
@@ -90,7 +91,7 @@ def comset(
 
 
 def comset_val(
-    conx, fc: ValueFuncCode, idx: int, val: t.Union[int, float, str]
+    conx: Connection, fc: ValueFuncCode, idx: int, val: t.Union[int, float, str]
 ) -> None:
     """Update the value of the element at 'idx'.
 
@@ -108,7 +109,7 @@ def comset_val(
     comset(conx, fc.value, idx, val=val)
 
 
-def comset_cmt(conx, fc: CommentFuncCode, idx: int, comment: str) -> None:
+def comset_cmt(conx: Connection, fc: CommentFuncCode, idx: int, comment: str) -> None:
     """Update the comment of the element at 'idx'.
 
     This method uses the COMSET Karel program on the controller, which is
