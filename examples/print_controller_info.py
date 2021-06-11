@@ -63,20 +63,26 @@ if __name__ == '__main__':
 
     print(f'\nGeneral override        : {c.general_override}%')
 
-    print('\nController status:')
-    print(f'  TP enabled            : {c.tp_enabled}')
-    print(f'  In AUTO               : {c.in_auto_mode}')
-    print(f'  In error              : {c.is_faulted}')
-    print(f'  E-stopped             : {c.is_e_stopped}')
-    print(f'  Remote mode           : {c.in_remote_mode}')
-    print(f'  Program running       : {c.is_program_running}')
-    print(f'  Program paused        : {c.is_program_paused}')
+    try:
+        print('\nController status:')
+        print(f'  TP enabled            : {c.tp_enabled}')
+        print(f'  In AUTO               : {c.in_auto_mode}')
+        print(f'  In error              : {c.is_faulted}')
+        print(f'  E-stopped             : {c.is_e_stopped}')
+        print(f'  Remote mode           : {c.in_remote_mode}')
+        print(f'  Program running       : {c.is_program_running}')
+        print(f'  Program paused        : {c.is_program_paused}')
+    except dominh.exceptions.DominhException as e:
+        print(f"\nCouldn't access some IO: {e}")
 
     numregs = ', '.join([str(c.numreg(i + 1).val) for i in range(5)])
     print(f'\nFirst 5 numregs         : {numregs}')
 
-    sopins = ', '.join([str(c.sopin(i + 1).val) for i in range(5)])
-    print(f'\nFirst 5 SOP inputs      : {sopins}')
+    try:
+        sopins = ', '.join([str(c.sopin(i + 1).val) for i in range(5)])
+        print(f'\nFirst 5 SOP inputs      : {sopins}')
+    except dominh.exceptions.DominhException as e:
+        print(f"\nCouldn't access some IO: {e}")
 
     pld = c.group(1).payload(1)
     pld_frame = f'({pld.payload_x}, {pld.payload_y}, {pld.payload_z})'
