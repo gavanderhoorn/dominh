@@ -26,6 +26,8 @@ The author recommends using PCDK and/or any of the supported fieldbuses in those
 
 **NOTE 2**: on R-30iB+ controllers, option `R912` can do some of the things this library supports.
 
+**NOTE 3**: on controllers with sufficiently recent system software versions, an OPC-UA server is included. Access over OPC-UA would also support some of the things this library supports.
+
 ## TOC
 
 1. [Requirements](#requirements)
