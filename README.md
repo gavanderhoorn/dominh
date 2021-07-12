@@ -336,6 +336,12 @@ As long as new features (or enhancements of existing functionality) pass CI and 
 
 Domin-a (the `h` is silent).
 
+### Why can't I change active payload?
+
+According to Fanuc, changing *just* the system variables which contain information about payload schedules is not sufficient.
+The UI on the TP triggers updates of internal controller settings other than those system variables, and writing to the variables alone does not trigger those internal updates.
+The PCDK does not have that problem as it uses FANUC RPC (on `tcp://:3002`) which has a direct interface to controller internals.
+
 ## Disclaimer
 
 The author of this software is not affiliated with FANUC Corporation in any way.
