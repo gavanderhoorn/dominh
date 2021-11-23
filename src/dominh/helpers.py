@@ -25,6 +25,7 @@ from .constants import HLPR_SCALAR_VAR
 from .exceptions import AuthenticationException
 from .exceptions import DominhException
 from .exceptions import LockedResourceException
+from .exceptions import MissingHelperException
 from .ftp import FtpClient
 
 
@@ -71,6 +72,13 @@ def get_stm(
     url = f'http://{conx.host}/{conx.base_path}/{page}'
     r = requests.get(url, params=params, timeout=conx.request_timeout)
     if r.status_code != requests.codes.ok:
+        # create slightly nicer error for 404s
+        if r.status_code == requests.codes.not_found:
+            raise MissingHelperException(
+                f"Helper '{page}' not found on the controller. Was helper upload"
+                " skipped?"
+            )
+        # any other errors get a generic exception
         raise DominhException(
             f"Controller web server returned an error: {r.status_code}"
         )
@@ -91,7 +99,7 @@ def read_helper(conx: Connection, helper: str, params: t.Dict[str, str] = {}) ->
     :rtype: dict
     """
     if not conx.helpers_uploaded and not conx.skipped_helpers_upload:
-        raise DominhException("Helpers not uploaded")
+        raise MissingHelperException("Helpers not uploaded")
     if '.stm' in helper.lower():
         raise ValueError("Helper name includes extension")
     return get_stm(conx, page=f'{helper}.stm', params=params).json()

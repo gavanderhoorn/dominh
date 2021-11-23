@@ -29,3 +29,7 @@ class AuthenticationException(DominhException):
 
 class UnsupportedVariableTypeException(DominhException):
     pass
+
+
+class MissingHelperException(DominhException):
+    pass
