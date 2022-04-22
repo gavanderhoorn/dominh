@@ -3,7 +3,7 @@ CC=ktrans.exe
 SUPPORT_VER?=V7.70-1
 CFLAGS=/ver $(SUPPORT_VER)
 
-SRCS=dmh_selprg.kl dmh_autom.kl
+SRCS=dmh_selprg.kl dmh_autom.kl dmh_simkey.kl
 
 OBJS=$(SRCS:.kl=.pc)
 
