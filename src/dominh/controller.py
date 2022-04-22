@@ -19,6 +19,7 @@ import datetime
 import re
 import typing as t
 
+from . import klevkeys
 from . import kliosop
 from . import kliouop
 
@@ -356,3 +357,14 @@ def get_clock(conx: Connection) -> datetime.datetime:
     # date & time is on the second line of the output
     stamp = ret.strip().split('\n')[1]
     return datetime.datetime.strptime(stamp, '%d-%b-%y %H:%M')
+
+
+def sim_key(conx: Connection, key_code: klevkeys.KeyCode) -> None:
+    """
+    """
+    # if key_code < 0 or key_code > 32767:
+    #     raise DominhException(f"Invalid key code ({key_code}): out of range")
+    params = {'kc': key_code}
+    ret = exec_karel_prg(conx, prg_name='dmh_simkey', params=params)
+    if not ret[JSON_SUCCESS]:
+        raise DominhException("Sim_Key error: " + ret[JSON_REASON])
