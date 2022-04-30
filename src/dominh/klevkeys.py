@@ -20,19 +20,19 @@ from enum import IntEnum
 
 
 class KeyCode(IntEnum):
-    # Undefined key 
+    # Undefined key
     KY_UNDEF        = 255
 
-    # Shift key 
+    # Shift key
     KY_SHIFT        = 0
 
-    # E-STOP, Enable, Deadman 
+    # E-STOP, Enable, Deadman
     TPI_ESTOP       = 250
-    TPI_ENABLE      = 249 
-    TPI_R_DMAN      = 248 
+    TPI_ENABLE      = 249
+    TPI_R_DMAN      = 248
     TPI_L_DMAN      = 247
 
-    # Arrow keys 
+    # Arrow keys
     KY_UP_ARW       = 212
     KY_DN_ARW       = 213
     KY_RT_ARW       = 208
@@ -48,12 +48,12 @@ class KeyCode(IntEnum):
     OP_UOP_HOME     = 169
 
     # Special shell command keys (to TPMM)
-    M_RECOVER_C     = 164 
+    M_RECOVER_C     = 164
     M_PRODSCRN_C    = 242
     SHELL_FWD_C     = 160
     SHELL_BWD_C     = 161
 
-    # Term_key codes for non-key terminations 
+    # Term_key codes for non-key terminations
     TK_BUFF_FULL    = 255
     TK_NO_WINDOW    = 254
     TK_NO_KB        = 253
@@ -61,8 +61,8 @@ class KeyCode(IntEnum):
     TK_TIMEOUT      = 251
     TK_UI_LOADED    = 226
 
-    # **********************************************   TP only keys 
-    # Hard keys (shifted or unshifted ) 
+    # **********************************************   TP only keys
+    # Hard keys (shifted or unshifted )
     TPI_SELECT   = 143
     TPI_MENUS    = 144
     TPI_EDIT     = 145
@@ -78,7 +78,7 @@ class KeyCode(IntEnum):
     TPI_RESET    = 153
     TPI_GROUP    = 28
 
-    # Shifted misc keys 
+    # Shifted misc keys
     KY_ITEM_S    = 154
     TPI_PCT_UP_S = 155
     TPI_PCT_DN_S = 156
@@ -86,16 +86,16 @@ class KeyCode(IntEnum):
     TPI_HOLD_S   = 158
     TPI_RESET_S  = 159
 
-    # Key codes for non-hardkey menus 
-    TPI_M_SYSTEM = 151 
-    TPI_M_STAT   = 154 
-    TPI_M_ALARM  = 162 
-    TPI_M_VISION = 163 
+    # Key codes for non-hardkey menus
+    TPI_M_SYSTEM = 151
+    TPI_M_STAT   = 154
+    TPI_M_ALARM  = 162
+    TPI_M_VISION = 163
     TPI_M_SWG_EQ = 243
     TPI_M_MAC_MF = 244
-    TPI_M_USER2  = 245 # USER2 menu (used by form and table managers) 
+    TPI_M_USER2  = 245 # USER2 menu (used by form and table managers)
 
-    # Motion related keys 
+    # Motion related keys
     TPI_FWD      = 185
     TPI_BWD      = 186
     TPI_COORD    = 187
@@ -112,28 +112,28 @@ class KeyCode(IntEnum):
     TPI_P_MNS    = 198
     TPI_R_MNS    = 199
 
-    # Shifted motion related keys 
-    TPI_FWD_S    = 200 
+    # Shifted motion related keys
+    TPI_FWD_S    = 200
     TPI_BWD_S    = 201
-    TPI_COORD_S  = 202 
-    TPI_X_PLS_S  = 214  
-    TPI_Y_PLS_S  = 215  
-    TPI_Z_PLS_S  = 216  
-    TPI_W_PLS_S  = 217  
-    TPI_P_PLS_S  = 218  
-    TPI_R_PLS_S  = 219  
-    TPI_X_MNS_S  = 220  
-    TPI_Y_MNS_S  = 221  
-    TPI_Z_MNS_S  = 222  
-    TPI_W_MNS_S  = 223  
-    TPI_P_MNS_S  = 224  
-    TPI_R_MNS_S  = 225  
+    TPI_COORD_S  = 202
+    TPI_X_PLS_S  = 214
+    TPI_Y_PLS_S  = 215
+    TPI_Z_PLS_S  = 216
+    TPI_W_PLS_S  = 217
+    TPI_P_PLS_S  = 218
+    TPI_R_PLS_S  = 219
+    TPI_X_MNS_S  = 220
+    TPI_Y_MNS_S  = 221
+    TPI_Z_MNS_S  = 222
+    TPI_W_MNS_S  = 223
+    TPI_P_MNS_S  = 224
+    TPI_R_MNS_S  = 225
 
     TPI_CHG_EQ_C = 228
 
     # **********************************************   TP & CRT Shared keys
 
-    # Keypad keys (shifted or unshifted) 
+    # Keypad keys (shifted or unshifted)
     KY_ENTER     = 13
     KY_BCKSPACE  =  8
     KY_COMMA     = 44
@@ -173,9 +173,9 @@ class KeyCode(IntEnum):
     KY_REISSUE     = 171
     KY_CANCEL      = 252
     KY_NEW_MENU    = 0
-    KY_WARN_REQ    = 172 
+    KY_WARN_REQ    = 172
 
-    # Shifted arrow keys 
+    # Shifted arrow keys
     KY_UP_ARW_S    = 204
     KY_DN_ARW_S    = 205
     KY_RT_ARW_S    = 206
@@ -223,7 +223,7 @@ class KeyCode(IntEnum):
     KY_F19       = 236
     KY_F20       = 237
 
-    # Editing keys 
+    # Editing keys
     KY_FIND      = 229
     KY_INSERT    = 230
     KY_REMOVE    = 231
@@ -231,13 +231,13 @@ class KeyCode(IntEnum):
     KY_PRV_SCR   = 233
     KY_NXT_SCR   = 234
 
-    # PF keys 
+    # PF keys
     KY_PF1       = 225
     KY_PF2       = 226
     KY_PF3       = 227
     KY_PF4       = 240
 
-    # Numeric keypad keys 
+    # Numeric keypad keys
     KY_NKP_0     = 176
     KY_NKP_1     = 177
     KY_NKP_2     = 178
