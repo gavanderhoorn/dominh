@@ -1,3 +1,5 @@
+# flake8: noqa
+
 # Copyright (c) 2022, G.A. vd. Hoorn
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
