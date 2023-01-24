@@ -285,6 +285,8 @@ In both cases the helpers were already present on the controller and the control
 
 For a similar library, but written in Go, see [onerobotics/go-fanuc](https://github.com/onerobotics/go-fanuc).
 
+For a more low-level wrapper around FANUC's `COMET` JSON-RPC over HTTP, see [gavanderhoorn/comet_rpc](https://github.com/gavanderhoorn/comet_rpc).
+
 ## Bugs, feature requests, etc
 
 Please use the [GitHub issue tracker](https://github.com/gavanderhoorn/dominh/issues).
