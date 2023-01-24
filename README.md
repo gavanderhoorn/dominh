@@ -88,7 +88,8 @@ Example (install dominh `0.4.2`; be sure to update the URL to download the desir
 ```shell
 python3 -m venv $HOME/venv_dominh
 source $HOME/venv_dominh/bin/activate
-pip install -U pip wheel setuptools
+pip install -U pip
+pip install -U wheel setuptools
 pip install https://github.com/gavanderhoorn/dominh/archive/0.4.2.tar.gz
 dominh --version
 ```
